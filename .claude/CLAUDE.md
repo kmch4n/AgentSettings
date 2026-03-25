@@ -1,50 +1,55 @@
-# CLAUDE.md
-思考・解答共に例外を除き、基本的に全て日本語で行ってください。
-しかし、以下の項目に当てはまる際にはその限りではありません。
-・複雑な問題を解決する際
-    → 複雑な問題を解決する場合、英語で思考をした方がより良い結果を得られると考えた場合には、英語で思考をしてもらって大丈夫です。ただし、その場合でも解答は日本語で生成することを忘れないでください。
-・コミットメッセージを作成する際
-    → コミットメッセージを作成するように指示された際には、英語で提案してください。ただし、後述のコミットメッセージのルールを参考にして作成することを忘れないでください。
+# Global CLAUDE.md
 
-コードは常に美しくあるべきです。Tab、Indent共にすべて4であるべきです。フォーマットは適宜行って下さい。
+## 言語ルール
+- 思考・解答は日本語。技術用語は無理に翻訳しない
+- 複雑な問題では英語で思考してよい。ただし解答は必ず日本語で出力する
+- コード、コメント、コミットメッセージは常に英語
 
-# Commit Message Rules
-## Format
-```
-[emoji] English commit message
-```
+## Git ルール
 
-## Emoji Guidelines
-- Follow [gitmoji.dev](https://gitmoji.dev) standards
-- Common emojis used in this project:
-  - ✨ (`:sparkles:`) - New feature
-  - 🐛 (`:bug:`) - Bug fix
-  - 📝 (`:memo:`) - Documentation
-  - 🎨 (`:art:`) - Code style/formatting
-  - ♻️ (`:recycle:`) - Refactoring
-  - 🔧 (`:wrench:`) - Configuration
-  - 🚀 (`:rocket:`) - Performance improvement
-  - 🥅 (`:goal_net:`) - Error handling
-  - ✅ (`:white_check_mark:`) - Tests
+### コミットメッセージ
+- 形式: `[emoji] English message` (gitmoji.dev 準拠)
+- よく使う絵文字: ✨ feature / 🐛 bug / 📝 docs / 🎨 style / ♻️ refactor / ✅ test / 🚀 perf / 🔧 config / 🥅 error / 🎉 begin
+- 1行目は72文字以内、現在形 ("Add feature" not "Added feature")
+- 複数の変更がある場合は本文にbullet pointsで列挙
 
-## Examples from this project
-```
-[✨] Add deadline warning highlight and list features with toggle settings v1.3.0
-[🐛] Fix duplicate course display in deadline list
-[♻️] Remove complex custom name feature, keep pinned courses only
-[📝] Update README with schedule customization features
-```
+### Git 操作ポリシー
+- ユーザーが明示的に依頼するまで、絶対に自動でcommit/pushしないこと
+- コミット前にメッセージを提案し、ユーザーの承認を待つ
+- push も同様に明示的な指示があるまで実行しない
 
-## When to provide commit messages
-- After implementing significant new features
-- After major refactoring or improvements
-- Before version releases
-- When user explicitly requests
+## コードスタイル
 
-## IMPORTANT: Git Operations Policy
-**NEVER automatically stage, commit, or push changes without explicit user request.**
+### 共通
+- インデント: 4 spaces (tabs 禁止)
+- クォート: double quotes 優先
+- ファイルは500-700行以内を目安にモジュール化
+- 型ヒント/型注釈を常に使用
 
-- Only suggest commit messages when appropriate
-- User will manually handle `git add`, `git commit`, and `git push`
-- If user asks for commit message suggestions, provide them but do NOT execute git commands
-- Only execute git commands (commit, push, etc.) when user explicitly requests it
+### Python
+- フォーマッタ: Black + Ruff
+- PEP 8 準拠、Google-style docstrings
+- 型チェック: mypy
+- パッケージ管理: pip + requirements.txt
+
+### TypeScript / JavaScript
+- フォーマッタ: Prettier
+- TypeScript strict mode
+- ブラウザJS: IIFE パターンでスクリプト分離
+- パッケージ管理: pnpm
+
+### 命名規則
+- API クライアントインスタンス: `cl` を使用 (`client` は不可)
+
+## 出力ルール
+- JSON 出力: `indent=4`, `ensure_ascii=False`
+- ファイル全体を再出力せず、最小限の差分で surgical edit を行う
+- コード参照時はファイルパスと行番号を明示
+
+## 開発方針
+- ローカル開発優先。明示的な承認なしに本番デプロイしない
+- 設定は `.env` ファイルで管理 (常に .gitignore に含める)
+
+## Web フロントエンド（該当プロジェクトのみ）
+- アクセシビリティ: ARIA labels, キーボードナビゲーション
+- レスポンシブ: mobile-first

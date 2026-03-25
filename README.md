@@ -2,26 +2,45 @@
 
 A unified configuration repository for managing AI assistant behavior across multiple platforms (Claude, Codex, Gemini).
 
+> **Note:** The `.claude/` directory in this repository is the source of truth for the **global `~/.claude/` configuration**.
+> When setting up a new device, copy `.claude/` to `~/.claude/` to apply these settings globally.
+
 ## Overview
 
-This repository centralizes the rules and instructions for AI coding assistants, ensuring consistent behavior across different AI platforms used in development workflows.
+This repository centralizes the rules and instructions for AI coding assistants, ensuring consistent behavior across different AI platforms and devices.
 
 ## Directory Structure
 
 ```
 Agent_Setting/
-├── .claude/                    # Claude AI configuration
-│   ├── CLAUDE.md               # Main instructions
-│   ├── commands/               # Custom command definitions
+├── .claude/                    # Claude Code global configuration (→ ~/.claude/)
+│   ├── CLAUDE.md               # Main instructions (language, git, code style)
+│   ├── commands/               # Custom slash commands (/command-name)
 │   │   ├── commit_message_suggestion.md
-│   │   └── diff_summary.md
-│   └── rules/                  # Rule definitions
+│   │   ├── diff_summary.md
+│   │   ├── pr-description.md
+│   │   ├── code-review.md
+│   │   ├── changelog.md
+│   │   ├── test-suggest.md
+│   │   ├── todo-list.md
+│   │   ├── explain.md
+│   │   ├── security-check.md
+│   │   └── refactor.md
+│   └── rules/                  # Rule definitions referenced by commands
 │       └── commit_message.md
-├── .codex/                     # Codex configuration
+├── .codex/                     # Codex (OpenAI) configuration
 │   └── AGENTS.md
-├── .gemini/                    # Gemini configuration
+├── .gemini/                    # Gemini CLI configuration
 │   └── GEMINI.md
 └── README.md
+```
+
+## Setup
+
+To apply this configuration globally on a new device:
+
+```bash
+cp -r .claude/ ~/.claude/
 ```
 
 ## Common Rules
@@ -30,10 +49,11 @@ All AI assistants in this repository follow these shared guidelines:
 
 | Rule | Description |
 |------|-------------|
-| **Language** | Responses should be in Japanese by default |
-| **Exceptions** | English thinking allowed for complex problems; commit messages in English |
-| **Code Style** | Tab and indent size: 4 spaces |
-| **Git Policy** | Never execute git operations without explicit user request |
+| **Language** | Responses in Japanese by default |
+| **Thinking** | English thinking allowed for complex problems; answers always in Japanese |
+| **Commit messages** | English, present tense, gitmoji format |
+| **Code style** | 4 spaces indent, double quotes, type hints required |
+| **Git policy** | Never execute git operations without explicit user request |
 
 ## Commit Message Format
 
@@ -43,27 +63,26 @@ All commit messages follow the [Gitmoji](https://gitmoji.dev) standard:
 [emoji] English commit message
 ```
 
-### Common Emojis
+Common emojis: ✨ feature / 🐛 bug / 📝 docs / 🎨 style / ♻️ refactor / ✅ test / 🚀 perf / 🔧 config / 🥅 error / 🎉 begin
 
-| Emoji | Code | Usage |
-|-------|------|-------|
-| ✨ | `:sparkles:` | New feature |
-| 🐛 | `:bug:` | Bug fix |
-| 📝 | `:memo:` | Documentation |
-| 🎨 | `:art:` | Code style/formatting |
-| ♻️ | `:recycle:` | Refactoring |
-| 🔧 | `:wrench:` | Configuration |
-| 🚀 | `:rocket:` | Performance improvement |
-| 🥅 | `:goal_net:` | Error handling |
-| ✅ | `:white_check_mark:` | Tests |
+See `.claude/rules/commit_message.md` for the full emoji reference.
 
-## Custom Commands
+## Custom Commands (Claude Code)
 
-### commit_message_suggestion
-Analyzes code differences and suggests appropriate commit messages following the Gitmoji format.
+Available as slash commands in Claude Code:
 
-### diff_summary
-Provides a concise summary of code changes in the current working directory.
+| Command | Description |
+|---------|-------------|
+| `/commit_message_suggestion` | Suggest a commit message for recent changes |
+| `/diff_summary` | Summarize recent code changes |
+| `/pr-description` | Generate a pull request title and body |
+| `/code-review` | Review changed code for bugs, security issues, and improvements |
+| `/changelog` | Generate a changelog entry from git log |
+| `/test-suggest` | Suggest test cases for changed code |
+| `/todo-list` | List all TODO / FIXME / HACK comments in the codebase |
+| `/explain <target>` | Explain a file, function, or class |
+| `/security-check` | Check changed code for security vulnerabilities (OWASP Top 10) |
+| `/refactor` | Suggest refactoring improvements for changed code |
 
 ## License
 
