@@ -37,11 +37,29 @@ Agent_Setting/
 
 ## Setup
 
-To apply this configuration globally on a new device:
+### 初回セットアップ
 
 ```bash
-cp -r .claude/ ~/.claude/
+git clone <this-repo>
 ```
+
+**macOS / Linux:**
+```bash
+chmod +x sync.sh
+./sync.sh
+```
+
+**Windows (PowerShell):**
+```powershell
+.\sync.ps1
+```
+
+### 以降の更新
+
+同じコマンドを実行するだけで `git pull` + グローバルへの同期が行われます。
+
+> **Note:** `plans/`・`plugins/`・`memory/` など Claude Code が自動管理するディレクトリは上書きしません。
+> このリポジトリで管理している `CLAUDE.md`・`commands/`・`rules/`・`skills/` のみ同期します。
 
 ## Common Rules
 
