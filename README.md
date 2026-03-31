@@ -26,12 +26,24 @@ Agent_Setting/
 │   │   ├── explain.md
 │   │   ├── security-check.md
 │   │   └── refactor.md
-│   └── rules/                  # Rule definitions referenced by commands
-│       └── commit_message.md
+│   ├── rules/                  # Rule definitions referenced by commands
+│   │   └── commit_message.md
+│   └── skills/                 # Custom skills (/skill-name)
+│       ├── ask-why/
+│       ├── debug-assist/
+│       ├── new-project/
+│       ├── project-health/
+│       ├── prompt-review/      # AI対話履歴分析・技術理解度診断
+│       ├── release-prep/
+│       └── standup/
 ├── .codex/                     # Codex (OpenAI) configuration
 │   └── AGENTS.md
 ├── .gemini/                    # Gemini CLI configuration
 │   └── GEMINI.md
+├── setup-plugins.sh            # Plugin & external skill installer (macOS/Linux)
+├── setup-plugins.ps1           # Plugin & external skill installer (Windows)
+├── sync.sh
+├── sync.ps1
 └── README.md
 ```
 
@@ -45,18 +57,21 @@ git clone <this-repo>
 
 **macOS / Linux:**
 ```bash
-chmod +x sync.sh
+chmod +x sync.sh setup-plugins.sh
 ./sync.sh
+./setup-plugins.sh
 ```
 
 **Windows (PowerShell):**
 ```powershell
 .\sync.ps1
+.\setup-plugins.ps1
 ```
 
 ### 以降の更新
 
-同じコマンドを実行するだけで `git pull` + グローバルへの同期が行われます。
+`sync.sh` / `sync.ps1` を実行するだけで `git pull` + グローバルへの同期が行われます。
+プラグインの再インストールが必要な場合は `setup-plugins` を再実行。
 
 > **Note:** `plans/`・`plugins/`・`memory/` など Claude Code が自動管理するディレクトリは上書きしません。
 > このリポジトリで管理している `CLAUDE.md`・`commands/`・`rules/`・`skills/` のみ同期します。
@@ -84,6 +99,41 @@ All commit messages follow the [Gitmoji](https://gitmoji.dev) standard:
 Common emojis: ✨ feature / 🐛 bug / 📝 docs / 🎨 style / ♻️ refactor / ✅ test / 🚀 perf / 🔧 config / 🥅 error / 🎉 begin
 
 See `.claude/rules/commit_message.md` for the full emoji reference.
+
+## Plugins (Claude Code)
+
+`setup-plugins.sh` / `setup-plugins.ps1` で一括インストール。
+
+| Plugin | Source |
+|--------|--------|
+| frontend-design | claude-plugins-official |
+| superpowers | claude-plugins-official |
+| context7 | claude-plugins-official |
+| code-review | claude-plugins-official |
+| code-simplifier | claude-plugins-official |
+| github | claude-plugins-official |
+| feature-dev | claude-plugins-official |
+| playwright | claude-plugins-official |
+| ralph-loop | claude-plugins-official |
+| typescript-lsp | claude-plugins-official |
+
+### External Skills
+
+| Skill | Install |
+|-------|---------|
+| remotion-best-practices | `npx skills add remotion-dev/skills -y` |
+
+## Custom Skills (Claude Code)
+
+| Skill | Description |
+|-------|-------------|
+| `/ask-why` | 設計意図・過去の判断理由を推論して説明 |
+| `/debug-assist` | エラー原因候補と調査手順を体系的に提示 |
+| `/new-project` | リポジトリ構造・技術スタック・注意点を自動調査 |
+| `/project-health` | TODO数・依存関係・コード品質を一括チェック |
+| `/prompt-review` | AI対話履歴を分析し技術理解度を診断 |
+| `/release-prep` | changelog・バージョン・テスト状態を一括確認 |
+| `/standup` | git logから当日の作業サマリーを生成 |
 
 ## Custom Commands (Claude Code)
 
