@@ -1,55 +1,65 @@
-# Global CLAUDE.md
+# Global Agent Guidelines
 
-## 言語ルール
-- 思考・解答は日本語。技術用語は無理に翻訳しない
-- 複雑な問題では英語で思考してよい。ただし解答は必ず日本語で出力する
-- コード、コメント、コミットメッセージは常に英語
+## Language Rules
+- Think and respond in Japanese; do not translate technical terms unnecessarily.
+- You may think in English for complex problems, but every final answer must be emitted in Japanese.
+- Write all code, comments, and commit messages in English.
+- Encode every file you touch in UTF-8.
 
-## Git ルール
+## Git Rules
 
-### コミットメッセージ
-- 形式: `[emoji] English message` (gitmoji.dev 準拠)
-- よく使う絵文字: ✨ feature / 🐛 bug / 📝 docs / 🎨 style / ♻️ refactor / ✅ test / 🚀 perf / 🔧 config / 🥅 error / 🎉 begin
-- 1行目は72文字以内、現在形 ("Add feature" not "Added feature")
-- 複数の変更がある場合は本文にbullet pointsで列挙
+### Commit Messages
+- Follow the full rules in `@rules/commit_message` (gitmoji format, emoji reference, and Git safety requirements).
+- At minimum: `[emoji] English message`, first line ≤72 chars in present tense, bullet the body for multiple logical changes.
 
-### Git 操作ポリシー
-- ユーザーが明示的に依頼するまで、絶対に自動でcommit/pushしないこと
-- コミット前にメッセージを提案し、ユーザーの承認を待つ
-- push も同様に明示的な指示があるまで実行しない
+### Git Operations Policy
+- Never commit or push automatically; wait for explicit user instructions.
+- Propose commit messages before committing and wait for approval.
+- Do not push until the user explicitly requests it.
 
-## コードスタイル
+## Code Style
 
-### 共通
-- インデント: 4 spaces (tabs 禁止)
-- クォート: double quotes 優先
-- ファイルは500-700行以内を目安にモジュール化
-- 型ヒント/型注釈を常に使用
+### General
+- Indent with 4 spaces (tabs are forbidden).
+- Prefer double quotes.
+- Keep individual files roughly within the 500–700 line range by modularizing.
+- Always include type hints or type annotations.
 
 ### Python
-- フォーマッタ: Black + Ruff
-- PEP 8 準拠、Google-style docstrings
-- 型チェック: mypy
-- パッケージ管理: pip + requirements.txt
+- Formatter: Black + Ruff.
+- Follow PEP 8 and use Google-style docstrings.
+- Type checking: mypy.
+- Dependency management: pip + requirements.txt.
 
 ### TypeScript / JavaScript
-- フォーマッタ: Prettier
-- TypeScript strict mode
-- ブラウザJS: IIFE パターンでスクリプト分離
-- パッケージ管理: pnpm
+- Formatter: Prettier.
+- Enable TypeScript strict mode.
+- For browser JS, isolate scripts via the IIFE pattern.
+- Dependency management: pnpm.
 
-### 命名規則
-- API クライアントインスタンス: `cl` を使用 (`client` は不可)
+### Naming Rules
+- Name API client instances `cl`; do not use `client`.
 
-## 出力ルール
-- JSON 出力: `indent=4`, `ensure_ascii=False`
-- ファイル全体を再出力せず、最小限の差分で surgical edit を行う
-- コード参照時はファイルパスと行番号を明示
+## Output Rules
+- JSON output must use `indent=4` and `ensure_ascii=False`.
+- Do not reprint an entire file; apply surgical edits with minimal diffs.
+- When referencing code, cite the file path and line number.
 
-## 開発方針
-- ローカル開発優先。明示的な承認なしに本番デプロイしない
-- 設定は `.env` ファイルで管理 (常に .gitignore に含める)
+## File Operations, Encodings, and Newlines
+- Perform path queries and file manipulations in PowerShell.
+- Use the following encodings and newline styles:
+  - PowerShell console paths/text: UTF-8, LF.
+  - CSV files: UTF-8 with BOM, CRLF.
+  - Markdown, YAML, TOML, and other text files: UTF-8 without BOM, LF.
+  - PowerShell 5.x scripts: UTF-8 with BOM, LF.
+  - PowerShell 7.x scripts: UTF-8 without BOM, LF.
 
-## Web フロントエンド（該当プロジェクトのみ）
-- アクセシビリティ: ARIA labels, キーボードナビゲーション
-- レスポンシブ: mobile-first
+## Development Policy
+- Prioritize local development; never deploy to production without explicit approval.
+- Manage secrets and configuration via `.env`, which must stay in `.gitignore`.
+- Store this guideline file in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, or another tool-specific directory—not at the repository root.
+- Review this file frequently and keep it up to date.
+
+## Web Frontend (when applicable)
+- Accessibility: follow ARIA labeling and ensure keyboard navigation.
+- Responsiveness: design mobile-first.

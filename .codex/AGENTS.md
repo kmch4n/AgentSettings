@@ -1,50 +1,65 @@
-# AGENTS.md
-思考・解答共に例外を除き、基本的に全て日本語で行ってください。
-しかし、以下の項目に当てはまる際にはその限りではありません。
-・複雑な問題を解決する際
-    → 複雑な問題を解決する場合、英語で思考をした方がより良い結果を得られると考えた場合には、英語で思考をしてもらって大丈夫です。ただし、その場合でも解答は日本語で生成することを忘れないでください。
-・コミットメッセージを作成する際
-    → コミットメッセージを作成するように指示された際には、英語で提案してください。ただし、後述のコミットメッセージのルールを参考にして作成することを忘れないでください。
+# Global Agent Guidelines
 
-コードは常に美しくあるべきです。Tab、Indent共にすべて4であるべきです。フォーマットは適宜行って下さい。
+## Language Rules
+- Think and respond in Japanese; do not translate technical terms unnecessarily.
+- You may think in English for complex problems, but every final answer must be emitted in Japanese.
+- Write all code, comments, and commit messages in English.
+- Encode every file you touch in UTF-8.
 
-# Commit Message Rules
-## Format
-```
-[emoji] English commit message
-```
+## Git Rules
 
-## Emoji Guidelines
-- Follow [gitmoji.dev](https://gitmoji.dev) standards
-- Common emojis used in this project:
-  - ✨ (`:sparkles:`) - New feature
-  - 🐛 (`:bug:`) - Bug fix
-  - 📝 (`:memo:`) - Documentation
-  - 🎨 (`:art:`) - Code style/formatting
-  - ♻️ (`:recycle:`) - Refactoring
-  - 🔧 (`:wrench:`) - Configuration
-  - 🚀 (`:rocket:`) - Performance improvement
-  - 🥅 (`:goal_net:`) - Error handling
-  - ✅ (`:white_check_mark:`) - Tests
+### Commit Messages
+- Follow the detailed policy in `.codex/commit_message.md` (gitmoji format, emoji mapping, Git safety).
+- Essentials: `[emoji] English message`, first line ≤72 chars in present tense, list multiple changes as bullet points in the body.
 
-## Examples from this project
-```
-[✨] Add deadline warning highlight and list features with toggle settings v1.3.0
-[🐛] Fix duplicate course display in deadline list
-[♻️] Remove complex custom name feature, keep pinned courses only
-[📝] Update README with schedule customization features
-```
+### Git Operations Policy
+- Never commit or push automatically; wait for explicit user instructions.
+- Propose commit messages before committing and wait for approval.
+- Do not push until the user explicitly requests it.
 
-## When to provide commit messages
-- After implementing significant new features
-- After major refactoring or improvements
-- Before version releases
-- When user explicitly requests
+## Code Style
 
-## IMPORTANT: Git Operations Policy
-**NEVER automatically stage, commit, or push changes without explicit user request.**
+### General
+- Indent with 4 spaces (tabs are forbidden).
+- Prefer double quotes.
+- Keep individual files roughly within the 500–700 line range by modularizing.
+- Always include type hints or type annotations.
 
-- Only suggest commit messages when appropriate
-- User will manually handle `git add`, `git commit`, and `git push`
-- If user asks for commit message suggestions, provide them but do NOT execute git commands
-- Only execute git commands (commit, push, etc.) when user explicitly requests it
+### Python
+- Formatter: Black + Ruff.
+- Follow PEP 8 and use Google-style docstrings.
+- Type checking: mypy.
+- Dependency management: pip + requirements.txt.
+
+### TypeScript / JavaScript
+- Formatter: Prettier.
+- Enable TypeScript strict mode.
+- For browser JS, isolate scripts via the IIFE pattern.
+- Dependency management: pnpm.
+
+### Naming Rules
+- Name API client instances `cl`; do not use `client`.
+
+## Output Rules
+- JSON output must use `indent=4` and `ensure_ascii=False`.
+- Do not reprint an entire file; apply surgical edits with minimal diffs.
+- When referencing code, cite the file path and line number.
+
+## File Operations, Encodings, and Newlines
+- Perform path queries and file manipulations in PowerShell.
+- Use the following encodings and newline styles:
+  - PowerShell console paths/text: UTF-8, LF.
+  - CSV files: UTF-8 with BOM, CRLF.
+  - Markdown, YAML, TOML, and other text files: UTF-8 without BOM, LF.
+  - PowerShell 5.x scripts: UTF-8 with BOM, LF.
+  - PowerShell 7.x scripts: UTF-8 without BOM, LF.
+
+## Development Policy
+- Prioritize local development; never deploy to production without explicit approval.
+- Manage secrets and configuration via `.env`, which must stay in `.gitignore`.
+- Store this guideline file in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, or another tool-specific directory—not at the repository root.
+- Review this file frequently and keep it up to date.
+
+## Web Frontend (when applicable)
+- Accessibility: follow ARIA labeling and ensure keyboard navigation.
+- Responsiveness: design mobile-first.
