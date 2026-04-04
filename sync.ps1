@@ -1,22 +1,65 @@
-# sync.ps1 - Pull latest config and sync to global $env:USERPROFILE\.claude\
+﻿# sync.ps1 - Pull latest config and sync to global tool directories (.claude/.codex/.gemini)
 
 $ErrorActionPreference = "Stop"
 
 $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$Dest = Join-Path $env:USERPROFILE ".claude"
 $ClaudeSrc = Join-Path $RepoDir ".claude"
+$CodexSrc = Join-Path $RepoDir ".codex"
+$GeminiSrc = Join-Path $RepoDir ".gemini"
+$PluginList = @(
+    "frontend-design@claude-plugins-official",
+    "superpowers@claude-plugins-official",
+    "context7@claude-plugins-official",
+    "code-review@claude-plugins-official",
+    "code-simplifier@claude-plugins-official",
+    "github@claude-plugins-official",
+    "feature-dev@claude-plugins-official",
+    "playwright@claude-plugins-official",
+    "ralph-loop@claude-plugins-official",
+    "typescript-lsp@claude-plugins-official"
+)
+
+$ClaudeDest = Join-Path $env:USERPROFILE ".claude"
+$CodexDest = Join-Path $env:USERPROFILE ".codex"
+$GeminiDest = Join-Path $env:USERPROFILE ".gemini"
+
+function Ensure-Directory {
+    param([string]$Path)
+    if (-not (Test-Path $Path)) {
+        New-Item -ItemType Directory -Force -Path $Path | Out-Null
+    }
+}
+
+function Copy-AllItems {
+    param(
+        [string]$Source,
+        [string]$Destination,
+        [string]$Label
+    )
+
+    if (-not (Test-Path $Source)) {
+        Write-Host ("    [skip] {0} source not found" -f $Label)
+        return
+    }
+
+    Ensure-Directory $Destination
+    Get-ChildItem -Force $Source | ForEach-Object {
+        Copy-Item -LiteralPath $_.FullName -Destination $Destination -Recurse -Force
+    }
+    Write-Host ("    [ok] {0}" -f $Label)
+}
 
 Write-Host "==> Pulling latest changes..."
 git -C $RepoDir pull
 
-Write-Host "==> Syncing to $Dest ..."
+Write-Host "==> Syncing Claude Code config to $ClaudeDest ..."
 
 # CLAUDE.md
-Copy-Item (Join-Path $ClaudeSrc "CLAUDE.md") (Join-Path $Dest "CLAUDE.md") -Force
+Copy-Item (Join-Path $ClaudeSrc "CLAUDE.md") (Join-Path $ClaudeDest "CLAUDE.md") -Force
 Write-Host "    [ok] CLAUDE.md"
 
 # commands/
-$CommandsDest = Join-Path $Dest "commands"
+$CommandsDest = Join-Path $ClaudeDest "commands"
 New-Item -ItemType Directory -Force -Path $CommandsDest | Out-Null
 Get-ChildItem (Join-Path $ClaudeSrc "commands") -Filter "*.md" | ForEach-Object {
     Copy-Item $_.FullName $CommandsDest -Force
@@ -24,7 +67,7 @@ Get-ChildItem (Join-Path $ClaudeSrc "commands") -Filter "*.md" | ForEach-Object 
 Write-Host "    [ok] commands/"
 
 # rules/
-$RulesDest = Join-Path $Dest "rules"
+$RulesDest = Join-Path $ClaudeDest "rules"
 New-Item -ItemType Directory -Force -Path $RulesDest | Out-Null
 Get-ChildItem (Join-Path $ClaudeSrc "rules") -Filter "*.md" | ForEach-Object {
     Copy-Item $_.FullName $RulesDest -Force
@@ -32,7 +75,7 @@ Get-ChildItem (Join-Path $ClaudeSrc "rules") -Filter "*.md" | ForEach-Object {
 Write-Host "    [ok] rules/"
 
 # skills/ - only overwrite skills managed by this repo
-$SkillsDest = Join-Path $Dest "skills"
+$SkillsDest = Join-Path $ClaudeDest "skills"
 New-Item -ItemType Directory -Force -Path $SkillsDest | Out-Null
 Get-ChildItem (Join-Path $ClaudeSrc "skills") -Directory | ForEach-Object {
     $skillName = $_.Name
@@ -42,4 +85,33 @@ Get-ChildItem (Join-Path $ClaudeSrc "skills") -Directory | ForEach-Object {
 }
 
 Write-Host ""
-Write-Host "Done. Global $Dest is up to date."
+Write-Host "==> Syncing Codex config to $CodexDest ..."
+Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex"
+
+Write-Host ""
+Write-Host "==> Syncing Gemini config to $GeminiDest ..."
+Copy-AllItems -Source $GeminiSrc -Destination $GeminiDest -Label ".gemini"
+
+Write-Host ""
+Write-Host "==> Installing Claude Code plugins..."
+foreach ($plugin in $PluginList) {
+    Write-Host ("  Installing {0} ..." -f $plugin)
+    $null = claude plugin install $plugin --scope user 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ("    [ok] {0}" -f $plugin)
+    } else {
+        Write-Host ("    [skip] {0} (already installed or unavailable)" -f $plugin)
+    }
+}
+
+Write-Host ""
+Write-Host "==> Installing external skills..."
+$null = npx -y skills add remotion-dev/skills -y 2>&1
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "    [ok] remotion-best-practices"
+} else {
+    Write-Host "    [skip] remotion-best-practices"
+}
+
+Write-Host ""
+Write-Host "Done. Local Claude, Codex, and Gemini configurations are up to date."
