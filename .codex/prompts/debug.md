@@ -13,8 +13,8 @@ Produce a concise, evidence-based GitHub Issue for GitHub.
 The deliverable is the Issue itself, or a duplicate-issue decision with references.
 
 ## Language
-- Write the GitHub Issue in **Japanese**.
-- User-facing explanations and progress updates must be in Japanese.
+- Write the GitHub Issue in English.
+- User-facing explanations and progress updates must be in English.
 
 ## Core policy
 - Create Issues, not fixes.

@@ -42,10 +42,10 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
   - The commit hash.
   - What files were changed and why.
   - A brief technical explanation of the fix.
-  - Write the GitHub Issue in **Japanese**.
+  - Write the GitHub Issue in English.
 
 ## Constraints
 - All git operations must be performed from the **user's account**. Never use a Claude account.
 - Never include Claude's name or attribution anywhere in commits, comments, or PR descriptions.
-- Respond and edit issue in Japanese; write code and commit messages in English.
+- Respond and edit issue in English; write code and commit messages in English.
 - If the issue is ambiguous or requires a design decision, ask the user before proceeding.
