@@ -4,7 +4,7 @@ description: >
   このスキルは、ユーザーが「プロンプトをレビューして」「対話履歴を分析して」「理解度を診断して」
   と依頼したとき、または /prompt-review で呼び出されたときに使用する。
   過去のAIエージェント対話履歴（Claude Code, GitHub Copilot Chat, Cline, Roo Code, Windsurf,
-  Antigravity, OpenCode）を読み取り、技術理解度・プロンプティングパターン・AI依存度を推定してレポートを生成する。
+  OpenAI Codex, OpenCode）を読み取り、技術理解度・プロンプティングパターン・AI依存度を推定してレポートを生成する。
 disable-model-invocation: true
 allowed-tools: Read, Write, Glob, Grep, Bash
 context: fork
@@ -26,7 +26,7 @@ context: fork
 ## ステップ1: データ収集（スクリプト実行）
 
 前処理スクリプト [scripts/collect.py](scripts/collect.py) を実行してデータを収集する。
-このスクリプトは Claude Code, GitHub Copilot Chat, Cline, Roo Code, Windsurf, Antigravity, OpenCode の
+このスクリプトは Claude Code, GitHub Copilot Chat, Cline, Roo Code, Windsurf, OpenAI Codex, OpenCode の
 ログを自動検出し、フィルタ済みのJSON を標準出力に返す。
 
 ### 引数からスクリプトオプションを組み立てる

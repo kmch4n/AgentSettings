@@ -29,7 +29,7 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
 ### 5. Commit
 - Stage only the files you changed.
 - Review the last 10 commit messages for style and consistency.
-- Write the commit message following the gitmoji rules in `~/.claude/rules/commit_message.md`:
+- Write the commit message following the gitmoji rules in `~/.codex/commit_message.md`:
   - Format: `[gitmoji] + space + English message` such as `[🐛] Fix sync path handling`
   - First line ≤ 72 characters, present tense.
   - Bullet the body for multiple logical changes.
@@ -47,7 +47,7 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
   - Write the GitHub Issue in English.
 
 ## Constraints
-- All git operations must be performed from the **user's account**. Never use a Claude account.
+- All git operations must be performed from the **user's account**. Never use a Claude or Codex account.
 - All GitHub Issue write actions must also be performed from the **user's account**. Never use a Claude or Codex account.
 - Never include Claude's name, Codex's name, or AI attribution anywhere in commits, comments, or PR descriptions.
 - Respond to the user in Japanese; write the GitHub Issue, issue comments, and commit messages in English.

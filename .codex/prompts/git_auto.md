@@ -1,6 +1,6 @@
 # Commit and Push Workflow
 
-When this command is invoked, follow the workflow below exactly.
+When this prompt is invoked, follow the workflow below exactly.
 
 ## Objective
 Review the current Git changes, determine whether the work is suitable for a single commit, propose an appropriate commit message, and complete the workflow through push when it is safe and appropriate to do so.
@@ -16,7 +16,7 @@ Review the current Git changes, determine whether the work is suitable for a sin
    - Use them as style and consistency references.
 
 3. Read the commit message rules.
-   - Open and follow `~/.claude/rules/commit_message.md`.
+   - Open and follow `~/.codex/commit_message.md`.
    - If this file does not exist or cannot be read, stop and report that clearly.
 
 4. Validate staging state before proceeding.
@@ -36,15 +36,15 @@ Review the current Git changes, determine whether the work is suitable for a sin
    - If suspicious generated files, unexpected binaries, or unrelated changes are included, stop and ask before proceeding.
 
 7. Propose the commit message.
-    - Create the commit message only after reviewing:
-      - the current diff
-      - the last 10 commit messages
-      - `~/.claude/rules/commit_message.md`
-    - Use `[gitmoji] + space + English message` with a real emoji inside the brackets, for example `[✨] Add issue helper`.
-    - Present the proposed commit message before executing the commit.
+   - Create the commit message only after reviewing:
+     - the current diff
+     - the last 10 commit messages
+     - `~/.codex/commit_message.md`
+   - Use `[gitmoji] + space + English message` with a real emoji inside the brackets, for example `[✨] Add issue helper`.
+   - Present the proposed commit message before executing the commit.
 
-8. Perform Git write operations only through this command.
-   - Only the following write operations are permitted through this command:
+8. Perform Git write operations only through this prompt.
+   - Only the following write operations are permitted through this prompt:
      - `git add`
      - `git commit`
      - `git push`
@@ -55,7 +55,7 @@ Review the current Git changes, determine whether the work is suitable for a sin
 
 ## Author identity restriction
 
-- Never create a commit using a Claude-related account, bot account, service identity, or placeholder identity.
+- Never create a commit using a Claude-related account, Codex-related account, bot account, service identity, or placeholder identity.
 - Before committing, verify the active Git author configuration.
 - If the configured `user.name` or `user.email` appears to belong to Claude, Codex, a bot, or an unintended account, stop and report the issue instead of committing.
 - Never include Claude, Codex, or any AI agent name in the commit message, push output summary, or related GitHub text.

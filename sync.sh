@@ -1,15 +1,13 @@
 ﻿#!/bin/bash
-# sync.sh - Pull latest config and sync to ~/.claude, ~/.codex, ~/.gemini
+# sync.sh - Pull latest config and sync to ~/.claude, ~/.codex
 
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 CLAUDE_DEST="$HOME/.claude"
 CODEX_DEST="$HOME/.codex"
-GEMINI_DEST="$HOME/.gemini"
 CLAUDE_SRC="$REPO_DIR/.claude"
 CODEX_SRC="$REPO_DIR/.codex"
-GEMINI_SRC="$REPO_DIR/.gemini"
 PLUGINS=(
     "frontend-design@claude-plugins-official"
     "superpowers@claude-plugins-official"
@@ -71,10 +69,6 @@ echo "==> Syncing Codex config to $CODEX_DEST ..."
 copy_tree "$CODEX_SRC" "$CODEX_DEST" ".codex"
 
 echo ""
-echo "==> Syncing Gemini config to $GEMINI_DEST ..."
-copy_tree "$GEMINI_SRC" "$GEMINI_DEST" ".gemini"
-
-echo ""
 echo "==> Installing Claude Code plugins..."
 for plugin in "${PLUGINS[@]}"; do
     echo "  Installing $plugin ..."
@@ -86,12 +80,4 @@ for plugin in "${PLUGINS[@]}"; do
 done
 
 echo ""
-echo "==> Installing external skills..."
-if npx -y skills add remotion-dev/skills -y >/dev/null 2>&1; then
-    echo "    [ok] remotion-best-practices"
-else
-    echo "    [skip] remotion-best-practices"
-fi
-
-echo ""
-echo "Done. Local Claude, Codex, and Gemini configurations are up to date."
+echo "Done. Local Claude and Codex configurations are up to date."

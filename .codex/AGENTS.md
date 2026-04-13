@@ -1,20 +1,24 @@
 # Global Agent Guidelines
 
 ## Language Rules
-- Think and respond in Japanese; do not translate technical terms unnecessarily.
-- You may think in English for complex problems, but every final answer must be emitted in Japanese.
-- Write all code, comments, and commit messages in English.
+- Converse with the user in Japanese; do not translate technical terms unnecessarily.
+- You may think in English for complex problems, but every user-facing response and progress update must be in Japanese.
+- Write code, comments, commit messages, GitHub Issues, PR descriptions, release notes, and similar repository artifacts in English unless the project explicitly uses another language.
+- Confirm the existing project convention before editing README or other project-facing documents whose language may vary.
 - Encode every file you touch in UTF-8.
 
 ## Git Rules
 
 ### Commit Messages
-- Follow the detailed policy in `.codex/commit_message.md` (gitmoji format, emoji mapping, Git safety).
-- Essentials: `[emoji] English message`, first line ≤72 chars in present tense, list multiple changes as bullet points in the body.
+- Follow the detailed policy in `~/.codex/commit_message.md` (gitmoji format, emoji mapping, Git safety).
+- Use `[gitmoji] + space + English message`, for example `[✨] Add issue helper`. The `[` and `]` characters are required.
+- Keep the first line ≤72 chars in present tense, and split unrelated work into separate commits whenever practical.
 
 ### Git Operations Policy
-- Never commit or push automatically; wait for explicit user instructions.
-- Propose commit messages before committing and wait for approval.
+- Do not run `git add`, `git commit`, `git push`, or GitHub Issue write actions unless the user explicitly instructs you to do so.
+- When the user asks for a commit, read `~/.codex/commit_message.md` and review the last 10 commit messages before drafting the commit message.
+- Never mention Claude, Codex, or any AI agent in commit messages, Issue text, comments, or PR descriptions.
+- Before commit or Issue write actions, verify the active Git and GitHub identity belongs to the user; if it appears to be Claude, Codex, a bot, or a service account, stop and report it.
 - Do not push until the user explicitly requests it.
 
 ## Code Style

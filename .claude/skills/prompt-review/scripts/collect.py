@@ -500,46 +500,6 @@ def collect_windsurf(cutoff_ms: int | None) -> dict:
     return result
 
 
-def collect_antigravity(cutoff_ms: int | None) -> dict:
-    """Google Antigravity のログを収集"""
-    result = {"tool": "Google Antigravity", "status": "未検出", "messages": [], "period": ""}
-
-    brain_dir = Path.home() / ".gemini" / "antigravity" / "brain"
-    if not brain_dir.exists():
-        return result
-
-    all_entries = []
-    for log_dir in brain_dir.glob("*/.system_generated/logs"):
-        for log_file in sorted(log_dir.rglob("*"), key=lambda p: p.stat().st_mtime, reverse=True)[:10]:
-            if not log_file.is_file() or log_file.suffix == ".pb":
-                continue
-            if cutoff_ms:
-                file_mtime_ms = int(log_file.stat().st_mtime * 1000)
-                if file_mtime_ms < cutoff_ms:
-                    continue
-            try:
-                text = log_file.read_text(encoding="utf-8").strip()
-                if text:
-                    file_mtime_ms = int(log_file.stat().st_mtime * 1000)
-                    all_entries.append({
-                        "text": text[:500],
-                        "timestamp": ts_to_iso(file_mtime_ms),
-                        "timestamp_ms": file_mtime_ms,
-                        "project": log_file.parent.parent.parent.name[:12],
-                    })
-            except (OSError, UnicodeDecodeError):
-                continue
-
-    if all_entries:
-        result["status"] = "検出"
-        result["messages"] = all_entries
-        timestamps = [m["timestamp"] for m in all_entries if m["timestamp"] != "unknown"]
-        if timestamps:
-            result["period"] = f"{min(timestamps)} 〜 {max(timestamps)}"
-
-    return result
-
-
 def collect_codex(cutoff_ms: int | None, project_filter: str | None) -> dict:
     """OpenAI Codex CLI の rollout JSONL からユーザープロンプトを収集"""
     result = {"tool": "OpenAI Codex", "status": "未検出", "messages": [], "period": ""}
@@ -826,7 +786,6 @@ def main():
         collect_cline(cutoff_ms),
         collect_roo_code(cutoff_ms),
         collect_windsurf(cutoff_ms),
-        collect_antigravity(cutoff_ms),
         collect_codex(cutoff_ms, args.project),
         collect_opencode(cutoff_ms, args.project),
     ]

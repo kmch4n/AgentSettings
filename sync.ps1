@@ -1,11 +1,10 @@
-﻿# sync.ps1 - Pull latest config and sync to global tool directories (.claude/.codex/.gemini)
+﻿# sync.ps1 - Pull latest config and sync to global tool directories (.claude/.codex)
 
 $ErrorActionPreference = "Stop"
 
 $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ClaudeSrc = Join-Path $RepoDir ".claude"
 $CodexSrc = Join-Path $RepoDir ".codex"
-$GeminiSrc = Join-Path $RepoDir ".gemini"
 $PluginList = @(
     "frontend-design@claude-plugins-official",
     "superpowers@claude-plugins-official",
@@ -21,7 +20,6 @@ $PluginList = @(
 
 $ClaudeDest = Join-Path $env:USERPROFILE ".claude"
 $CodexDest = Join-Path $env:USERPROFILE ".codex"
-$GeminiDest = Join-Path $env:USERPROFILE ".gemini"
 
 function Ensure-Directory {
     param([string]$Path)
@@ -89,10 +87,6 @@ Write-Host "==> Syncing Codex config to $CodexDest ..."
 Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex"
 
 Write-Host ""
-Write-Host "==> Syncing Gemini config to $GeminiDest ..."
-Copy-AllItems -Source $GeminiSrc -Destination $GeminiDest -Label ".gemini"
-
-Write-Host ""
 Write-Host "==> Installing Claude Code plugins..."
 foreach ($plugin in $PluginList) {
     Write-Host ("  Installing {0} ..." -f $plugin)
@@ -105,13 +99,4 @@ foreach ($plugin in $PluginList) {
 }
 
 Write-Host ""
-Write-Host "==> Installing external skills..."
-$null = npx -y skills add remotion-dev/skills -y 2>&1
-if ($LASTEXITCODE -eq 0) {
-    Write-Host "    [ok] remotion-best-practices"
-} else {
-    Write-Host "    [skip] remotion-best-practices"
-}
-
-Write-Host ""
-Write-Host "Done. Local Claude, Codex, and Gemini configurations are up to date."
+Write-Host "Done. Local Claude and Codex configurations are up to date."

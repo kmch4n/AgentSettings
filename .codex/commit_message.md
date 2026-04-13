@@ -2,19 +2,25 @@
 
 ## Required Format
 ```
-[emoji] English commit message
+[✨] English commit message
 ```
+
+Use a real gitmoji wrapped in `[` and `]`, followed by a space and an English subject line.
+The `[` and `]` characters are mandatory.
 
 ## Core Requirements
 - Keep the first line ≤ 72 characters and write it in present tense (“Add feature”, not “Added feature”).
 - When multiple logical changes exist, enumerate them as bullet points in the body.
 - Choose an emoji prefix from the official gitmoji list before writing the subject.
+- Prefer separate commits for unrelated changes; do not force multiple concerns into one commit when they can be split cleanly.
 
 ## Git Safety Policy
-**Never stage, commit, or push automatically.**
+**Do not stage, commit, or push unless the user explicitly instructs you to do so.**
 
-- Only propose commit messages; the user decides when to run `git add`, `git commit`, or `git push`.
-- Execute git commands (including staging) only when explicitly instructed by the user.
+- When the user asks for a commit, read `~/.codex/commit_message.md` and review the last 10 commit messages before drafting the message.
+- Never include Claude, Codex, or any AI attribution in the commit message.
+- Never include `Co-Authored-By` lines or similar agent attribution.
+- Before running git write operations, verify the active Git identity belongs to the user; if it appears to be Claude, Codex, a bot, or a service account, stop and report it.
 
 ## Complete Gitmoji Catalog (synced 2026-04-04)
 Sourced from [gitmoji.dev](https://gitmoji.dev/) to avoid external lookups inside prompts. Descriptions use the wording published there on April 4, 2026; update this table whenever gitmoji.dev adds or removes entries.

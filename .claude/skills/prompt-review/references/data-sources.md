@@ -174,40 +174,7 @@ Cline と同じ手順。
 
 ---
 
-## 6. Google Antigravity
-
-### 保存場所
-| OS | パス |
-|----|------|
-| Windows | `%USERPROFILE%\.gemini\antigravity\brain\` |
-| macOS | `~/.gemini/antigravity/brain/` + `~/.gemini/antigravity/conversations/` |
-| Linux | `~/.gemini/antigravity/brain/` |
-
-### ファイル構造
-```
-~/.gemini/antigravity/
-├── brain/
-│   └── {conversation-id}/
-│       └── .system_generated/
-│           └── logs/                  # 会話ログ
-└── conversations/
-    └── *.pb                           # Protocol Buffers 形式
-```
-
-### 抽出方法
-1. `~/.gemini/antigravity/brain/` 配下をGlobで探索
-2. `.system_generated/logs/` 内のテキストファイルを読み込み
-3. `.pb` ファイル（Protocol Buffers）はバイナリのため直接読み取り不可 → スキップ
-4. テキスト形式のログファイルのみ対象
-
-### 注意事項
-- Antigravity は比較的新しいツールのため、ログ形式が変更される可能性がある
-- `.gemini/` フォルダが削除されると会話リストは残るが内容は読めなくなる（既知のバグ）
-- Protocol Buffers 形式のファイルはテキストとして読めないためスキップする
-
----
-
-## 7. OpenAI Codex（CLI）
+## 6. OpenAI Codex（CLI）
 
 ### 保存場所
 | OS | パス |
@@ -257,7 +224,7 @@ Cline と同じ手順。
 
 ---
 
-## 8. OpenCode
+## 7. OpenCode
 
 ### 保存場所
 | OS | パス |
@@ -304,7 +271,7 @@ SQLite データベース（`opencode.db` または `opencode-<channel>.db`）
 - Cline/Roo Code: `task_metadata.json` のタイムスタンプで比較
 - GitHub Copilot Chat: セッションデータ内のタイムスタンプで比較
 - OpenAI Codex: `timestamp` フィールド（ISO 8601）で比較
-- Windsurf/Antigravity: ファイルの更新日時で比較（正確なタイムスタンプが取れない場合）
+- Windsurf: ファイルの更新日時で比較（正確なタイムスタンプが取れない場合）
 
 ### 存在チェックの順序
 1. まず各ツールのベースディレクトリが存在するかをGlobまたはlsで確認

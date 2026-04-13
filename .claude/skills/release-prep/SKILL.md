@@ -50,23 +50,25 @@ git log $(git describe --tags --abbrev=0)..HEAD --oneline
 
 ## ステップ4: リリースレポートの生成
 
+ユーザーへの対話は日本語で行うが、リリース向けのレポートと CHANGELOG 用サマリーは英語で出力する。
+
 以下の形式で出力する:
 
 ```
-## リリース準備レポート: v<version>
+## Release Preparation Report: v<version>
 
-### ✅ 確認済み
-- <問題なかった項目>
+### Confirmed
+- <items that look good>
 
-### ⚠️ 要確認
-- <確認が必要な項目と理由>
+### Needs Attention
+- <items that still need confirmation and why>
 
-### 📝 推奨アクション
-1. <アクション1>
-2. <アクション2>
+### Recommended Actions
+1. <action 1>
+2. <action 2>
 
-### 変更サマリー（CHANGELOG 用）
-<git log から生成した変更一覧>
+### Change Summary for CHANGELOG
+<release-facing summary generated from git log>
 ```
 
 ## 注意事項
