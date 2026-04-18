@@ -59,6 +59,9 @@
   - PowerShell 7.x scripts: UTF-8 without BOM, LF.
 
 ## Development Policy
+- Treat discussion, brainstorming, clarification, reviews, and design consultation as read-only by default.
+- Do not edit files, generate patches, run write operations, or start implementation unless the user explicitly asks for execution.
+- If the user's intent is ambiguous, stay in analysis mode, summarize the recommended change, and ask before making any file modification or implementation step.
 - Prioritize local development; never deploy to production without explicit approval.
 - Manage secrets and configuration via `.env`, which must stay in `.gitignore`.
 - Store this guideline file in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, or another tool-specific directory—not at the repository root.
