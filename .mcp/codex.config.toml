@@ -1,0 +1,15 @@
+[mcp_servers.ehs208-timetree-mcp]
+command = "npx"
+args = ["--no-install", "timetree-mcp"]
+
+[mcp_servers.ehs208-timetree-mcp.env]
+TIMETREE_EMAIL = "${TIMETREE_EMAIL}"
+TIMETREE_PASSWORD = "${TIMETREE_PASSWORD}"
+
+[mcp_servers.gmail]
+command = "npx"
+args = ["-y", "@gongrzhe/server-gmail-autoauth-mcp"]
+
+[mcp_servers.github]
+url = "https://api.githubcopilot.com/mcp/"
+bearer_token_env_var = "GITHUB_PERSONAL_ACCESS_TOKEN"
