@@ -6,6 +6,7 @@
 ## 管理対象
 - `.claude/` - Claude Code 用の commands、rules、skills
 - `.codex/` - Codex 用の AGENTS と prompts
+- `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期するスクリプト
 
 ## 共通ルール
@@ -55,6 +56,12 @@
 - `.codex/prompts/debug_assist.md` - Claude の `debug-assist` 相当
 - `.codex/prompts/fix_issue.md` - Claude の `/fix-issue` 相当
 - `.codex/prompts/git_auto.md` - Claude の `/git auto` 相当
+
+## MCP server 同期
+- MCP server 定義は `.mcp/` を source of truth とし、sync 時に `~/.codex/config.toml` と `~/.claude.json` へ反映します。
+- 現在の管理対象は TimeTree、Gmail、GitHub MCP です。
+- 秘密情報はリポジトリに保存しません。TimeTree の認証情報は既存のホーム側設定、環境変数、または repo root の `.env` から解決します。
+- 新しい環境では `.env.example` を参考に `.env` を作成してください。`.env` は Git 管理外です。
 
 ## 補足
 - `prompt-review` は Claude Code、GitHub Copilot Chat、Cline、Roo Code、Windsurf、OpenAI Codex、OpenCode を対象にしています。

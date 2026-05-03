@@ -47,6 +47,28 @@ function Copy-AllItems {
     Write-Host ("    [ok] {0}" -f $Label)
 }
 
+function Remove-LegacyNestedSkillDirectory {
+    param(
+        [string]$SkillDestination,
+        [string]$SkillName
+    )
+
+    $legacyNestedSkillDest = Join-Path $SkillDestination $SkillName
+    if (-not (Test-Path -LiteralPath $legacyNestedSkillDest)) {
+        return
+    }
+
+    $resolvedSkillDest = (Resolve-Path -LiteralPath $SkillDestination).Path.TrimEnd("\")
+    $resolvedNestedSkillDest = (Resolve-Path -LiteralPath $legacyNestedSkillDest).Path.TrimEnd("\")
+    $expectedPrefix = $resolvedSkillDest + "\"
+    if (-not $resolvedNestedSkillDest.StartsWith($expectedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        throw ("Refusing to remove unexpected nested skill path: {0}" -f $resolvedNestedSkillDest)
+    }
+
+    Remove-Item -LiteralPath $legacyNestedSkillDest -Recurse -Force
+    Write-Host ("    [clean] removed stale nested skills/{0}/{0}" -f $SkillName)
+}
+
 Write-Host "==> Pulling latest changes..."
 git -C $RepoDir pull
 
@@ -78,13 +100,22 @@ New-Item -ItemType Directory -Force -Path $SkillsDest | Out-Null
 Get-ChildItem (Join-Path $ClaudeSrc "skills") -Directory | ForEach-Object {
     $skillName = $_.Name
     $skillDest = Join-Path $SkillsDest $skillName
-    Copy-Item $_.FullName $skillDest -Recurse -Force
-    Write-Host "    [ok] skills/$skillName"
+    Ensure-Directory $skillDest
+    Remove-LegacyNestedSkillDirectory -SkillDestination $skillDest -SkillName $skillName
+    Copy-AllItems -Source $_.FullName -Destination $skillDest -Label ("skills/{0}" -f $skillName)
 }
 
 Write-Host ""
 Write-Host "==> Syncing Codex config to $CodexDest ..."
 Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex"
+
+Write-Host ""
+Write-Host "==> Syncing MCP server config ..."
+$McpSyncScript = Join-Path $RepoDir "scripts\sync-mcp-config.mjs"
+& node $McpSyncScript --repo $RepoDir --home $env:USERPROFILE
+if ($LASTEXITCODE -ne 0) {
+    throw "MCP server config sync failed."
+}
 
 Write-Host ""
 Write-Host "==> Installing Claude Code plugins..."

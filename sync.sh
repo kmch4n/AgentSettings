@@ -60,13 +60,34 @@ echo "    [ok] rules/"
 mkdir -p "$CLAUDE_DEST/skills"
 for skill_dir in "$CLAUDE_SRC/skills"/*/; do
     skill_name="$(basename "$skill_dir")"
-    cp -r "$skill_dir" "$CLAUDE_DEST/skills/$skill_name"
+    skill_dest="$CLAUDE_DEST/skills/$skill_name"
+    mkdir -p "$skill_dest"
+    legacy_nested_skill_dest="$skill_dest/$skill_name"
+    if [ -d "$legacy_nested_skill_dest" ]; then
+        skill_dest_real="$(cd "$skill_dest" && pwd -P)"
+        legacy_nested_skill_dest_real="$(cd "$legacy_nested_skill_dest" && pwd -P)"
+        case "$legacy_nested_skill_dest_real" in
+            "$skill_dest_real"/*)
+                rm -rf "$legacy_nested_skill_dest"
+                echo "    [clean] removed stale nested skills/$skill_name/$skill_name"
+                ;;
+            *)
+                echo "    [error] refusing to remove unexpected nested skill path: $legacy_nested_skill_dest_real"
+                exit 1
+                ;;
+        esac
+    fi
+    cp -a "$skill_dir/." "$skill_dest/"
     echo "    [ok] skills/$skill_name"
 done
 
 echo ""
 echo "==> Syncing Codex config to $CODEX_DEST ..."
 copy_tree "$CODEX_SRC" "$CODEX_DEST" ".codex"
+
+echo ""
+echo "==> Syncing MCP server config ..."
+node "$REPO_DIR/scripts/sync-mcp-config.mjs" --repo "$REPO_DIR" --home "$HOME"
 
 echo ""
 echo "==> Installing Claude Code plugins..."
