@@ -62,6 +62,8 @@
 - Treat discussion, brainstorming, clarification, reviews, and design consultation as read-only by default.
 - Do not edit files, generate patches, run write operations, or start implementation unless the user explicitly asks for execution.
 - If the user's intent is ambiguous, stay in analysis mode, summarize the recommended change, and ask before making any file modification or implementation step.
+- If an objective review from someone other than the user would materially reduce risk, ask a sub-agent for a candid review. Do not implement the review feedback immediately; share the review with the user first and ask how to proceed.
+- Do not flatter, appease, or agree with the user by default. Prioritize whether the response or action will genuinely help the user, even when that means challenging the user's assumption or recommendation.
 - Prioritize local development; never deploy to production without explicit approval.
 - Manage secrets and configuration via `.env`, which must stay in `.gitignore`.
 - Store this guideline file in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, or another tool-specific directory—not at the repository root.
