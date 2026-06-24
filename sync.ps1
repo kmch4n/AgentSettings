@@ -5,7 +5,8 @@ $ErrorActionPreference = "Stop"
 $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $ClaudeSrc = Join-Path $RepoDir ".claude"
 $CodexSrc = Join-Path $RepoDir ".codex"
-$PluginList = @(
+$SharedAgentSrc = Join-Path $RepoDir "vendor\slide-md"
+$ClaudePluginList = @(
     "frontend-design@claude-plugins-official",
     "superpowers@claude-plugins-official",
     "context7@claude-plugins-official",
@@ -17,9 +18,24 @@ $PluginList = @(
     "ralph-loop@claude-plugins-official",
     "typescript-lsp@claude-plugins-official"
 )
+$CodexPluginMarketplaces = @(
+    @{
+        Source = "openai/role-specific-plugins"
+        Ref = "main"
+    }
+)
+$CodexPluginList = @(
+    "product-design@role-specific-plugins"
+)
+$SharedSkillList = @(
+    "slide-md-creator",
+    "slide-pattern-creator",
+    "slide-deck-builder"
+)
 
 $ClaudeDest = Join-Path $env:USERPROFILE ".claude"
 $CodexDest = Join-Path $env:USERPROFILE ".codex"
+$SharedAgentDest = Join-Path $env:USERPROFILE ".agents\slide-md"
 
 function Ensure-Directory {
     param([string]$Path)
@@ -110,6 +126,22 @@ Write-Host "==> Syncing Codex config to $CodexDest ..."
 Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex"
 
 Write-Host ""
+Write-Host "==> Syncing shared slide skills to Codex..."
+$CodexSkillsDest = Join-Path $CodexDest "skills"
+Ensure-Directory $CodexSkillsDest
+foreach ($skillName in $SharedSkillList) {
+    $skillSource = Join-Path $ClaudeSrc ("skills\{0}" -f $skillName)
+    $skillDest = Join-Path $CodexSkillsDest $skillName
+    Ensure-Directory $skillDest
+    Remove-LegacyNestedSkillDirectory -SkillDestination $skillDest -SkillName $skillName
+    Copy-AllItems -Source $skillSource -Destination $skillDest -Label ("Codex skills/{0}" -f $skillName)
+}
+
+Write-Host ""
+Write-Host "==> Syncing shared SLIDE.md templates..."
+Copy-AllItems -Source $SharedAgentSrc -Destination $SharedAgentDest -Label ".agents/slide-md"
+
+Write-Host ""
 Write-Host "==> Syncing MCP server config ..."
 $McpSyncScript = Join-Path $RepoDir "scripts\sync-mcp-config.mjs"
 & node $McpSyncScript --repo $RepoDir --home $env:USERPROFILE
@@ -119,9 +151,30 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host ""
 Write-Host "==> Installing Claude Code plugins..."
-foreach ($plugin in $PluginList) {
+foreach ($plugin in $ClaudePluginList) {
     Write-Host ("  Installing {0} ..." -f $plugin)
     $null = claude plugin install $plugin --scope user 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ("    [ok] {0}" -f $plugin)
+    } else {
+        Write-Host ("    [skip] {0} (already installed or unavailable)" -f $plugin)
+    }
+}
+
+Write-Host ""
+Write-Host "==> Installing Codex plugins..."
+foreach ($marketplace in $CodexPluginMarketplaces) {
+    Write-Host ("  Adding marketplace {0} ..." -f $marketplace.Source)
+    $null = codex plugin marketplace add $marketplace.Source --ref $marketplace.Ref 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host ("    [ok] {0}" -f $marketplace.Source)
+    } else {
+        Write-Host ("    [skip] {0} (already added or unavailable)" -f $marketplace.Source)
+    }
+}
+foreach ($plugin in $CodexPluginList) {
+    Write-Host ("  Installing {0} ..." -f $plugin)
+    $null = codex plugin add $plugin 2>&1
     if ($LASTEXITCODE -eq 0) {
         Write-Host ("    [ok] {0}" -f $plugin)
     } else {

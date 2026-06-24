@@ -7,7 +7,8 @@
 - `.claude/` - Claude Code 用の commands、rules、skills
 - `.codex/` - Codex 用の AGENTS と prompts
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
-- `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期するスクリプト
+- `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
+- `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期し、管理対象 plugin を導入するスクリプト
 
 ## 共通ルール
 - ユーザーとの対話は日本語
@@ -48,7 +49,24 @@
 - `project-health` - TODO、巨大ファイル、依存関係などの健全性確認
 - `prompt-review` - 各種 AI ツールの対話履歴を分析してレポート化
 - `release-prep` - リリース前チェックと release 向けサマリー生成
+- `slide-md-creator` - スライドやWebサイトからSLIDE.mdデザインシステムを生成
+- `slide-pattern-creator` - スライドから再利用可能なレイアウトパターンを生成
+- `slide-deck-builder` - プレゼン内容からAI向けのSLIDE-DECK.mdを生成
 - `standup` - 当日や指定期間の作業サマリー生成
+
+### SLIDE.md の共有
+- 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexの `~/.codex/skills/` の両方へ同期します。
+- サンプルデザインとパターンは `~/.agents/slide-md/` に共有し、各プロジェクトへ自動ではコピーしません。
+- PowerShellでプロジェクトを初期化する場合:
+
+      & "$HOME\.agents\slide-md\init-slide-md.ps1" -TargetPath (Get-Location)
+
+- Bashでプロジェクトを初期化する場合:
+
+      "$HOME/.agents/slide-md/init-slide-md.sh" "$PWD"
+
+- 既存の `SLIDE-md/` または `SLIDE-PATTERN/` がある場合は停止します。明示的に更新する場合だけ `-Overwrite` または `--overwrite` を指定してください。
+- 取り込み元は [sho-ai-magic/slide.md](https://github.com/sho-ai-magic/slide.md) で、MIT Licenseに従います。取り込んだcommitは `vendor/slide-md/UPSTREAM_COMMIT` に記録します。
 
 ## Codex 側の対応 prompt
 - `.codex/prompts/commit_message_suggestion.md` - Claude の `/commit_message_suggestion` 相当
@@ -56,6 +74,11 @@
 - `.codex/prompts/debug_assist.md` - Claude の `debug-assist` 相当
 - `.codex/prompts/fix_issue.md` - Claude の `/fix-issue` 相当
 - `.codex/prompts/git_auto.md` - Claude の `/git auto` 相当
+
+## Codex plugins
+- `product-design@role-specific-plugins` - OpenAI の Product Design plugin。アイデア探索、UX audit、URL / screenshot からの prototype 作成に使う。
+- `role-specific-plugins` marketplace は `openai/role-specific-plugins` の `main` を参照します。
+- Product Design は Sites connector を使う場合があります。workspace 側で Sites が使えない場合でも、ローカル prototype や audit 用の skill として利用できます。
 
 ## MCP server 同期
 - MCP server 定義は `.mcp/` を source of truth とし、sync 時に `~/.codex/config.toml` と `~/.claude.json` へ反映します。
