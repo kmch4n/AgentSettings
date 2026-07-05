@@ -4,12 +4,17 @@
 set -e
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+if [ "${1:-}" = "--check" ]; then
+    node "$REPO_DIR/scripts/check-agent-settings.mjs" \
+        --repo "$REPO_DIR" \
+        --home "$HOME"
+    exit $?
+fi
 CLAUDE_DEST="$HOME/.claude"
 CODEX_DEST="$HOME/.codex"
 CLAUDE_SRC="$REPO_DIR/.claude"
 CODEX_SRC="$REPO_DIR/.codex"
-SHARED_AGENT_SRC="$REPO_DIR/vendor/slide-md"
-SHARED_AGENT_DEST="$HOME/.agents/slide-md"
 CLAUDE_PLUGINS=(
     "frontend-design@claude-plugins-official"
     "superpowers@claude-plugins-official"
@@ -23,16 +28,28 @@ CLAUDE_PLUGINS=(
     "typescript-lsp@claude-plugins-official"
 )
 CODEX_PLUGIN_MARKETPLACES=(
-    "openai/role-specific-plugins|main"
+    "https://github.com/anthropics/claude-plugins-official.git|"
+    "https://github.com/openai/role-specific-plugins.git|main"
 )
 CODEX_PLUGINS=(
+    "code-review@claude-plugins-official"
+    "code-simplifier@claude-plugins-official"
+    "context7@claude-plugins-official"
+    "feature-dev@claude-plugins-official"
+    "frontend-design@claude-plugins-official"
+    "playwright@claude-plugins-official"
+    "ralph-loop@claude-plugins-official"
+    "superpowers@claude-plugins-official"
+    "gmail@openai-curated"
+    "canva@openai-curated"
+    "github@openai-curated"
+    "expo@openai-curated"
     "product-design@role-specific-plugins"
 )
-SHARED_SKILLS=(
-    "slide-md-creator"
-    "slide-pattern-creator"
-    "slide-deck-builder"
+CODEX_PLUGIN_REMOVE_LIST=(
+    "github@claude-plugins-official"
 )
+SHARED_SKILL_SYNC_SCRIPT="$REPO_DIR/scripts/sync-shared-skills.mjs"
 
 copy_tree() {
     local src="$1"
@@ -69,64 +86,13 @@ mkdir -p "$CLAUDE_DEST/rules"
 cp "$CLAUDE_SRC/rules/"*.md "$CLAUDE_DEST/rules/"
 echo "    [ok] rules/"
 
-# skills/ - only overwrite skills managed by this repo
-mkdir -p "$CLAUDE_DEST/skills"
-for skill_dir in "$CLAUDE_SRC/skills"/*/; do
-    skill_name="$(basename "$skill_dir")"
-    skill_dest="$CLAUDE_DEST/skills/$skill_name"
-    mkdir -p "$skill_dest"
-    legacy_nested_skill_dest="$skill_dest/$skill_name"
-    if [ -d "$legacy_nested_skill_dest" ]; then
-        skill_dest_real="$(cd "$skill_dest" && pwd -P)"
-        legacy_nested_skill_dest_real="$(cd "$legacy_nested_skill_dest" && pwd -P)"
-        case "$legacy_nested_skill_dest_real" in
-            "$skill_dest_real"/*)
-                rm -rf "$legacy_nested_skill_dest"
-                echo "    [clean] removed stale nested skills/$skill_name/$skill_name"
-                ;;
-            *)
-                echo "    [error] refusing to remove unexpected nested skill path: $legacy_nested_skill_dest_real"
-                exit 1
-                ;;
-        esac
-    fi
-    cp -a "$skill_dir/." "$skill_dest/"
-    echo "    [ok] skills/$skill_name"
-done
-
 echo ""
 echo "==> Syncing Codex config to $CODEX_DEST ..."
 copy_tree "$CODEX_SRC" "$CODEX_DEST" ".codex"
 
 echo ""
-echo "==> Syncing shared slide skills to Codex..."
-mkdir -p "$CODEX_DEST/skills"
-for skill_name in "${SHARED_SKILLS[@]}"; do
-    skill_source="$CLAUDE_SRC/skills/$skill_name"
-    skill_dest="$CODEX_DEST/skills/$skill_name"
-    mkdir -p "$skill_dest"
-    legacy_nested_skill_dest="$skill_dest/$skill_name"
-    if [ -d "$legacy_nested_skill_dest" ]; then
-        skill_dest_real="$(cd "$skill_dest" && pwd -P)"
-        legacy_nested_skill_dest_real="$(cd "$legacy_nested_skill_dest" && pwd -P)"
-        case "$legacy_nested_skill_dest_real" in
-            "$skill_dest_real"/*)
-                rm -rf "$legacy_nested_skill_dest"
-                echo "    [clean] removed stale Codex skills/$skill_name/$skill_name"
-                ;;
-            *)
-                echo "    [error] refusing to remove unexpected nested Codex skill path: $legacy_nested_skill_dest_real"
-                exit 1
-                ;;
-        esac
-    fi
-    cp -a "$skill_source/." "$skill_dest/"
-    echo "    [ok] Codex skills/$skill_name"
-done
-
-echo ""
-echo "==> Syncing shared SLIDE.md templates..."
-copy_tree "$SHARED_AGENT_SRC" "$SHARED_AGENT_DEST" ".agents/slide-md"
+echo "==> Syncing shared skills..."
+node "$SHARED_SKILL_SYNC_SCRIPT" --repo "$REPO_DIR" --home "$HOME"
 
 echo ""
 echo "==> Syncing MCP server config ..."
@@ -139,7 +105,8 @@ for plugin in "${CLAUDE_PLUGINS[@]}"; do
     if claude plugin install "$plugin" --scope user >/dev/null 2>&1; then
         echo "    [ok] $plugin"
     else
-        echo "    [skip] $plugin (already installed or unavailable)"
+        echo "    [error] failed to install $plugin" >&2
+        exit 1
     fi
 done
 
@@ -149,10 +116,17 @@ for marketplace in "${CODEX_PLUGIN_MARKETPLACES[@]}"; do
     marketplace_source="${marketplace%%|*}"
     marketplace_ref="${marketplace#*|}"
     echo "  Adding marketplace $marketplace_source ..."
-    if codex plugin marketplace add "$marketplace_source" --ref "$marketplace_ref" >/dev/null 2>&1; then
+    if [ -n "$marketplace_ref" ]; then
+        codex plugin marketplace add "$marketplace_source" \
+            --ref "$marketplace_ref" >/dev/null 2>&1
+    else
+        codex plugin marketplace add "$marketplace_source" >/dev/null 2>&1
+    fi
+    if [ "$?" -eq 0 ]; then
         echo "    [ok] $marketplace_source"
     else
-        echo "    [skip] $marketplace_source (already added or unavailable)"
+        echo "    [error] failed to add marketplace $marketplace_source" >&2
+        exit 1
     fi
 done
 for plugin in "${CODEX_PLUGINS[@]}"; do
@@ -160,7 +134,21 @@ for plugin in "${CODEX_PLUGINS[@]}"; do
     if codex plugin add "$plugin" >/dev/null 2>&1; then
         echo "    [ok] $plugin"
     else
-        echo "    [skip] $plugin (already installed or unavailable)"
+        echo "    [error] failed to install $plugin" >&2
+        exit 1
+    fi
+done
+
+CODEX_CONFIG_PATH="$CODEX_DEST/config.toml"
+for plugin in "${CODEX_PLUGIN_REMOVE_LIST[@]}"; do
+    if [ -f "$CODEX_CONFIG_PATH" ] && grep -Fq "[plugins.\"$plugin\"]" "$CODEX_CONFIG_PATH"; then
+        echo "  Removing conflicting $plugin ..."
+        if codex plugin remove "$plugin" >/dev/null 2>&1; then
+            echo "    [ok] removed $plugin"
+        else
+            echo "    [error] failed to remove $plugin" >&2
+            exit 1
+        fi
     fi
 done
 

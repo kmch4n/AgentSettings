@@ -1,11 +1,19 @@
-﻿# sync.ps1 - Pull latest config and sync to global tool directories (.claude/.codex)
+# sync.ps1 - Pull latest config and sync to global tool directories (.claude/.codex)
+
+[CmdletBinding()]
+param([switch]$Check)
 
 $ErrorActionPreference = "Stop"
 
 $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$AuditScript = Join-Path $RepoDir "scripts\check-agent-settings.mjs"
+
+if ($Check) {
+    & node $AuditScript --repo $RepoDir --home $env:USERPROFILE
+    exit $LASTEXITCODE
+}
 $ClaudeSrc = Join-Path $RepoDir ".claude"
 $CodexSrc = Join-Path $RepoDir ".codex"
-$SharedAgentSrc = Join-Path $RepoDir "vendor\slide-md"
 $ClaudePluginList = @(
     "frontend-design@claude-plugins-official",
     "superpowers@claude-plugins-official",
@@ -20,22 +28,35 @@ $ClaudePluginList = @(
 )
 $CodexPluginMarketplaces = @(
     @{
-        Source = "openai/role-specific-plugins"
+        Source = "https://github.com/anthropics/claude-plugins-official.git"
+    },
+    @{
+        Source = "https://github.com/openai/role-specific-plugins.git"
         Ref = "main"
     }
 )
 $CodexPluginList = @(
+    "code-review@claude-plugins-official",
+    "code-simplifier@claude-plugins-official",
+    "context7@claude-plugins-official",
+    "feature-dev@claude-plugins-official",
+    "frontend-design@claude-plugins-official",
+    "playwright@claude-plugins-official",
+    "ralph-loop@claude-plugins-official",
+    "superpowers@claude-plugins-official",
+    "gmail@openai-curated",
+    "canva@openai-curated",
+    "github@openai-curated",
+    "expo@openai-curated",
     "product-design@role-specific-plugins"
 )
-$SharedSkillList = @(
-    "slide-md-creator",
-    "slide-pattern-creator",
-    "slide-deck-builder"
+$CodexPluginRemoveList = @(
+    "github@claude-plugins-official"
 )
 
 $ClaudeDest = Join-Path $env:USERPROFILE ".claude"
 $CodexDest = Join-Path $env:USERPROFILE ".codex"
-$SharedAgentDest = Join-Path $env:USERPROFILE ".agents\slide-md"
+$SharedSkillSyncScript = Join-Path $RepoDir "scripts\sync-shared-skills.mjs"
 
 function Ensure-Directory {
     param([string]$Path)
@@ -63,30 +84,11 @@ function Copy-AllItems {
     Write-Host ("    [ok] {0}" -f $Label)
 }
 
-function Remove-LegacyNestedSkillDirectory {
-    param(
-        [string]$SkillDestination,
-        [string]$SkillName
-    )
-
-    $legacyNestedSkillDest = Join-Path $SkillDestination $SkillName
-    if (-not (Test-Path -LiteralPath $legacyNestedSkillDest)) {
-        return
-    }
-
-    $resolvedSkillDest = (Resolve-Path -LiteralPath $SkillDestination).Path.TrimEnd("\")
-    $resolvedNestedSkillDest = (Resolve-Path -LiteralPath $legacyNestedSkillDest).Path.TrimEnd("\")
-    $expectedPrefix = $resolvedSkillDest + "\"
-    if (-not $resolvedNestedSkillDest.StartsWith($expectedPrefix, [StringComparison]::OrdinalIgnoreCase)) {
-        throw ("Refusing to remove unexpected nested skill path: {0}" -f $resolvedNestedSkillDest)
-    }
-
-    Remove-Item -LiteralPath $legacyNestedSkillDest -Recurse -Force
-    Write-Host ("    [clean] removed stale nested skills/{0}/{0}" -f $SkillName)
-}
-
 Write-Host "==> Pulling latest changes..."
 git -C $RepoDir pull
+if ($LASTEXITCODE -ne 0) {
+    throw "Git pull failed."
+}
 
 Write-Host "==> Syncing Claude Code config to $ClaudeDest ..."
 
@@ -110,36 +112,16 @@ Get-ChildItem (Join-Path $ClaudeSrc "rules") -Filter "*.md" | ForEach-Object {
 }
 Write-Host "    [ok] rules/"
 
-# skills/ - only overwrite skills managed by this repo
-$SkillsDest = Join-Path $ClaudeDest "skills"
-New-Item -ItemType Directory -Force -Path $SkillsDest | Out-Null
-Get-ChildItem (Join-Path $ClaudeSrc "skills") -Directory | ForEach-Object {
-    $skillName = $_.Name
-    $skillDest = Join-Path $SkillsDest $skillName
-    Ensure-Directory $skillDest
-    Remove-LegacyNestedSkillDirectory -SkillDestination $skillDest -SkillName $skillName
-    Copy-AllItems -Source $_.FullName -Destination $skillDest -Label ("skills/{0}" -f $skillName)
-}
-
 Write-Host ""
 Write-Host "==> Syncing Codex config to $CodexDest ..."
 Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex"
 
 Write-Host ""
-Write-Host "==> Syncing shared slide skills to Codex..."
-$CodexSkillsDest = Join-Path $CodexDest "skills"
-Ensure-Directory $CodexSkillsDest
-foreach ($skillName in $SharedSkillList) {
-    $skillSource = Join-Path $ClaudeSrc ("skills\{0}" -f $skillName)
-    $skillDest = Join-Path $CodexSkillsDest $skillName
-    Ensure-Directory $skillDest
-    Remove-LegacyNestedSkillDirectory -SkillDestination $skillDest -SkillName $skillName
-    Copy-AllItems -Source $skillSource -Destination $skillDest -Label ("Codex skills/{0}" -f $skillName)
+Write-Host "==> Syncing shared skills..."
+& node $SharedSkillSyncScript --repo $RepoDir --home $env:USERPROFILE
+if ($LASTEXITCODE -ne 0) {
+    throw "Shared skill sync failed."
 }
-
-Write-Host ""
-Write-Host "==> Syncing shared SLIDE.md templates..."
-Copy-AllItems -Source $SharedAgentSrc -Destination $SharedAgentDest -Label ".agents/slide-md"
 
 Write-Host ""
 Write-Host "==> Syncing MCP server config ..."
@@ -154,31 +136,47 @@ Write-Host "==> Installing Claude Code plugins..."
 foreach ($plugin in $ClaudePluginList) {
     Write-Host ("  Installing {0} ..." -f $plugin)
     $null = claude plugin install $plugin --scope user 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host ("    [ok] {0}" -f $plugin)
-    } else {
-        Write-Host ("    [skip] {0} (already installed or unavailable)" -f $plugin)
+    if ($LASTEXITCODE -ne 0) {
+        throw ("Claude plugin installation failed: {0}" -f $plugin)
     }
+    Write-Host ("    [ok] {0}" -f $plugin)
 }
 
 Write-Host ""
 Write-Host "==> Installing Codex plugins..."
 foreach ($marketplace in $CodexPluginMarketplaces) {
     Write-Host ("  Adding marketplace {0} ..." -f $marketplace.Source)
-    $null = codex plugin marketplace add $marketplace.Source --ref $marketplace.Ref 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host ("    [ok] {0}" -f $marketplace.Source)
+    if ($marketplace.Ref) {
+        $null = codex plugin marketplace add $marketplace.Source --ref $marketplace.Ref 2>&1
     } else {
-        Write-Host ("    [skip] {0} (already added or unavailable)" -f $marketplace.Source)
+        $null = codex plugin marketplace add $marketplace.Source 2>&1
     }
+    if ($LASTEXITCODE -ne 0) {
+        throw ("Codex plugin marketplace setup failed: {0}" -f $marketplace.Source)
+    }
+    Write-Host ("    [ok] {0}" -f $marketplace.Source)
 }
 foreach ($plugin in $CodexPluginList) {
     Write-Host ("  Installing {0} ..." -f $plugin)
     $null = codex plugin add $plugin 2>&1
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host ("    [ok] {0}" -f $plugin)
-    } else {
-        Write-Host ("    [skip] {0} (already installed or unavailable)" -f $plugin)
+    if ($LASTEXITCODE -ne 0) {
+        throw ("Codex plugin installation failed: {0}" -f $plugin)
+    }
+    Write-Host ("    [ok] {0}" -f $plugin)
+}
+
+$CodexConfigPath = Join-Path $CodexDest "config.toml"
+foreach ($plugin in $CodexPluginRemoveList) {
+    $pluginHeader = '[plugins."{0}"]' -f $plugin
+    $isInstalled = (Test-Path -LiteralPath $CodexConfigPath) -and
+        (Select-String -LiteralPath $CodexConfigPath -SimpleMatch $pluginHeader -Quiet)
+    if ($isInstalled) {
+        Write-Host ("  Removing conflicting {0} ..." -f $plugin)
+        $null = codex plugin remove $plugin 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            throw ("Codex plugin removal failed: {0}" -f $plugin)
+        }
+        Write-Host ("    [ok] removed {0}" -f $plugin)
     }
 }
 
