@@ -4,11 +4,27 @@
 ルール、補助プロンプト、Claude 用の slash command / skill をここで管理し、ローカル環境へ同期する前提です。
 
 ## 管理対象
-- `.claude/` - Claude Code 用の commands、rules、skills
+- `.claude/` - Claude Code 用の commands、rules、および共有 skills の source of truth
 - `.codex/` - Codex 用の AGENTS と prompts
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
 - `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期し、管理対象 plugin を導入するスクリプト
+
+## 同期範囲と所有者
+
+| 対象 | 所有者 | 同期方針 |
+| --- | --- | --- |
+| `.claude/skills/` 内の skill | このリポジトリ | `~/.claude/skills/` と `~/.agents/skills/` の同名ディレクトリを完全に置換 |
+| `~/.agents/skills/` 内の外部 skill | 各 skill の導入元 | リポジトリに同名 skill がなければ保持 |
+| Codex の管理対象 plugin | このリポジトリ | sync 時に導入し、欠落や無効化を drift として扱う |
+| Browser、Chrome、Computer Use などの Codex bundled plugin | Codex runtime | sync では変更しない |
+| Claude の cloud connector | Claude の account / runtime | sync では変更しない |
+
+- Codex は共有 skill を `~/.agents/skills/` から利用します。旧配置の `~/.codex/skills/` にある管理済み skill は削除します。
+- `frontend-design` は Codex plugin 版を正とし、standalone skill との重複を避けます。
+- GitHub plugin は Codex では `github@openai-curated`、Claude Code では `github@claude-plugins-official` を使用します。
+- 同期はリポジトリから各 runtime への一方向です。Windows 側で任意に変更された設定をリポジトリへ逆輸入しません。
+- `.\sync.ps1 -Check` または `./sync.sh --check` で、ファイル変更、`git pull`、plugin 導入を行わずに drift を確認できます。
 
 ## 共通ルール
 - ユーザーとの対話は日本語
@@ -55,7 +71,7 @@
 - `standup` - 当日や指定期間の作業サマリー生成
 
 ### SLIDE.md の共有
-- 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexの `~/.codex/skills/` の両方へ同期します。
+- 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexが参照する `~/.agents/skills/` の両方へ同期します。
 - サンプルデザインとパターンは `~/.agents/slide-md/` に共有し、各プロジェクトへ自動ではコピーしません。
 - PowerShellでプロジェクトを初期化する場合:
 
@@ -76,6 +92,8 @@
 - `.codex/prompts/git_auto.md` - Claude の `/git auto` 相当
 
 ## Codex plugins
+- `frontend-design@claude-plugins-official` - Codex の frontend design skill の正規導入元
+- `github@openai-curated` - Codex の GitHub 連携の正規導入元
 - `product-design@role-specific-plugins` - OpenAI の Product Design plugin。アイデア探索、UX audit、URL / screenshot からの prototype 作成に使う。
 - `role-specific-plugins` marketplace は `openai/role-specific-plugins` の `main` を参照します。
 - Product Design は Sites connector を使う場合があります。workspace 側で Sites が使えない場合でも、ローカル prototype や audit 用の skill として利用できます。
@@ -88,4 +106,4 @@
 
 ## 補足
 - `prompt-review` は Claude Code、GitHub Copilot Chat、Cline、Roo Code、Windsurf、OpenAI Codex、OpenCode を対象にしています。
-- sync 後は `~/.claude` と `~/.codex` の内容を確認してください。
+- sync 後は `.\sync.ps1 -Check` または `./sync.sh --check` で管理対象の一致を確認してください。
