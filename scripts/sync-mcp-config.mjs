@@ -240,16 +240,23 @@ function resolveTemplate(text, values, escapeValue) {
 }
 
 /**
+ * Remove marker comments without deleting tables that another runtime may have
+ * inserted between them.
+ *
  * @param {string} text
  * @returns {string}
  */
-function removeExistingManagedBlock(text) {
-    const pattern = new RegExp(
-        `\\n?${MANAGED_BLOCK_BEGIN.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}[\\s\\S]*?${MANAGED_BLOCK_END.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\n?`,
-        "g",
-    );
+export function removeManagedBlockMarkers(text) {
+    return text
+        .split(/\r?\n/)
+        .filter((line) => {
+            const trimmed = line.trim();
 
-    return text.replace(pattern, "\n").replace(/\n{3,}/g, "\n\n").trimEnd();
+            return trimmed !== MANAGED_BLOCK_BEGIN && trimmed !== MANAGED_BLOCK_END;
+        })
+        .join("\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trimEnd();
 }
 
 /**
@@ -326,8 +333,8 @@ export async function syncCodexMcpServers(options) {
         getCodexExistingEnvValues(currentConfig),
     ]);
     const resolvedTemplate = resolveTemplate(template, values, escapeTomlBasicString);
-    const withoutBlock = removeExistingManagedBlock(currentConfig);
-    const withoutManagedTables = removeCodexServerTables(withoutBlock, serverNames);
+    const withoutMarkers = removeManagedBlockMarkers(currentConfig);
+    const withoutManagedTables = removeCodexServerTables(withoutMarkers, serverNames);
     const withFeature = ensureCodexRmcpClientEnabled(withoutManagedTables);
     const nextConfig = ensureTrailingNewline(
         [

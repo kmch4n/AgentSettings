@@ -31,6 +31,7 @@ async function testCodexMcpServersAreReplacedWithoutDuplicates() {
                 "[features]",
                 "memories = true",
                 "",
+                "# BEGIN AgentSettings managed MCP servers",
                 "[mcp_servers.ehs208-timetree-mcp]",
                 'command = "old"',
                 "",
@@ -38,8 +39,24 @@ async function testCodexMcpServersAreReplacedWithoutDuplicates() {
                 'TIMETREE_EMAIL = "existing@example.com"',
                 'TIMETREE_PASSWORD = "existing-secret"',
                 "",
+                "[mcp_servers.node_repl]",
+                'command = "runtime-node-repl"',
+                "",
+                "[mcp_servers.node_repl.env]",
+                'RUNTIME_SECRET = "preserve-me"',
+                "# END AgentSettings managed MCP servers",
+                "",
+                "[mcp_servers.gmail]",
+                'command = "old-gmail"',
+                "",
                 "[mcp_servers.unmanaged]",
                 'command = "keep"',
+                "",
+                "# BEGIN AgentSettings managed MCP servers",
+                "[hooks.state]",
+                'trusted_hash = "preserve-hook"',
+                "# END AgentSettings managed MCP servers",
+                "# END AgentSettings managed MCP servers",
                 "",
             ].join("\n"),
             "utf8",
@@ -70,10 +87,25 @@ async function testCodexMcpServersAreReplacedWithoutDuplicates() {
             templatePath,
         });
 
+        const firstUpdate = await readFile(configPath, "utf8");
+
+        await syncCodexMcpServers({
+            configPath,
+            dotenvValues: {},
+            templatePath,
+        });
+
         const updated = await readFile(configPath, "utf8");
 
+        assert.equal(updated, firstUpdate);
         assert.match(updated, /rmcp_client = true/);
         assert.match(updated, /\[mcp_servers\.unmanaged\]\ncommand = "keep"/);
+        assert.match(
+            updated,
+            /\[mcp_servers\.node_repl\]\ncommand = "runtime-node-repl"/,
+        );
+        assert.match(updated, /RUNTIME_SECRET = "preserve-me"/);
+        assert.match(updated, /\[hooks\.state\]\ntrusted_hash = "preserve-hook"/);
         assert.match(updated, /command = "npx"/);
         assert.match(updated, /TIMETREE_EMAIL = "existing@example\.com"/);
         assert.match(updated, /TIMETREE_PASSWORD = "existing-secret"/);
@@ -82,6 +114,16 @@ async function testCodexMcpServersAreReplacedWithoutDuplicates() {
             1,
         );
         assert.equal([...updated.matchAll(/\[mcp_servers\.gmail\]/g)].length, 1);
+        assert.equal(
+            [...updated.matchAll(/# BEGIN AgentSettings managed MCP servers/g)]
+                .length,
+            1,
+        );
+        assert.equal(
+            [...updated.matchAll(/# END AgentSettings managed MCP servers/g)]
+                .length,
+            1,
+        );
     });
 }
 
