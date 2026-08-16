@@ -29,7 +29,7 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
 ### 5. Commit
 - Stage only the files you changed.
 - Review the last 10 commit messages for style and consistency.
-- Write the commit message following the gitmoji rules in `~/.claude/rules/commit_message.md`:
+- Write the commit message following the `gitmoji` skill (fallback: `~/.claude/skills/gitmoji/SKILL.md`). If the catalog cannot be loaded, stop and report instead of guessing an emoji:
   - Format: `[gitmoji] + space + English message` such as `[🐛] Fix sync path handling`
   - First line ≤ 72 characters, present tense.
   - Bullet the body for multiple logical changes.

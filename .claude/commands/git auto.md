@@ -15,9 +15,11 @@ Review the current Git changes, determine whether the work is suitable for a sin
    - Read the most recent 10 commit messages.
    - Use them as style and consistency references.
 
-3. Read the commit message rules.
-   - Open and follow `~/.claude/rules/commit_message.md`.
-   - If this file does not exist or cannot be read, stop and report that clearly.
+3. Load the commit message rules.
+   - Invoke the `gitmoji` skill.
+   - If the skill cannot be invoked, open and read `~/.claude/skills/gitmoji/SKILL.md` directly.
+   - Confirm that what you loaded contains the "Complete Gitmoji Catalog" table. A file that loads but has no catalog is a load failure.
+   - If neither the skill nor that file yields the catalog, stop and report that clearly. Do not draft a commit message from memory.
 
 4. Validate staging state before proceeding.
    - The following staging states are considered valid:
@@ -39,7 +41,7 @@ Review the current Git changes, determine whether the work is suitable for a sin
     - Create the commit message only after reviewing:
       - the current diff
       - the last 10 commit messages
-      - `~/.claude/rules/commit_message.md`
+      - the gitmoji catalog loaded in step 3
     - Use `[gitmoji] + space + English message` with a real emoji inside the brackets, for example `[✨] Add issue helper`.
     - Present the proposed commit message before executing the commit.
 

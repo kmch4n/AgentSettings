@@ -10,14 +10,15 @@
 ## Git Rules
 
 ### Commit Messages
-- Follow the full rules in `~/.claude/rules/commit_message.md` (gitmoji format, emoji reference, and Git safety requirements).
 - Use `[gitmoji] + space + English message`, for example `[✨] Add issue helper`. The `[` and `]` characters are required.
 - Keep the first line ≤72 chars in present tense, and split unrelated work into separate commits whenever practical.
+- When one commit covers multiple logical changes, enumerate them as bullet points in the body.
+- Before writing any commit message, invoke the `gitmoji` skill to choose the emoji. Never guess a gitmoji from memory.
 
 ### Git Operations Policy
 - Do not run `git add`, `git commit`, `git push`, or GitHub Issue write actions unless the user explicitly instructs you to do so.
-- When the user asks for a commit, read `~/.claude/rules/commit_message.md` and review the last 10 commit messages before drafting the commit message.
-- Never mention Claude, Codex, or any AI agent in commit messages, Issue text, comments, or PR descriptions.
+- When the user asks for a commit, review the last 10 commit messages before drafting the commit message.
+- Never mention Claude, Codex, or any AI agent in commit messages, Issue text, comments, or PR descriptions, and never add `Co-Authored-By` or similar attribution trailers.
 - Before commit or Issue write actions, verify the active Git and GitHub identity belongs to the user; if it appears to be Claude, Codex, a bot, or a service account, stop and report it.
 - Do not push until the user explicitly requests it.
 

@@ -1,4 +1,16 @@
-# Commit Message Rules
+---
+name: gitmoji
+description: >
+  このスキルは、コミットメッセージを書く・提案する・修正する直前に必ず使用する。
+  ユーザーが「コミットして」「コミットメッセージ考えて」「gitmoji どれを使う」「commit」
+  と依頼したとき、または /git auto・/commit_message_suggestion・/fix-issue から
+  呼び出されたときにも使用する。
+  Load this before writing, proposing, or amending any commit message.
+  Provides the complete 75-entry gitmoji catalog and the
+  `[gitmoji] + space + English message` format rules. Never guess a gitmoji without it.
+---
+
+# Gitmoji Commit Messages
 
 ## Required Format
 ```
@@ -8,19 +20,14 @@
 Use a real gitmoji wrapped in `[` and `]`, followed by a space and an English subject line.
 The `[` and `]` characters are mandatory.
 
-## Core Requirements
+## Authoring checklist
 - Keep the first line ≤ 72 characters and write it in present tense (“Add feature”, not “Added feature”).
 - When multiple logical changes exist, enumerate them as bullet points in the body.
-- Choose an emoji prefix from the official gitmoji list before writing the subject.
+- Choose the emoji prefix from the catalog below before writing the subject. Do not use an emoji that is absent from the table.
 - Prefer separate commits for unrelated changes; do not force multiple concerns into one commit when they can be split cleanly.
+- Review the last 10 commit messages (`git log -10 --pretty=format:%s`) as a style and consistency reference.
 
-## Git Safety Policy
-**Do not stage, commit, or push unless the user explicitly instructs you to do so.**
-
-- When the user asks for a commit, read `~/.claude/rules/commit_message.md` and review the last 10 commit messages before drafting the message.
-- Never include Claude, Codex, or any AI attribution in the commit message.
-- Never include `Co-Authored-By` lines or similar agent attribution.
-- Before running git write operations, verify the active Git identity belongs to the user; if it appears to be Claude, Codex, a bot, or a service account, stop and report it.
+The Git safety policy (no staging, committing, or pushing without explicit instruction; no AI attribution; verify the active Git identity) lives in `CLAUDE.md` / `AGENTS.md` and applies whether or not this skill is loaded.
 
 ## Complete Gitmoji Catalog (synced 2026-04-04)
 Sourced from [gitmoji.dev](https://gitmoji.dev/) to avoid external lookups inside prompts. Descriptions use the wording published there on April 4, 2026; update this table whenever gitmoji.dev adds or removes entries.

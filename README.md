@@ -4,7 +4,7 @@
 ルール、補助プロンプト、Claude 用の slash command / skill をここで管理し、ローカル環境へ同期する前提です。
 
 ## 管理対象
-- `.claude/` - Claude Code 用の commands、rules、および共有 skills の source of truth
+- `.claude/` - Claude Code 用の commands および共有 skills の source of truth
 - `.codex/` - Codex 用の AGENTS と prompts
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
@@ -35,7 +35,7 @@
 - コード、コメント、コミットメッセージ、Issue、PR、release 関連の成果物は英語
 - README などプロジェクト向け文書は、そのプロジェクトの既存慣習を確認してから編集
 - Git 操作や Issue 書き込みは、ユーザーが明示的に依頼したときだけ実行
-- コミット時は各エージェントの commit rule と直近 10 件のコミット履歴を確認
+- コミット時は `gitmoji` skill と直近 10 件のコミット履歴を確認
 - コミット形式は `[gitmoji] + 半角スペース + English message`
 - 例: `[✨] Add issue helper`
 - `[` と `]` は必須
@@ -65,6 +65,7 @@
 ## Claude の skills
 - `ask-why` - 設計意図や判断理由の調査
 - `debug-assist` - エラー原因の切り分けと解決手順の提示
+- `gitmoji` - コミットメッセージ用の gitmoji カタログ（75種）と書式規約。コミットメッセージを書く前に必ず参照する。
 - `new-project` - 新規リポジトリの読み解き
 - `project-health` - TODO、巨大ファイル、依存関係などの健全性確認
 - `prompt-review` - 各種 AI ツールの対話履歴を分析してレポート化

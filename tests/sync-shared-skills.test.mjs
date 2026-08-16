@@ -12,6 +12,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import {
+    RETIRED_MANAGED_FILES,
     syncSharedSkills,
     VENDORED_SKILLS,
 } from "../scripts/sync-shared-skills.mjs";
@@ -106,6 +107,11 @@ async function withFixture(testFn) {
             await mkdir(legacyPath, { recursive: true });
             await writeFile(path.join(legacyPath, "old.txt"), "old\n", "utf8");
         }
+        for (const retiredPath of RETIRED_MANAGED_FILES) {
+            const targetPath = path.join(homeDir, ...retiredPath.split("/"));
+            await mkdir(path.dirname(targetPath), { recursive: true });
+            await writeFile(targetPath, "retired\n", "utf8");
+        }
 
         await testFn({ homeDir, repoDir, root });
     } finally {
@@ -137,12 +143,31 @@ await withFixture(async ({ homeDir, repoDir }) => {
         "stale slide\n",
         "check mode must not change shared slide files",
     );
+    for (const retiredPath of RETIRED_MANAGED_FILES) {
+        assert.ok(
+            checkResult.items.includes(`retired:${retiredPath}`),
+            `check mode must report the retired file ${retiredPath}`,
+        );
+        assert.equal(
+            await exists(path.join(homeDir, ...retiredPath.split("/"))),
+            true,
+            "check mode must not delete retired files",
+        );
+    }
 
     const applyResult = await syncSharedSkills({
         apply: true,
         homeDir,
         repoDir,
     });
+
+    for (const retiredPath of RETIRED_MANAGED_FILES) {
+        assert.equal(
+            await exists(path.join(homeDir, ...retiredPath.split("/"))),
+            false,
+            `retired file ${retiredPath} must be removed from the home directory`,
+        );
+    }
 
     assert.equal(applyResult.drift, true);
     assert.equal(
@@ -257,6 +282,29 @@ await withFixture(async ({ homeDir, repoDir, root }) => {
         await readFile(path.join(outsidePath, "keep.txt"), "utf8"),
         "outside\n",
     );
+});
+
+await withFixture(async ({ homeDir, repoDir, root }) => {
+    const retiredPath = path.join(
+        homeDir,
+        ...RETIRED_MANAGED_FILES[0].split("/"),
+    );
+    const outsideFile = path.join(root, "retired-target.md");
+
+    await writeFile(outsideFile, "outside\n", "utf8");
+    await rm(retiredPath, { force: true });
+    await symlink(outsideFile, retiredPath, "file");
+
+    await assert.rejects(
+        syncSharedSkills({
+            apply: true,
+            homeDir,
+            repoDir,
+        }),
+        /symbolic link|junction/i,
+        "a retired path that is a symlink must not be unlinked",
+    );
+    assert.equal(await readFile(outsideFile, "utf8"), "outside\n");
 });
 
 console.log("shared skill sync tests passed");

@@ -43,6 +43,8 @@ git diff --name-only HEAD~$(git log --since="$(date +%Y-%m-%d)" --oneline | wc -
 - 🔧 設定・環境
 - その他
 
+（分類用の抜粋。コミットメッセージを書くときは `gitmoji` skill のカタログを使う）
+
 ## ステップ3: サマリー生成
 
 以下の形式で出力する（ファイルには書き出さない）:

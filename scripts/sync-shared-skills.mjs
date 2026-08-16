@@ -5,6 +5,7 @@ import {
     readdir,
     readFile,
     rm,
+    unlink,
 } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -17,6 +18,18 @@ export const VENDORED_SKILLS = [
     { name: "apple-design", vendorDir: "apple-design" },
     { name: "create-readme", vendorDir: "create-readme" },
     { name: "hallmark", vendorDir: "hallmark" },
+];
+
+/**
+ * Files this repository used to manage and has since retired. Neither sync
+ * script prunes the home directory, so without this list a retired file would
+ * linger in `~` forever and keep being loaded by the runtimes.
+ *
+ * Paths are relative to the home directory and use POSIX separators.
+ */
+export const RETIRED_MANAGED_FILES = [
+    ".claude/rules/commit_message.md",
+    ".codex/commit_message.md",
 ];
 
 const LEGACY_CODEX_SKILLS = [
@@ -65,6 +78,38 @@ async function assertRemovableDirectory(targetPath) {
     }
     if (!state.isDirectory()) {
         throw new Error(`Refusing to remove non-directory path: ${targetPath}`);
+    }
+
+    return true;
+}
+
+function containedPath(rootPath, relativePath) {
+    const resolvedRoot = path.resolve(rootPath);
+    const candidate = path.resolve(resolvedRoot, relativePath);
+    const prefix = resolvedRoot.endsWith(path.sep)
+        ? resolvedRoot
+        : `${resolvedRoot}${path.sep}`;
+
+    if (!candidate.startsWith(prefix)) {
+        throw new Error(`Refusing unsafe path outside root: ${candidate}`);
+    }
+
+    return candidate;
+}
+
+async function assertRemovableFile(targetPath) {
+    const state = await pathState(targetPath);
+
+    if (!state) {
+        return false;
+    }
+    if (state.isSymbolicLink()) {
+        throw new Error(
+            `Refusing to remove symbolic link or junction: ${targetPath}`,
+        );
+    }
+    if (!state.isFile()) {
+        throw new Error(`Refusing to remove non-file path: ${targetPath}`);
     }
 
     return true;
@@ -243,6 +288,21 @@ export async function syncSharedSkills(options) {
         if (options.apply) {
             await assertRemovableDirectory(destinationPath);
             await rm(destinationPath, { recursive: true });
+        }
+    }
+
+    for (const relativePath of RETIRED_MANAGED_FILES) {
+        const destinationPath = containedPath(options.homeDir, relativePath);
+
+        if (!(await pathState(destinationPath))) {
+            continue;
+        }
+
+        items.push(`retired:${relativePath}`);
+
+        if (options.apply) {
+            await assertRemovableFile(destinationPath);
+            await unlink(destinationPath);
         }
     }
 

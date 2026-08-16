@@ -82,9 +82,13 @@ cp "$CLAUDE_SRC/commands/"*.md "$CLAUDE_DEST/commands/"
 echo "    [ok] commands/"
 
 # rules/
-mkdir -p "$CLAUDE_DEST/rules"
-cp "$CLAUDE_SRC/rules/"*.md "$CLAUDE_DEST/rules/"
-echo "    [ok] rules/"
+if compgen -G "$CLAUDE_SRC/rules/*.md" > /dev/null; then
+    mkdir -p "$CLAUDE_DEST/rules"
+    cp "$CLAUDE_SRC/rules/"*.md "$CLAUDE_DEST/rules/"
+    echo "    [ok] rules/"
+else
+    echo "    [skip] rules/ source not found"
+fi
 
 echo ""
 echo "==> Syncing Codex config to $CODEX_DEST ..."

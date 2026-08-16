@@ -105,12 +105,17 @@ Get-ChildItem (Join-Path $ClaudeSrc "commands") -Filter "*.md" | ForEach-Object 
 Write-Host "    [ok] commands/"
 
 # rules/
-$RulesDest = Join-Path $ClaudeDest "rules"
-New-Item -ItemType Directory -Force -Path $RulesDest | Out-Null
-Get-ChildItem (Join-Path $ClaudeSrc "rules") -Filter "*.md" | ForEach-Object {
-    Copy-Item $_.FullName $RulesDest -Force
+$RulesSrc = Join-Path $ClaudeSrc "rules"
+if (Test-Path $RulesSrc) {
+    $RulesDest = Join-Path $ClaudeDest "rules"
+    New-Item -ItemType Directory -Force -Path $RulesDest | Out-Null
+    Get-ChildItem $RulesSrc -Filter "*.md" | ForEach-Object {
+        Copy-Item $_.FullName $RulesDest -Force
+    }
+    Write-Host "    [ok] rules/"
+} else {
+    Write-Host "    [skip] rules/ source not found"
 }
-Write-Host "    [ok] rules/"
 
 Write-Host ""
 Write-Host "==> Syncing Codex config to $CodexDest ..."
