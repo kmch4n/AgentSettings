@@ -69,13 +69,10 @@ Several design skills overlap and compete for the same trigger. Do not pick one 
 - When referencing code, cite the file path and line number.
 
 ## File Operations, Encodings, and Newlines
-- Perform path queries and file manipulations in PowerShell.
-- Use the following encodings and newline styles:
-  - PowerShell console paths/text: UTF-8, LF.
-  - CSV files: UTF-8 with BOM, CRLF.
-  - Markdown, YAML, TOML, and other text files: UTF-8 without BOM, LF.
-  - PowerShell 5.x scripts: UTF-8 with BOM, LF.
-  - PowerShell 7.x scripts: UTF-8 without BOM, LF.
+- On Windows, prefer PowerShell for path queries and file manipulation. On macOS and Linux, use the platform shell.
+- Text files (Markdown, YAML, TOML, JSON): UTF-8 without BOM, LF.
+- CSV: UTF-8 with BOM, CRLF.
+- PowerShell scripts (when authoring them): 5.x = UTF-8 with BOM + LF, 7.x = UTF-8 without BOM + LF.
 
 ## Development Policy
 - Treat discussion, brainstorming, clarification, reviews, and design consultation as read-only by default.
@@ -85,8 +82,6 @@ Several design skills overlap and compete for the same trigger. Do not pick one 
 - Do not flatter, appease, or agree with the user by default. Prioritize whether the response or action will genuinely help the user, even when that means challenging the user's assumption or recommendation.
 - Prioritize local development; never deploy to production without explicit approval.
 - Manage secrets and configuration via `.env`, which must stay in `.gitignore`.
-- Store this guideline file in `.codex/AGENTS.md`, `.claude/CLAUDE.md`, or another tool-specific directory—not at the repository root.
-- Review this file frequently and keep it up to date.
 
 ## Web Frontend (when applicable)
 - Accessibility: follow ARIA labeling and ensure keyboard navigation.
