@@ -8,6 +8,8 @@
 - `.codex/` - Codex 用の AGENTS と prompts
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
+- `vendor/hallmark/` - 外部由来の `hallmark` skill 本体（Claude Code と Codex の両方へ配布）
+- `vendor/apple-design/` - 外部由来の `apple-design` skill 本体（Claude Code と Codex の両方へ配布）
 - `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期し、管理対象 plugin を導入するスクリプト
 
 ## 同期範囲と所有者
@@ -15,6 +17,7 @@
 | 対象 | 所有者 | 同期方針 |
 | --- | --- | --- |
 | `.claude/skills/` 内の skill | このリポジトリ | `~/.claude/skills/` と `~/.agents/skills/` の同名ディレクトリを完全に置換 |
+| `vendor/` 配下の vendored skill | 上流リポジトリ | このリポジトリを経由して両 runtime の `skills/` へ完全に置換 |
 | `~/.agents/skills/` 内の外部 skill | 各 skill の導入元 | リポジトリに同名 skill がなければ保持 |
 | Codex の管理対象 plugin | このリポジトリ | sync 時に導入し、欠落や無効化を drift として扱う |
 | Browser、Chrome、Computer Use などの Codex bundled plugin | Codex runtime | sync では変更しない |
@@ -69,6 +72,33 @@
 - `slide-pattern-creator` - スライドから再利用可能なレイアウトパターンを生成
 - `slide-deck-builder` - プレゼン内容からAI向けのSLIDE-DECK.mdを生成
 - `standup` - 当日や指定期間の作業サマリー生成
+
+### 外部由来の skill
+- `hallmark` - AI 生成っぽさを排したWeb UIデザイン skill。新規ページ作成、既存UIのaudit、redesign、URL / screenshot からのデザイン抽出に使う。
+- `apple-design` - モーションとインタラクションの質感を扱う skill。ジェスチャ、spring、drag / sheet、慣性、中断可能なトランジション、半透明マテリアルなど。
+- 本体は `vendor/` を source of truth とし、sync 時に `~/.claude/skills/` と `~/.agents/skills/` の両方へ配布します。
+- 取り込み元と License:
+  - `hallmark` - [Nutlope/hallmark](https://github.com/Nutlope/hallmark)、MIT License
+  - `apple-design` - [emilkowalski/skills](https://github.com/emilkowalski/skills)、MIT License
+- 取り込んだcommitは各 `vendor/<name>/UPSTREAM_COMMIT` に記録します。
+- 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
+
+### デザイン系 skill の使い分け
+デザイン系の skill は担当領域が重なるため、エージェントが黙って1つを選ぶことは禁止しています。正となるルールは `.claude/CLAUDE.md` と `.codex/AGENTS.md` の `Design Skill Selection` にあり、以下はその要約です。
+
+- 新規UI、リデザイン、美的判断を伴うスタイリングでは、候補を2〜3個提示してユーザーの選択を待ちます。ボタンのズレ修正のような機械的な作業では発動しません。
+- 確認は1タスクにつき1回だけで、選んだ skill はそのタスク中は維持します。
+- 併用可能です。構造面の選択に `apple-design` をモーション層として重ねられます。
+
+| Skill | 用途 | 対象外 |
+| --- | --- | --- |
+| `hallmark` | 規範的なページ / コンポーネント構築。20種のテーマ、macrostructure、anti-slop ゲート、`audit` / `redesign` / `study` | モーション物理、チャート、スライド |
+| `frontend-design` | 要件が緩く、ルールより美的判断が効く場面。パレット、書体の組み合わせ、意図的な冒険を1つ | 規範的なゲート、モーション物理 |
+| `apple-design` | モーションとインタラクションの質感。上記どちらとも併用可 | レイアウト構造、パレット、コンテンツ |
+| slide 系3種 | スライドと SLIDE.md デザインシステム | Webページ |
+| `dataviz` (Claude) / `product-design` (Codex) | 前者はチャートとダッシュボード、後者はプロトタイプとUXリサーチ | ページレイアウト / 通常の実装 |
+
+`hallmark` と `frontend-design` が本当に衝突する組み合わせです。違いは領域ではなく方法で、`hallmark` はルールエンジン、`frontend-design` は美的判断のガイドです。ユーザーの好みが不明なときは両方を提示します。
 
 ### SLIDE.md の共有
 - 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexが参照する `~/.agents/skills/` の両方へ同期します。

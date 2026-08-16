@@ -44,6 +44,24 @@
 ### Naming Rules
 - Name API client instances `cl`; do not use `client`.
 
+## Design Skill Selection
+Several design skills overlap and compete for the same trigger. Do not pick one silently.
+
+- This applies to new UI, redesigns, and styling work where taste is in play. It does not apply to mechanical fixes such as correcting a misaligned button or repairing a failing layout test.
+- Before starting, name the 2–3 candidate skills with one line each on why they fit, then wait for the user's choice.
+- Ask once per task, not once per edit. Keep the chosen skill for the rest of that task.
+- These skills compose. A structural choice can be combined with `apple-design` for the motion layer.
+
+| Skill | Use for | Not for |
+| --- | --- | --- |
+| `hallmark` | Prescriptive page and component system: 20 named themes, macrostructures, anti-slop gates, plus the `audit` / `redesign` / `study` verbs | Motion physics, charts, slides |
+| `frontend-design` | Open briefs where taste beats rules: palette, type pairing, one deliberate risk. Short prose guidance, not a checklist | Prescriptive gates, motion physics |
+| `apple-design` | Motion and interaction feel: gestures, springs, drag and sheet interactions, momentum, interruptible transitions, translucent materials. Composes with either of the above | Layout structure, palette, content |
+| `slide-md-creator` / `slide-pattern-creator` / `slide-deck-builder` | Slide decks and SLIDE.md design systems | Web pages |
+| `product-design@role-specific-plugins` | Reviewable interactive prototypes, UX research, and faithful cloning from a URL or screenshot | Ordinary implementation, unless the user asks for it by name |
+
+`hallmark` and `frontend-design` are the genuine collision: the difference is method, not domain. `hallmark` is a rule engine, `frontend-design` is taste guidance. When the user has expressed no preference, name both.
+
 ## Output Rules
 - JSON output must use `indent=4` and `ensure_ascii=False`.
 - Do not reprint an entire file; apply surgical edits with minimal diffs.
