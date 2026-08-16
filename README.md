@@ -10,6 +10,7 @@
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
 - `vendor/hallmark/` - 外部由来の `hallmark` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/apple-design/` - 外部由来の `apple-design` skill 本体（Claude Code と Codex の両方へ配布）
+- `vendor/create-readme/` - 外部由来の `create-readme` skill 本体（Claude Code と Codex の両方へ配布）
 - `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期し、管理対象 plugin を導入するスクリプト
 
 ## 同期範囲と所有者
@@ -76,10 +77,13 @@
 ### 外部由来の skill
 - `hallmark` - AI 生成っぽさを排したWeb UIデザイン skill。新規ページ作成、既存UIのaudit、redesign、URL / screenshot からのデザイン抽出に使う。
 - `apple-design` - モーションとインタラクションの質感を扱う skill。ジェスチャ、spring、drag / sheet、慣性、中断可能なトランジション、半透明マテリアルなど。
+- `create-readme` - プロジェクトの README.md を作成する skill。構成、トーン、GFM と GitHub admonition の使い方を指示します。
 - 本体は `vendor/` を source of truth とし、sync 時に `~/.claude/skills/` と `~/.agents/skills/` の両方へ配布します。
+- 配布対象は `scripts/sync-shared-skills.mjs` の `VENDORED_SKILLS` が正で、テストもこの配列を参照します。skill を増やす場合はここへ 1 行追加してください。
 - 取り込み元と License:
   - `hallmark` - [Nutlope/hallmark](https://github.com/Nutlope/hallmark)、MIT License
   - `apple-design` - [emilkowalski/skills](https://github.com/emilkowalski/skills)、MIT License
+  - `create-readme` - [github/awesome-copilot](https://github.com/github/awesome-copilot)、MIT License
 - 取り込んだcommitは各 `vendor/<name>/UPSTREAM_COMMIT` に記録します。
 - 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
 

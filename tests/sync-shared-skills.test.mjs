@@ -11,7 +11,12 @@ import {
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { syncSharedSkills } from "../scripts/sync-shared-skills.mjs";
+import {
+    syncSharedSkills,
+    VENDORED_SKILLS,
+} from "../scripts/sync-shared-skills.mjs";
+
+const VENDORED_SKILL_NAMES = VENDORED_SKILLS.map((skill) => skill.name);
 
 async function exists(targetPath) {
     try {
@@ -44,6 +49,16 @@ async function withFixture(testFn) {
             "repo slide\n",
             "utf8",
         );
+        for (const vendorName of VENDORED_SKILL_NAMES) {
+            await mkdir(path.join(repoDir, "vendor", vendorName), {
+                recursive: true,
+            });
+            await writeFile(
+                path.join(repoDir, "vendor", vendorName, "SKILL.md"),
+                `vendored ${vendorName}\n`,
+                "utf8",
+            );
+        }
         await mkdir(path.join(homeDir, ".agents", "slide-md"), {
             recursive: true,
         });
@@ -152,6 +167,22 @@ await withFixture(async ({ homeDir, repoDir }) => {
         );
         assert.equal(await exists(path.join(managedPath, "removed.txt")), false);
         assert.equal(await exists(path.join(managedPath, "managed")), false);
+        for (const vendorName of VENDORED_SKILL_NAMES) {
+            assert.equal(
+                await readFile(
+                    path.join(
+                        homeDir,
+                        runtimeRoot,
+                        "skills",
+                        vendorName,
+                        "SKILL.md",
+                    ),
+                    "utf8",
+                ),
+                `vendored ${vendorName}\n`,
+                "vendored skills must reach both runtime skill roots",
+            );
+        }
         assert.equal(
             await readFile(
                 path.join(

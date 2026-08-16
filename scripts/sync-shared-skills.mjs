@@ -9,6 +9,16 @@ import {
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
+/**
+ * Third-party skills vendored under `vendor/`. They are deployed to the same
+ * runtime skill roots as the repo-owned skills in `.claude/skills/`.
+ */
+export const VENDORED_SKILLS = [
+    { name: "apple-design", vendorDir: "apple-design" },
+    { name: "create-readme", vendorDir: "create-readme" },
+    { name: "hallmark", vendorDir: "hallmark" },
+];
+
 const LEGACY_CODEX_SKILLS = [
     "slide-md-creator",
     "slide-pattern-creator",
@@ -155,18 +165,36 @@ async function replaceManagedDirectory(sourcePath, destinationPath) {
  */
 export async function syncSharedSkills(options) {
     const sourceRoot = path.join(options.repoDir, ".claude", "skills");
+    const vendorRoot = path.join(options.repoDir, "vendor");
     const skillEntries = await readdir(sourceRoot, { withFileTypes: true });
-    const skillNames = skillEntries
+    const skills = skillEntries
         .filter((entry) => entry.isDirectory() && !entry.isSymbolicLink())
-        .map((entry) => entry.name)
-        .sort();
+        .map((entry) => ({
+            name: entry.name,
+            sourcePath: directChildPath(sourceRoot, entry.name),
+        }));
+
+    for (const vendored of VENDORED_SKILLS) {
+        if (skills.some((skill) => skill.name === vendored.name)) {
+            throw new Error(
+                `Vendored skill collides with a repo skill: ${vendored.name}`,
+            );
+        }
+
+        skills.push({
+            name: vendored.name,
+            sourcePath: directChildPath(vendorRoot, vendored.vendorDir),
+        });
+    }
+
+    skills.sort((left, right) => left.name.localeCompare(right.name));
+
     const items = [];
 
     for (const runtimeRoot of [".claude", ".agents"]) {
         const destinationRoot = path.join(options.homeDir, runtimeRoot, "skills");
 
-        for (const skillName of skillNames) {
-            const sourcePath = directChildPath(sourceRoot, skillName);
+        for (const { name: skillName, sourcePath } of skills) {
             const destinationPath = directChildPath(destinationRoot, skillName);
 
             if (!(await directoriesMatch(sourcePath, destinationPath))) {
