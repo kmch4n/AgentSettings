@@ -70,6 +70,7 @@
 - `project-health` - TODO、巨大ファイル、依存関係などの健全性確認
 - `prompt-review` - 各種 AI ツールの対話履歴を分析してレポート化
 - `release-prep` - リリース前チェックと release 向けサマリー生成
+- `sanitize-artifacts` - 生成物から制作過程の痕跡を取り除き、単体で完結した納品物に整える
 - `slide-md-creator` - スライドやWebサイトからSLIDE.mdデザインシステムを生成
 - `slide-pattern-creator` - スライドから再利用可能なレイアウトパターンを生成
 - `slide-deck-builder` - プレゼン内容からAI向けのSLIDE-DECK.mdを生成
