@@ -1,6 +1,6 @@
 ---
 name: slide-deck-builder
-description: プレゼンの内容（テキスト・Markdown・PDF等）を入力すると、SLIDE.mdとSLIDE-PATTERN-*.mdを自動選択・割り当てしてAIツールに渡せる設計書SLIDE-DECK.mdを生成する。「プレゼンの設計書を作って」「スライドデッキを組んで」「SLIDE-DECK.mdを生成して」「このプレゼン内容でスライドを作りたい」「slide-deck-builder」と言われたときに使用する。
+description: プレゼンの内容（テキスト・Markdown・PDF等）を入力すると、SLIDE.mdとSLIDE-PATTERN-*.mdを自動選択・割り当てしてAIツールに渡せる設計書SLIDE-DECK.mdを生成する。「プレゼンの設計書を作って」「スライドデッキを組んで」「SLIDE-DECK.mdを生成して」「このプレゼン内容でスライドを作りたい」「slide-deck-builder」と言われたときに使用する。なお、スライド作成の依頼は consulting-pptx スキルとも競合する（あちらは見た目の再現ではなく内容の規約・機械チェック・編集可能PPTX出力を担当する）。どちらを使うかは自動で決めず、着手前にユーザーへ確認する。
 ---
 
 # slide-deck-builder

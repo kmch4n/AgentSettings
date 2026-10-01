@@ -58,10 +58,19 @@ Several design skills overlap and compete for the same trigger. Do not pick one 
 | `hallmark` | Prescriptive page and component system: 20 named themes, macrostructures, anti-slop gates, plus the `audit` / `redesign` / `study` verbs | Motion physics, charts, slides |
 | `frontend-design` | Open briefs where taste beats rules: palette, type pairing, one deliberate risk. Short prose guidance, not a checklist | Prescriptive gates, motion physics |
 | `apple-design` | Motion and interaction feel: gestures, springs, drag and sheet interactions, momentum, interruptible transitions, translucent materials. Composes with either of the above | Layout structure, palette, content |
-| `slide-md-creator` / `slide-pattern-creator` / `slide-deck-builder` | Slide decks and SLIDE.md design systems | Web pages |
+| `slide-md-creator` / `slide-pattern-creator` / `slide-deck-builder` | Slide decks whose look must match a reference: design extraction, 99 layout patterns, SLIDE.md design systems. Output is a spec handed to a downstream AI tool | Web pages, content rules, PPTX output |
+| `consulting-pptx` | Slide decks whose content must survive scrutiny: a ~110-rule Japanese slide rulebook, a mechanical checker, a fresh-eye review pass, and natively editable PPTX output | Web pages, brand mimicry, non-Japanese decks |
 | `product-design@role-specific-plugins` | Reviewable interactive prototypes, UX research, and faithful cloning from a URL or screenshot | Ordinary implementation, unless the user asks for it by name |
 
 `hallmark` and `frontend-design` are the genuine collision: the difference is method, not domain. `hallmark` is a rule engine, `frontend-design` is taste guidance. When the user has expressed no preference, name both.
+
+### Slide decks: always ask which family
+
+`consulting-pptx` and the `slide-md-*` family both fire on "make me a deck" and sit at opposite ends: one governs content, the other reproduces a look. **Never choose between them silently — ask the user, even when one seems obvious.**
+
+- Deciding question: will this deck be printed and marked up? If the reader has to judge or push back on it (proposals, reports, investment cases, board material) it is `consulting-pptx`. If the reader watches or skims it (talks, internal shares, events, training) it is the `slide-md-*` family.
+- The tie-breaker facts to state when asking: `consulting-pptx` outputs a finished deck (HTML / PDF / editable PPTX) but offers only two colour skins; `slide-md-*` reproduces any reference design but stops at a Markdown spec.
+- **Do not combine them.** Their rules contradict each other directly — `consulting-pptx` bans rounded corners outright, while 77 of the 99 `SLIDE-PATTERN` layouts use `border-radius`. Pick one and keep it for the whole task.
 
 ## Output Rules
 - JSON output must use `indent=4` and `ensure_ascii=False`.

@@ -1,6 +1,6 @@
 ---
 name: slide-md-creator
-description: 既存のスライド・画像・WebサイトからデザインシステムSLIDE.mdと6ページのHTMLサンプルスライドを生成する。「このスライドのデザインシステムを作って」「SLIDE.mdを生成して」「SLIDE.mdを作りたい」「このサイトのデザインでSLIDE.mdを生成して」「slide-md-creator」と言われたときに使用する。
+description: 既存のスライド・画像・WebサイトからデザインシステムSLIDE.mdと6ページのHTMLサンプルスライドを生成する。「このスライドのデザインシステムを作って」「SLIDE.mdを生成して」「SLIDE.mdを作りたい」「このサイトのデザインでSLIDE.mdを生成して」「slide-md-creator」と言われたときに使用する。なお、スライド作成の依頼は consulting-pptx スキルとも競合する（あちらは見た目の再現ではなく内容の規約・機械チェック・編集可能PPTX出力を担当する）。どちらを使うかは自動で決めず、着手前にユーザーへ確認する。
 ---
 
 # slide-md-creator

@@ -1,6 +1,6 @@
 ---
 name: slide-pattern-creator
-description: スライドの画像・ファイルからレイアウトパターンを抽出し、SLIDE-PATTERN-{name}.mdとスケルトンHTMLを生成する。「スライドパターンを抽出して」「スライドパターンを作って」「SLIDE-PATTERNを生成して」「slide-pattern-creator」と言われたときに使用する。
+description: スライドの画像・ファイルからレイアウトパターンを抽出し、SLIDE-PATTERN-{name}.mdとスケルトンHTMLを生成する。「スライドパターンを抽出して」「スライドパターンを作って」「SLIDE-PATTERNを生成して」「slide-pattern-creator」と言われたときに使用する。なお、スライド作成の依頼は consulting-pptx スキルとも競合する（あちらは見た目の再現ではなく内容の規約・機械チェック・編集可能PPTX出力を担当する）。どちらを使うかは自動で決めず、着手前にユーザーへ確認する。
 ---
 
 # slide-pattern-creator
