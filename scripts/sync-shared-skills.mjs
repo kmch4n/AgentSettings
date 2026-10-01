@@ -2,6 +2,7 @@ import {
     cp,
     lstat,
     mkdir,
+    readlink,
     readdir,
     readFile,
     rm,
@@ -18,6 +19,7 @@ export const VENDORED_SKILLS = [
     { name: "apple-design", vendorDir: "apple-design" },
     { name: "create-readme", vendorDir: "create-readme" },
     { name: "hallmark", vendorDir: "hallmark" },
+    { name: "yomiyasu", vendorDir: "yomiyasu" },
 ];
 
 /**
@@ -37,6 +39,7 @@ const LEGACY_CODEX_SKILLS = [
     "slide-pattern-creator",
     "slide-deck-builder",
     "frontend-design",
+    "yomiyasu",
 ];
 
 async function pathState(targetPath) {
@@ -188,12 +191,42 @@ export async function directoriesMatch(sourcePath, destinationPath) {
     return true;
 }
 
-async function replaceManagedDirectory(sourcePath, destinationPath) {
+/**
+ * @param {string} sourcePath
+ * @param {string} destinationPath
+ * @param {string | undefined} allowedLegacyLinkTarget
+ */
+async function replaceManagedDirectory(
+    sourcePath,
+    destinationPath,
+    allowedLegacyLinkTarget,
+) {
     const state = await pathState(destinationPath);
 
     if (state) {
-        await assertRemovableDirectory(destinationPath);
-        await rm(destinationPath, { recursive: true });
+        if (state.isSymbolicLink()) {
+            const linkTarget = path.resolve(
+                path.dirname(destinationPath),
+                await readlink(destinationPath),
+            );
+            const expectedTarget = allowedLegacyLinkTarget
+                ? path.resolve(allowedLegacyLinkTarget)
+                : "";
+            const matchesExpected =
+                process.platform === "win32"
+                    ? linkTarget.toLowerCase() === expectedTarget.toLowerCase()
+                    : linkTarget === expectedTarget;
+
+            if (!matchesExpected) {
+                throw new Error(
+                    `Refusing to remove symbolic link or junction: ${destinationPath}`,
+                );
+            }
+            await unlink(destinationPath);
+        } else {
+            await assertRemovableDirectory(destinationPath);
+            await rm(destinationPath, { recursive: true });
+        }
     }
 
     await mkdir(path.dirname(destinationPath), { recursive: true });
@@ -246,7 +279,20 @@ export async function syncSharedSkills(options) {
                 items.push(`${runtimeRoot}/skills/${skillName}`);
 
                 if (options.apply) {
-                    await replaceManagedDirectory(sourcePath, destinationPath);
+                    const allowedLegacyLinkTarget =
+                        runtimeRoot === ".claude" && skillName === "yomiyasu"
+                            ? path.join(
+                                  options.homeDir,
+                                  ".agents",
+                                  "skills",
+                                  "yomiyasu",
+                              )
+                            : undefined;
+                    await replaceManagedDirectory(
+                        sourcePath,
+                        destinationPath,
+                        allowedLegacyLinkTarget,
+                    );
                 }
             }
         }

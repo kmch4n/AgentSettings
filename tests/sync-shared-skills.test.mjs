@@ -19,6 +19,11 @@ import {
 
 const VENDORED_SKILL_NAMES = VENDORED_SKILLS.map((skill) => skill.name);
 
+assert.ok(
+    VENDORED_SKILL_NAMES.includes("yomiyasu"),
+    "yomiyasu must be distributed by both sync commands",
+);
+
 async function exists(targetPath) {
     try {
         await access(targetPath);
@@ -102,6 +107,7 @@ async function withFixture(testFn) {
             "slide-pattern-creator",
             "slide-deck-builder",
             "frontend-design",
+            "yomiyasu",
         ]) {
             const legacyPath = path.join(homeDir, ".codex", "skills", legacyName);
             await mkdir(legacyPath, { recursive: true });
@@ -228,6 +234,7 @@ await withFixture(async ({ homeDir, repoDir }) => {
         "slide-pattern-creator",
         "slide-deck-builder",
         "frontend-design",
+        "yomiyasu",
     ]) {
         assert.equal(
             await exists(path.join(homeDir, ".codex", "skills", legacyName)),
@@ -255,6 +262,64 @@ await withFixture(async ({ homeDir, repoDir }) => {
         repoDir,
     });
     assert.equal(converged.drift, false);
+});
+
+await withFixture(async ({ homeDir, repoDir }) => {
+    const claudeSkill = path.join(homeDir, ".claude", "skills", "yomiyasu");
+    const agentsSkill = path.join(homeDir, ".agents", "skills", "yomiyasu");
+
+    await mkdir(agentsSkill, { recursive: true });
+    await writeFile(path.join(agentsSkill, "SKILL.md"), "old skill\n", "utf8");
+    await mkdir(path.dirname(claudeSkill), { recursive: true });
+    await symlink(
+        agentsSkill,
+        claudeSkill,
+        process.platform === "win32" ? "junction" : "dir",
+    );
+
+    const checkResult = await syncSharedSkills({ apply: false, homeDir, repoDir });
+    assert.ok(checkResult.items.includes(".claude/skills/yomiyasu"));
+    assert.equal(
+        await readFile(path.join(claudeSkill, "SKILL.md"), "utf8"),
+        "old skill\n",
+    );
+
+    await syncSharedSkills({ apply: true, homeDir, repoDir });
+    assert.equal(
+        await readFile(path.join(claudeSkill, "SKILL.md"), "utf8"),
+        "vendored yomiyasu\n",
+    );
+    assert.equal(
+        await readFile(path.join(agentsSkill, "SKILL.md"), "utf8"),
+        "vendored yomiyasu\n",
+    );
+});
+
+await withFixture(async ({ homeDir, repoDir, root }) => {
+    const claudeSkill = path.join(homeDir, ".claude", "skills", "yomiyasu");
+    const unrelatedTarget = path.join(root, "unrelated-yomiyasu");
+
+    await mkdir(unrelatedTarget, { recursive: true });
+    await writeFile(
+        path.join(unrelatedTarget, "keep.txt"),
+        "unrelated\n",
+        "utf8",
+    );
+    await mkdir(path.dirname(claudeSkill), { recursive: true });
+    await symlink(
+        unrelatedTarget,
+        claudeSkill,
+        process.platform === "win32" ? "junction" : "dir",
+    );
+
+    await assert.rejects(
+        syncSharedSkills({ apply: true, homeDir, repoDir }),
+        /symbolic link|junction/i,
+    );
+    assert.equal(
+        await readFile(path.join(unrelatedTarget, "keep.txt"), "utf8"),
+        "unrelated\n",
+    );
 });
 
 await withFixture(async ({ homeDir, repoDir, root }) => {
