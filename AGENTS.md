@@ -1,6 +1,6 @@
 # AgentSettings
 
-This repository is the source for personal Codex and Claude Code settings. Keep it focused on repository-specific guidance; global behavior lives in `.codex/AGENTS.md` and `global/CLAUDE.md`.
+This repository is the source for personal Codex and Claude Code settings. Keep it focused on repository-specific guidance; global behavior lives in `.codex/AGENTS_global.md` and `.claude/CLAUDE_global.md`.
 
 ## Sources and sync
 

@@ -6,14 +6,36 @@ const shellScript = await readFile("sync.sh", "utf8");
 
 assert.match(
     powershellScript,
-    /Join-Path \$RepoDir "global\\CLAUDE\.md"/,
-    "Windows sync must read the global Claude source outside .claude/",
+    /Join-Path \$RepoDir "\.claude\\CLAUDE_global\.md"/,
+    "Windows sync must read the global Claude source",
 );
 assert.match(
     shellScript,
-    /GLOBAL_CLAUDE_SRC="\$REPO_DIR\/global\/CLAUDE\.md"/,
-    "Unix sync must read the global Claude source outside .claude/",
+    /GLOBAL_CLAUDE_SRC="\$REPO_DIR\/\.claude\/CLAUDE_global\.md"/,
+    "Unix sync must read the global Claude source",
 );
+assert.match(
+    powershellScript,
+    /Join-Path \$RepoDir "\.codex\\AGENTS_global\.md"/,
+    "Windows sync must read the global Codex source",
+);
+assert.match(
+    shellScript,
+    /GLOBAL_CODEX_SRC="\$REPO_DIR\/\.codex\/AGENTS_global\.md"/,
+    "Unix sync must read the global Codex source",
+);
+assert.match(
+    powershellScript,
+    /Copy-AllItems -Source \$CodexSrc -Destination \$CodexDest -Label "\.codex" -Exclude @\("AGENTS_global\.md"\)/,
+    "Windows sync must not copy the source-only Codex filename",
+);
+assert.match(
+    shellScript,
+    /copy_tree "\$CODEX_SRC" "\$CODEX_DEST" "\.codex" "AGENTS_global\.md"/,
+    "Unix sync must not copy the source-only Codex filename",
+);
+assert.match(powershellScript, /Join-Path \$CodexDest "AGENTS\.md"/);
+assert.match(shellScript, /cp "\$GLOBAL_CODEX_SRC" "\$CODEX_DEST\/AGENTS\.md"/);
 const expectedCodexPlugins = [
     "code-review@claude-plugins-official",
     "code-simplifier@claude-plugins-official",

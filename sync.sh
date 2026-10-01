@@ -15,7 +15,8 @@ CLAUDE_DEST="$HOME/.claude"
 CODEX_DEST="$HOME/.codex"
 CLAUDE_SRC="$REPO_DIR/.claude"
 CODEX_SRC="$REPO_DIR/.codex"
-GLOBAL_CLAUDE_SRC="$REPO_DIR/global/CLAUDE.md"
+GLOBAL_CLAUDE_SRC="$REPO_DIR/.claude/CLAUDE_global.md"
+GLOBAL_CODEX_SRC="$REPO_DIR/.codex/AGENTS_global.md"
 CLAUDE_PLUGINS=(
     "frontend-design@claude-plugins-official"
     "superpowers@claude-plugins-official"
@@ -56,6 +57,7 @@ copy_tree() {
     local src="$1"
     local dest="$2"
     local label="$3"
+    local skip="${4:-}"
 
     if [ ! -d "$src" ]; then
         echo "    [skip] $label source not found"
@@ -63,7 +65,11 @@ copy_tree() {
     fi
 
     mkdir -p "$dest"
-    cp -a "$src/." "$dest/"
+    for item in "$src"/* "$src"/.[!.]* "$src"/..?*; do
+        [ -e "$item" ] || continue
+        [ "$(basename "$item")" = "$skip" ] && continue
+        cp -a "$item" "$dest/"
+    done
     echo "    [ok] $label"
 }
 
@@ -93,7 +99,9 @@ fi
 
 echo ""
 echo "==> Syncing Codex config to $CODEX_DEST ..."
-copy_tree "$CODEX_SRC" "$CODEX_DEST" ".codex"
+copy_tree "$CODEX_SRC" "$CODEX_DEST" ".codex" "AGENTS_global.md"
+cp "$GLOBAL_CODEX_SRC" "$CODEX_DEST/AGENTS.md"
+echo "    [ok] AGENTS.md"
 
 echo ""
 echo "==> Syncing shared skills..."

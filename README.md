@@ -7,7 +7,7 @@
 
 Git、Node.js、Claude Code CLI、Codex CLI を用意し、このリポジトリを clone します。同期にはネットワーク接続と、各 CLI で plugin を導入できる状態が必要です。
 
-Claude Code のグローバル指示の正本はリポジトリ内の **[global/CLAUDE.md](global/CLAUDE.md)** です。同期後の配置先は **`~/.claude/CLAUDE.md`** で、リポジトリの `.claude/` 以下には置きません。
+グローバル指示の正本は、このリポジトリ内の **[.claude/CLAUDE_global.md](.claude/CLAUDE_global.md)** と **[.codex/AGENTS_global.md](.codex/AGENTS_global.md)** です。同期後はそれぞれ `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md` に配置されます。
 
 ```powershell
 git clone https://github.com/kmch4n/AgentSettings.git
@@ -22,8 +22,8 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 
 ## 管理対象
 - `.claude/` - Claude Code 用の commands および共有 skills の source of truth
-- `global/CLAUDE.md` - 全プロジェクトへ同期する Claude Code のグローバル指示。リポジトリ内で同じ指示を二重に読み込まないため、`.claude/` の外に置く
-- `.codex/` - Codex 用の AGENTS と prompts
+- `.claude/CLAUDE_global.md` - Claude Code のグローバル指示の正本。同期時に `CLAUDE.md` という名前で配置
+- `.codex/` - Codex 用の `AGENTS_global.md` と prompts。グローバル指示は同期時に `AGENTS.md` という名前で配置
 - `AGENTS.md` - このリポジトリ固有の作業案内。固定の skill 一覧は持たない
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
@@ -114,7 +114,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
 
 ### デザイン系 skill の使い分け
-デザイン系の skill は担当領域が重なります。正となる短い選択ルールは `global/CLAUDE.md` と `.codex/AGENTS.md` に置き、以下に詳細をまとめます。ユーザーが skill を指定した場合はその指定を優先します。
+デザイン系の skill は担当領域が重なります。正となる短い選択ルールは `.claude/CLAUDE_global.md` と `.codex/AGENTS_global.md` に置き、以下に詳細をまとめます。ユーザーが skill を指定した場合はその指定を優先します。
 
 - 新規UIやリデザインで方法の指定がない場合は、`hallmark` と `frontend-design` を提示してユーザーの選択を待ちます。ボタンのズレ修正のような機械的な作業では発動しません。
 - 確認は1タスクにつき1回だけで、選んだ skill はそのタスク中は維持します。

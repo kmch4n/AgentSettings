@@ -6,7 +6,7 @@
 
 | 変更内容 | リポジトリ内の正本 | 同期先 |
 | --- | --- | --- |
-| 共通の行動指示 | `global/CLAUDE.md` と `.codex/AGENTS.md` | `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md` |
+| 共通の行動指示 | `.claude/CLAUDE_global.md` と `.codex/AGENTS_global.md` | `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md` |
 | このリポジトリだけの作業指示 | `AGENTS.md` | 同期しない |
 | Claude Code の slash command | `.claude/commands/` | `~/.claude/commands/` |
 | Codex の対応 prompt | `.codex/prompts/` | `~/.codex/prompts/` |

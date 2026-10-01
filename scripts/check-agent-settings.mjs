@@ -73,7 +73,13 @@ async function listFiles(rootPath, relativePrefix = "") {
     return files.sort();
 }
 
-async function compareManagedFiles(sourceRoot, destinationRoot, prefix, drift) {
+async function compareManagedFiles(
+    sourceRoot,
+    destinationRoot,
+    prefix,
+    drift,
+    excludedFiles = [],
+) {
     const sourceState = await pathState(sourceRoot);
 
     if (!sourceState?.isDirectory()) {
@@ -81,6 +87,9 @@ async function compareManagedFiles(sourceRoot, destinationRoot, prefix, drift) {
     }
 
     for (const relativePath of await listFiles(sourceRoot)) {
+        if (excludedFiles.includes(relativePath)) {
+            continue;
+        }
         const sourcePath = path.join(sourceRoot, relativePath);
         const destinationPath = path.join(destinationRoot, relativePath);
         const destinationState = await pathState(destinationPath);
@@ -319,9 +328,10 @@ export async function checkAgentSettings(options) {
         path.join(options.homeDir, ".claude"),
         ".claude",
         drift,
+        ["CLAUDE_global.md"],
     );
     await compareManagedFile(
-        path.join(options.repoDir, "global", "CLAUDE.md"),
+        path.join(options.repoDir, ".claude", "CLAUDE_global.md"),
         path.join(options.homeDir, ".claude", "CLAUDE.md"),
         ".claude/CLAUDE.md",
         drift,
@@ -330,6 +340,13 @@ export async function checkAgentSettings(options) {
         path.join(options.repoDir, ".codex"),
         path.join(options.homeDir, ".codex"),
         ".codex",
+        drift,
+        ["AGENTS_global.md"],
+    );
+    await compareManagedFile(
+        path.join(options.repoDir, ".codex", "AGENTS_global.md"),
+        path.join(options.homeDir, ".codex", "AGENTS.md"),
+        ".codex/AGENTS.md",
         drift,
     );
 

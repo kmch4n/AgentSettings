@@ -7,7 +7,8 @@ $ErrorActionPreference = "Stop"
 
 $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $AuditScript = Join-Path $RepoDir "scripts\check-agent-settings.mjs"
-$GlobalClaudeSource = Join-Path $RepoDir "global\CLAUDE.md"
+$GlobalClaudeSource = Join-Path $RepoDir ".claude\CLAUDE_global.md"
+$GlobalCodexSource = Join-Path $RepoDir ".codex\AGENTS_global.md"
 
 if ($Check) {
     & node $AuditScript --repo $RepoDir --home $env:USERPROFILE
@@ -70,7 +71,8 @@ function Copy-AllItems {
     param(
         [string]$Source,
         [string]$Destination,
-        [string]$Label
+        [string]$Label,
+        [string[]]$Exclude = @()
     )
 
     if (-not (Test-Path $Source)) {
@@ -79,7 +81,7 @@ function Copy-AllItems {
     }
 
     Ensure-Directory $Destination
-    Get-ChildItem -Force $Source | ForEach-Object {
+    Get-ChildItem -Force $Source | Where-Object { $_.Name -notin $Exclude } | ForEach-Object {
         Copy-Item -LiteralPath $_.FullName -Destination $Destination -Recurse -Force
     }
     Write-Host ("    [ok] {0}" -f $Label)
@@ -121,7 +123,9 @@ if (Test-Path $RulesSrc) {
 
 Write-Host ""
 Write-Host "==> Syncing Codex config to $CodexDest ..."
-Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex"
+Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex" -Exclude @("AGENTS_global.md")
+Copy-Item -LiteralPath $GlobalCodexSource -Destination (Join-Path $CodexDest "AGENTS.md") -Force
+Write-Host "    [ok] AGENTS.md"
 
 Write-Host ""
 Write-Host "==> Syncing shared skills..."
