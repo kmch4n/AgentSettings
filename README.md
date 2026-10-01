@@ -3,6 +3,23 @@
 このリポジトリは、`Claude Code` と `Codex` の設定ファイルをまとめて管理するためのものです。
 ルール、補助プロンプト、Claude 用の slash command / skill をここで管理し、ローカル環境へ同期する前提です。
 
+## 導入
+
+Git、Node.js、Claude Code CLI、Codex CLI を用意し、このリポジトリを clone します。同期にはネットワーク接続と、各 CLI で plugin を導入できる状態が必要です。
+
+Claude Code のグローバル指示の正本は **`global/CLAUDE.md`** です。同期後の配置先は **`~/.claude/CLAUDE.md`** で、リポジトリの `.claude/` 以下には置きません。
+
+```powershell
+git clone https://github.com/kmch4n/AgentSettings.git
+Set-Location AgentSettings
+.\sync.ps1
+.\sync.ps1 -Check
+```
+
+macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使います。通常の同期は最初に `git pull` を実行し、設定・skill のコピー、MCP 設定の更新、plugin の導入まで進めます。`-Check` / `--check` は読み取り専用で、未導入の端末では差分が出ます。
+
+変更時の手順、各ファイルの編集先、確認方法は [保守ガイド](docs/maintenance.md) を参照してください。
+
 ## 管理対象
 - `.claude/` - Claude Code 用の commands および共有 skills の source of truth
 - `global/CLAUDE.md` - 全プロジェクトへ同期する Claude Code のグローバル指示。リポジトリ内で同じ指示を二重に読み込まないため、`.claude/` の外に置く

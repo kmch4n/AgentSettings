@@ -22,16 +22,13 @@ Review the current Git changes, determine whether the work is suitable for a sin
    - If neither the skill nor that file yields the catalog, stop and report that clearly. Do not draft a commit message from memory.
 
 4. Validate staging state before proceeding.
-   - The following staging states are considered valid:
-     - all intended changed files are already staged
-     - no files are staged yet
-   - If only some files are staged while others are not, do not proceed immediately.
-   - In that case, ask the user to confirm whether the partially staged state is intentional before continuing.
+   - Review both the staged patch and unstaged changes; preserve intentional staging.
+   - Stage only task-related files. Ask only if the intended scope cannot be determined from the request and diff.
 
 5. Evaluate commit scope before committing.
    - Determine whether the current changes form a single cohesive commit.
-   - If the changes are clearly unrelated or should be split into multiple commits, do not commit yet.
-   - In that case, ask the user whether the changes should be split before proceeding.
+   - Split clearly unrelated changes into separate commits when the intended scope is clear.
+   - If the ownership or scope of changes is ambiguous, ask before committing those changes.
 
 6. Check for sensitive or risky content.
    - If any secret, credential, token, private key, environment-specific secret, or other sensitive data appears in the diff, stop immediately and ask the user before proceeding.
@@ -43,9 +40,10 @@ Review the current Git changes, determine whether the work is suitable for a sin
      - the last 10 commit messages
      - the gitmoji catalog loaded in step 3
    - Use `[gitmoji] + space + English message` with a real emoji inside the brackets, for example `[✨] Add issue helper`.
-   - Present the proposed commit message before executing the commit.
+   - Briefly announce the proposed commit message before executing the commit.
 
 8. Perform Git write operations only through this prompt.
+   - Follow any user or project rule that limits commits, pushes, or delegates Git operations.
    - Only the following write operations are permitted through this prompt:
      - `git add`
      - `git commit`
@@ -53,20 +51,20 @@ Review the current Git changes, determine whether the work is suitable for a sin
    - Do not use other Git write operations unless the user explicitly asks for them.
 
 9. Push the commit.
-   - After committing, push to `main`.
+   - After committing, push the current branch, subject to the user's and project's instructions.
 
 ## Author identity restriction
 
 - Never create a commit using a Claude-related account, Codex-related account, bot account, service identity, or placeholder identity.
 - Before committing, verify the active Git author configuration.
+- Before pushing, verify the hosting account belongs to the user.
 - If the configured `user.name` or `user.email` appears to belong to Claude, Codex, a bot, or an unintended account, stop and report the issue instead of committing.
-- Never include Claude, Codex, or any AI agent name in the commit message, push output summary, or related GitHub text.
+- Do not add AI attribution trailers. Technical references to tools are allowed when they describe the change.
 
 ## Branch policy
 
-- Direct push to `main` is allowed.
-- Push to `main` only.
-- Do not switch branches, create branches, or push to another branch unless the user explicitly requests it.
+- Push the current branch unless the user or project instructions require another workflow.
+- Do not switch branches or create branches unless the task requires it.
 
 ## Safety rules
 
@@ -84,17 +82,11 @@ Review the current Git changes, determine whether the work is suitable for a sin
   2. show the proposed commit message
   3. stage the relevant files if needed
   4. commit
-  5. push to `main`
+  5. push the current branch
   6. report the result clearly
 
-- If the changes should be split:
-  - explain why
-  - describe the likely split briefly
-  - ask the user how to proceed before making any commit
-
-- If the staging state is partial:
-  - explain that only some files are staged
-  - ask whether that staging state is intentional before proceeding
+- If the changes should be split, make separate commits for clear scopes and report them.
+- If staging is partial, preserve intentional staging and exclude unrelated files.
 
 - If no files are staged, stage all intended changes before committing.
 
@@ -105,5 +97,5 @@ Review the current Git changes, determine whether the work is suitable for a sin
   - whether the changes are suitable for one commit
   - whether the staging state is acceptable
   - what commit message is proposed
-  - whether commit and push to `main` were completed
+  - whether commit and push to the current branch were completed
   - why execution was stopped, if it was stopped

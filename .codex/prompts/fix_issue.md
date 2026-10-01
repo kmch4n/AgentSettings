@@ -20,11 +20,10 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
 ### 3. Implementation
 - Apply the minimal fix that satisfies the acceptance criteria.
 - Do not add unrelated refactors, comments, or improvements.
-- Follow the project's TypeScript strict mode, 4-space indent, double-quote conventions.
+- Follow the target project's existing language, formatter, type-checking, and naming conventions.
 
 ### 4. Verification
-- Run `npm run lint` and confirm **0 errors**. Existing warnings unrelated to this fix are acceptable.
-- If lint fails, fix the issue and re-run.
+- Run the target project's relevant tests, lint, and type checks. Resolve failures caused by this fix and re-run the affected checks.
 
 ### 5. Commit
 - Stage only the files you changed.
@@ -34,7 +33,7 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
   - First line ≤ 72 characters, present tense.
   - Bullet the body for multiple logical changes.
   - Split unrelated changes into separate commits when appropriate.
-- **NEVER include `Co-Authored-By`, Claude, Codex, or any AI attribution.**
+- Do not add `Co-Authored-By` or other AI attribution trailers. Technical references to tools are allowed when they describe the fix.
 
 ### 6. Push
 - `git push` to the remote.
@@ -49,6 +48,6 @@ $ARGUMENTS — GitHub issue number (e.g. `3`, `#12`)
 ## Constraints
 - All git operations must be performed from the **user's account**. Never use a Claude or Codex account.
 - All GitHub Issue write actions must also be performed from the **user's account**. Never use a Claude or Codex account.
-- Never include Claude's name, Codex's name, or AI attribution anywhere in commits, comments, or PR descriptions.
+- Do not add AI attribution in commits, comments, or PR descriptions; technical references to tools are allowed when relevant.
 - Respond to the user in Japanese; write the GitHub Issue, issue comments, and commit messages in English.
 - If the issue is ambiguous or requires a design decision, ask the user before proceeding.
