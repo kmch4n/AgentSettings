@@ -3,6 +3,17 @@ import { readFile } from "node:fs/promises";
 
 const powershellScript = await readFile("sync.ps1", "utf8");
 const shellScript = await readFile("sync.sh", "utf8");
+
+assert.match(
+    powershellScript,
+    /Join-Path \$RepoDir "global\\CLAUDE\.md"/,
+    "Windows sync must read the global Claude source outside .claude/",
+);
+assert.match(
+    shellScript,
+    /GLOBAL_CLAUDE_SRC="\$REPO_DIR\/global\/CLAUDE\.md"/,
+    "Unix sync must read the global Claude source outside .claude/",
+);
 const expectedCodexPlugins = [
     "code-review@claude-plugins-official",
     "code-simplifier@claude-plugins-official",

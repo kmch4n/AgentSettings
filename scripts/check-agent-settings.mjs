@@ -105,6 +105,30 @@ async function compareManagedFiles(sourceRoot, destinationRoot, prefix, drift) {
     }
 }
 
+async function compareManagedFile(sourcePath, destinationPath, displayPath, drift) {
+    const sourceState = await pathState(sourcePath);
+
+    if (!sourceState?.isFile()) {
+        throw new Error(`Managed source file is missing: ${displayPath}`);
+    }
+
+    const destinationState = await pathState(destinationPath);
+
+    if (!destinationState?.isFile()) {
+        drift.push(displayPath);
+        return;
+    }
+
+    const [sourceContent, destinationContent] = await Promise.all([
+        readFile(sourcePath),
+        readFile(destinationPath),
+    ]);
+
+    if (!sourceContent.equals(destinationContent)) {
+        drift.push(displayPath);
+    }
+}
+
 function parseTomlValue(rawValue, context) {
     const value = rawValue.trim();
 
@@ -294,6 +318,12 @@ export async function checkAgentSettings(options) {
         path.join(options.repoDir, ".claude"),
         path.join(options.homeDir, ".claude"),
         ".claude",
+        drift,
+    );
+    await compareManagedFile(
+        path.join(options.repoDir, "global", "CLAUDE.md"),
+        path.join(options.homeDir, ".claude", "CLAUDE.md"),
+        ".claude/CLAUDE.md",
         drift,
     );
     await compareManagedFiles(

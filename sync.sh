@@ -1,4 +1,4 @@
-﻿#!/bin/bash
+#!/bin/bash
 # sync.sh - Pull latest config and sync to ~/.claude, ~/.codex
 
 set -e
@@ -15,6 +15,7 @@ CLAUDE_DEST="$HOME/.claude"
 CODEX_DEST="$HOME/.codex"
 CLAUDE_SRC="$REPO_DIR/.claude"
 CODEX_SRC="$REPO_DIR/.codex"
+GLOBAL_CLAUDE_SRC="$REPO_DIR/global/CLAUDE.md"
 CLAUDE_PLUGINS=(
     "frontend-design@claude-plugins-official"
     "superpowers@claude-plugins-official"
@@ -73,7 +74,7 @@ echo "==> Syncing Claude Code config to $CLAUDE_DEST ..."
 
 # CLAUDE.md
 mkdir -p "$CLAUDE_DEST"
-cp "$CLAUDE_SRC/CLAUDE.md" "$CLAUDE_DEST/CLAUDE.md"
+cp "$GLOBAL_CLAUDE_SRC" "$CLAUDE_DEST/CLAUDE.md"
 echo "    [ok] CLAUDE.md"
 
 # commands/

@@ -7,6 +7,7 @@ $ErrorActionPreference = "Stop"
 
 $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $AuditScript = Join-Path $RepoDir "scripts\check-agent-settings.mjs"
+$GlobalClaudeSource = Join-Path $RepoDir "global\CLAUDE.md"
 
 if ($Check) {
     & node $AuditScript --repo $RepoDir --home $env:USERPROFILE
@@ -93,7 +94,8 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "==> Syncing Claude Code config to $ClaudeDest ..."
 
 # CLAUDE.md
-Copy-Item (Join-Path $ClaudeSrc "CLAUDE.md") (Join-Path $ClaudeDest "CLAUDE.md") -Force
+Ensure-Directory $ClaudeDest
+Copy-Item -LiteralPath $GlobalClaudeSource -Destination (Join-Path $ClaudeDest "CLAUDE.md") -Force
 Write-Host "    [ok] CLAUDE.md"
 
 # commands/

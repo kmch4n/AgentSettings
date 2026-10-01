@@ -27,7 +27,7 @@ The `[` and `]` characters are mandatory.
 - Prefer separate commits for unrelated changes; do not force multiple concerns into one commit when they can be split cleanly.
 - Review the last 10 commit messages (`git log -10 --pretty=format:%s`) as a style and consistency reference.
 
-The Git safety policy (no staging, committing, or pushing without explicit instruction; no AI attribution; verify the active Git identity) lives in `CLAUDE.md` / `AGENTS.md` and applies whether or not this skill is loaded.
+Git operation permissions and identity checks are defined by the user's current instructions and the applicable global and project instructions. Follow those rules whether or not this skill is loaded.
 
 ## Complete Gitmoji Catalog (synced 2026-04-04)
 Sourced from [gitmoji.dev](https://gitmoji.dev/) to avoid external lookups inside prompts. Descriptions use the wording published there on April 4, 2026; update this table whenever gitmoji.dev adds or removes entries.

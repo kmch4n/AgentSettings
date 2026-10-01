@@ -18,7 +18,7 @@ async function write(relativePath, content, baseDir = repoDir) {
 }
 
 async function createFixture() {
-    await write(".claude/CLAUDE.md", "shared\n");
+    await write("global/CLAUDE.md", "shared\n");
     await write(".claude/skills/example/SKILL.md", "skill\n");
     await write(".codex/AGENTS.md", "shared\n");
     await write("vendor/slide-md/SLIDE.md", "slide\n");

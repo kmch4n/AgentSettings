@@ -5,7 +5,9 @@
 
 ## 管理対象
 - `.claude/` - Claude Code 用の commands および共有 skills の source of truth
+- `global/CLAUDE.md` - 全プロジェクトへ同期する Claude Code のグローバル指示。リポジトリ内で同じ指示を二重に読み込まないため、`.claude/` の外に置く
 - `.codex/` - Codex 用の AGENTS と prompts
+- `AGENTS.md` - このリポジトリ固有の作業案内。固定の skill 一覧は持たない
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
 - `vendor/hallmark/` - 外部由来の `hallmark` skill 本体（Claude Code と Codex の両方へ配布）
@@ -35,7 +37,8 @@
 - ユーザーとの対話は日本語
 - コード、コメント、コミットメッセージ、Issue、PR、release 関連の成果物は英語
 - README などプロジェクト向け文書は、そのプロジェクトの既存慣習を確認してから編集
-- Git 操作や Issue 書き込みは、ユーザーが明示的に依頼したときだけ実行
+- 依頼されたリポジトリ変更は、検証後に追加確認なく commit / push してよい。プロジェクト別の禁止・委任ルールがあればそちらを優先する
+- force-push、公開済み履歴の書き換え、Issue・PR・コメントの投稿、デプロイは個別の許可が必要
 - コミット時は `gitmoji` skill と直近 10 件のコミット履歴を確認
 - コミット形式は `[gitmoji] + 半角スペース + English message`
 - 例: `[✨] Add issue helper`
@@ -94,9 +97,9 @@
 - 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
 
 ### デザイン系 skill の使い分け
-デザイン系の skill は担当領域が重なるため、エージェントが黙って1つを選ぶことは禁止しています。正となるルールは `.claude/CLAUDE.md` と `.codex/AGENTS.md` の `Design Skill Selection` にあり、以下はその要約です。
+デザイン系の skill は担当領域が重なります。正となる短い選択ルールは `global/CLAUDE.md` と `.codex/AGENTS.md` に置き、以下に詳細をまとめます。ユーザーが skill を指定した場合はその指定を優先します。
 
-- 新規UI、リデザイン、美的判断を伴うスタイリングでは、候補を2〜3個提示してユーザーの選択を待ちます。ボタンのズレ修正のような機械的な作業では発動しません。
+- 新規UIやリデザインで方法の指定がない場合は、`hallmark` と `frontend-design` を提示してユーザーの選択を待ちます。ボタンのズレ修正のような機械的な作業では発動しません。
 - 確認は1タスクにつき1回だけで、選んだ skill はそのタスク中は維持します。
 - 併用可能です。構造面の選択に `apple-design` をモーション層として重ねられます。
 
@@ -111,7 +114,7 @@
 
 `hallmark` と `frontend-design` が本当に衝突する組み合わせです。違いは領域ではなく方法で、`hallmark` はルールエンジン、`frontend-design` は美的判断のガイドです。ユーザーの好みが不明なときは両方を提示します。
 
-スライドでは `consulting-pptx` と slide 系3種が正面から衝突します。前者は内容を統制し、後者は見た目を再現するもので、担当レイヤーが逆です。**どちらを使うかは自動で決めず必ずユーザーに確認し、1つを選んだらそのタスク中は併用しません。** 規約が直接矛盾するためで、たとえば `consulting-pptx` は角丸を全面禁止しますが、`SLIDE-PATTERN` は99個中77個が `border-radius` を使っています。判定に迷うときは「そのスライドは印刷されて赤入れされるか」で分けます。
+スライドでは `consulting-pptx` と slide 系3種が正面から衝突します。前者は内容を統制し、後者は見た目を再現するもので、担当レイヤーが逆です。**ユーザーが系統を指定していない場合に確認し、1つを選んだらそのタスク中は併用しません。** 規約が直接矛盾するためで、たとえば `consulting-pptx` は角丸を全面禁止しますが、`SLIDE-PATTERN` は99個中77個が `border-radius` を使っています。判定に迷うときは「そのスライドは印刷されて赤入れされるか」で分けます。
 
 ### SLIDE.md の共有
 - 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexが参照する `~/.agents/skills/` の両方へ同期します。
