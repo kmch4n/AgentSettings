@@ -7,7 +7,7 @@
 
 Git、Node.js、Claude Code CLI、Codex CLI を用意し、このリポジトリを clone します。同期にはネットワーク接続と、各 CLI で plugin を導入できる状態が必要です。
 
-Claude Code のグローバル指示の正本は **`global/CLAUDE.md`** です。同期後の配置先は **`~/.claude/CLAUDE.md`** で、リポジトリの `.claude/` 以下には置きません。
+Claude Code のグローバル指示の正本はリポジトリ内の **[global/CLAUDE.md](global/CLAUDE.md)** です。同期後の配置先は **`~/.claude/CLAUDE.md`** で、リポジトリの `.claude/` 以下には置きません。
 
 ```powershell
 git clone https://github.com/kmch4n/AgentSettings.git
