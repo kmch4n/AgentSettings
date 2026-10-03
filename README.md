@@ -1,13 +1,13 @@
 # Agent Settings
 
-このリポジトリは、`Claude Code` と `Codex` の設定ファイルをまとめて管理するためのものです。
+このリポジトリは、`Claude Code`、`Codex`、および `Antigravity CLI (agy)` の設定ファイルをまとめて管理するためのものです。
 ルール、補助プロンプト、Claude 用の slash command / skill をここで管理し、ローカル環境へ同期する前提です。
 
 ## 導入
 
-Git、Node.js、Claude Code CLI、Codex CLI を用意し、このリポジトリを clone します。同期にはネットワーク接続と、各 CLI で plugin を導入できる状態が必要です。
+Git、Node.js、Claude Code CLI、Codex CLI、Antigravity CLI を用意し、このリポジトリを clone します。同期にはネットワーク接続と、各 CLI で plugin を導入できる状態が必要です。
 
-グローバル指示の正本は、このリポジトリ内の **[.claude/CLAUDE_global.md](.claude/CLAUDE_global.md)** と **[.codex/AGENTS_global.md](.codex/AGENTS_global.md)** です。同期後はそれぞれ `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md` に配置されます。
+グローバル指示の正本は、このリポジトリ内の **[.claude/CLAUDE_global.md](.claude/CLAUDE_global.md)**、**[.codex/AGENTS_global.md](.codex/AGENTS_global.md)**、および **[.gemini/GEMINI_global.md](.gemini/GEMINI_global.md)** です。同期後はそれぞれ `~/.claude/CLAUDE.md`、`~/.codex/AGENTS.md`、および `~/.gemini/config/GEMINI.md` に配置されます。
 
 ```powershell
 git clone https://github.com/kmch4n/AgentSettings.git
@@ -24,6 +24,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `.claude/` - Claude Code 用の commands および共有 skills の source of truth
 - `.claude/CLAUDE_global.md` - Claude Code のグローバル指示の正本。同期時に `CLAUDE.md` という名前で配置
 - `.codex/` - Codex 用の `AGENTS_global.md` と prompts。グローバル指示は同期時に `AGENTS.md` という名前で配置
+- `.gemini/` - Antigravity CLI (agy) 用の `GEMINI_global.md`。同期時に `~/.gemini/config/GEMINI.md` という名前で配置
 - `AGENTS.md` - このリポジトリ固有の作業案内。固定の skill 一覧は持たない
 - `.mcp/` - Codex / Claude Code 用の MCP server 定義テンプレート
 - `vendor/slide-md/` - SLIDE.md のサンプルデザイン、99種類のパターン、プロジェクト初期化スクリプト
@@ -31,7 +32,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `vendor/apple-design/` - 外部由来の `apple-design` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/create-readme/` - 外部由来の `create-readme` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/yomiyasu/` - 外部由来の `yomiyasu` skill 本体（Claude Code と Codex の両方へ配布）
-- `sync.ps1` / `sync.sh` - `~/.claude` と `~/.codex` へ同期し、管理対象 plugin を導入するスクリプト
+- `sync.ps1` / `sync.sh` - `~/.claude`、`~/.codex`、`~/.gemini/config` へ同期し、管理対象 plugin を導入するスクリプト
 
 ## 同期範囲と所有者
 
@@ -114,7 +115,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
 
 ### デザイン系 skill の使い分け
-デザイン系の skill は担当領域が重なります。正となる短い選択ルールは `.claude/CLAUDE_global.md` と `.codex/AGENTS_global.md` に置き、以下に詳細をまとめます。ユーザーが skill を指定した場合はその指定を優先します。
+デザイン系の skill は担当領域が重なります。正となる短い選択ルールは `.claude/CLAUDE_global.md`、`.codex/AGENTS_global.md`、および `.gemini/GEMINI_global.md` に置き、以下に詳細をまとめます。ユーザーが skill を指定した場合はその指定を優先します。
 
 - 新規UIやリデザインで方法の指定がない場合は、`hallmark` と `frontend-design` を提示してユーザーの選択を待ちます。ボタンのズレ修正のような機械的な作業では発動しません。
 - 確認は1タスクにつき1回だけで、選んだ skill はそのタスク中は維持します。

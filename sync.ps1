@@ -9,6 +9,7 @@ $RepoDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $AuditScript = Join-Path $RepoDir "scripts\check-agent-settings.mjs"
 $GlobalClaudeSource = Join-Path $RepoDir ".claude\CLAUDE_global.md"
 $GlobalCodexSource = Join-Path $RepoDir ".codex\AGENTS_global.md"
+$GlobalAgySource = Join-Path $RepoDir ".gemini\GEMINI_global.md"
 
 if ($Check) {
     & node $AuditScript --repo $RepoDir --home $env:USERPROFILE
@@ -58,6 +59,7 @@ $CodexPluginRemoveList = @(
 
 $ClaudeDest = Join-Path $env:USERPROFILE ".claude"
 $CodexDest = Join-Path $env:USERPROFILE ".codex"
+$AgyDest = Join-Path $env:USERPROFILE ".gemini\config"
 $SharedSkillSyncScript = Join-Path $RepoDir "scripts\sync-shared-skills.mjs"
 
 function Ensure-Directory {
@@ -126,6 +128,12 @@ Write-Host "==> Syncing Codex config to $CodexDest ..."
 Copy-AllItems -Source $CodexSrc -Destination $CodexDest -Label ".codex" -Exclude @("AGENTS_global.md")
 Copy-Item -LiteralPath $GlobalCodexSource -Destination (Join-Path $CodexDest "AGENTS.md") -Force
 Write-Host "    [ok] AGENTS.md"
+
+Write-Host ""
+Write-Host "==> Syncing Antigravity CLI (agy) config to $AgyDest ..."
+Ensure-Directory $AgyDest
+Copy-Item -LiteralPath $GlobalAgySource -Destination (Join-Path $AgyDest "GEMINI.md") -Force
+Write-Host "    [ok] GEMINI.md"
 
 Write-Host ""
 Write-Host "==> Syncing shared skills..."

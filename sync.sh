@@ -13,10 +13,12 @@ if [ "${1:-}" = "--check" ]; then
 fi
 CLAUDE_DEST="$HOME/.claude"
 CODEX_DEST="$HOME/.codex"
+AGY_DEST="$HOME/.gemini/config"
 CLAUDE_SRC="$REPO_DIR/.claude"
 CODEX_SRC="$REPO_DIR/.codex"
 GLOBAL_CLAUDE_SRC="$REPO_DIR/.claude/CLAUDE_global.md"
 GLOBAL_CODEX_SRC="$REPO_DIR/.codex/AGENTS_global.md"
+GLOBAL_AGY_SRC="$REPO_DIR/.gemini/GEMINI_global.md"
 CLAUDE_PLUGINS=(
     "frontend-design@claude-plugins-official"
     "superpowers@claude-plugins-official"
@@ -102,6 +104,12 @@ echo "==> Syncing Codex config to $CODEX_DEST ..."
 copy_tree "$CODEX_SRC" "$CODEX_DEST" ".codex" "AGENTS_global.md"
 cp "$GLOBAL_CODEX_SRC" "$CODEX_DEST/AGENTS.md"
 echo "    [ok] AGENTS.md"
+
+echo ""
+echo "==> Syncing Antigravity CLI (agy) config to $AGY_DEST ..."
+mkdir -p "$AGY_DEST"
+cp "$GLOBAL_AGY_SRC" "$AGY_DEST/GEMINI.md"
+echo "    [ok] GEMINI.md"
 
 echo ""
 echo "==> Syncing shared skills..."

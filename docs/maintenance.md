@@ -1,12 +1,12 @@
 # Agent Settings の保守
 
-このリポジトリを正本として、各端末の Claude Code と Codex のグローバル環境へ一方向に同期します。ホームディレクトリ側のコピーを直接編集しても、次の同期で上書きされます。
+このリポジトリを正本として、各端末の Claude Code、Codex、および Antigravity CLI (agy) のグローバル環境へ一方向に同期します。ホームディレクトリ側のコピーを直接編集しても、次の同期で上書きされます。
 
 ## 編集する場所
 
 | 変更内容 | リポジトリ内の正本 | 同期先 |
 | --- | --- | --- |
-| 共通の行動指示 | `.claude/CLAUDE_global.md` と `.codex/AGENTS_global.md` | `~/.claude/CLAUDE.md` と `~/.codex/AGENTS.md` |
+| 共通の行動指示 | `.claude/CLAUDE_global.md`、`.codex/AGENTS_global.md`、`.gemini/GEMINI_global.md` | `~/.claude/CLAUDE.md`、`~/.codex/AGENTS.md`、`~/.gemini/config/GEMINI.md` |
 | このリポジトリだけの作業指示 | `AGENTS.md` | 同期しない |
 | Claude Code の slash command | `.claude/commands/` | `~/.claude/commands/` |
 | Codex の対応 prompt | `.codex/prompts/` | `~/.codex/prompts/` |
@@ -15,7 +15,7 @@
 | MCP server の定義 | `.mcp/` | `~/.claude.json` と `~/.codex/config.toml` の管理対象部分 |
 | 同期・検査の処理 | `sync.ps1`、`sync.sh`、`scripts/` | リポジトリから実行 |
 
-共通の行動指示を変える場合は、Claude Code 用と Codex 用の両方を更新します。`README.md` は人向けの説明、`AGENTS.md` はこのリポジトリ固有の作業指示です。プロジェクトごとの Git 操作制限や委任ルールは、そのプロジェクトの指示に置きます。
+共通の行動指示を変える場合は、各エージェント用（Claude, Codex, agy）のファイルをすべて更新します。`README.md` は人向けの説明、`AGENTS.md` はこのリポジトリ固有の作業指示です。プロジェクトごとの Git 操作制限や委任ルールは、そのプロジェクトの指示に置きます。
 
 ## 変更から各端末への反映
 
