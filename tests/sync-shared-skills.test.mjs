@@ -18,9 +18,12 @@ import {
 } from "../scripts/sync-shared-skills.mjs";
 
 const VENDORED_SKILL_NAMES = VENDORED_SKILLS.map((skill) => skill.name);
-const EXPLICIT_ONLY_SKILL_NAMES = VENDORED_SKILLS.filter(
-    (skill) => skill.explicitOnly,
-).map((skill) => skill.name);
+const DESCRIPTION_OVERRIDES = new Map(
+    VENDORED_SKILLS.filter((skill) => skill.description).map((skill) => [
+        skill.name,
+        skill.description,
+    ]),
+);
 
 assert.ok(
     VENDORED_SKILL_NAMES.includes("yomiyasu"),
@@ -30,19 +33,33 @@ assert.ok(
     VENDORED_SKILL_NAMES.includes("natural-japanese"),
     "natural-japanese must be distributed by both sync commands",
 );
-assert.deepEqual(
-    EXPLICIT_ONLY_SKILL_NAMES,
-    ["yomiyasu"],
-    "only one Japanese rewriting skill may be invoked automatically",
+assert.match(
+    DESCRIPTION_OVERRIDES.get("natural-japanese") ?? "",
+    /新しく書く/,
+    "natural-japanese must be scoped to writing new text",
 );
+assert.match(
+    DESCRIPTION_OVERRIDES.get("yomiyasu") ?? "",
+    /既にある/,
+    "yomiyasu must be scoped to revising existing text",
+);
+for (const name of ["natural-japanese", "yomiyasu"]) {
+    assert.match(
+        DESCRIPTION_OVERRIDES.get(name) ?? "",
+        /ユーザーに確認/,
+        `${name} must ask the user when the skill choice is unclear`,
+    );
+}
 
 function vendoredSkill(vendorName) {
-    return `---\nname: ${vendorName}\n---\nvendored ${vendorName}\n`;
+    return `---\nname: ${vendorName}\ndescription: upstream ${vendorName}\n  continued\nlicense: MIT\n---\nvendored ${vendorName}\n`;
 }
 
 function deployedSkill(vendorName) {
-    return EXPLICIT_ONLY_SKILL_NAMES.includes(vendorName)
-        ? `---\nname: ${vendorName}\ndisable-model-invocation: true\n---\nvendored ${vendorName}\n`
+    const description = DESCRIPTION_OVERRIDES.get(vendorName);
+
+    return description
+        ? `---\nname: ${vendorName}\ndescription: ${JSON.stringify(description)}\nlicense: MIT\n---\nvendored ${vendorName}\n`
         : vendoredSkill(vendorName);
 }
 
@@ -235,35 +252,7 @@ await withFixture(async ({ homeDir, repoDir }) => {
                 deployedSkill(vendorName),
                 "vendored skills must reach both runtime skill roots",
             );
-            assert.equal(
-                await exists(
-                    path.join(
-                        homeDir,
-                        runtimeRoot,
-                        "skills",
-                        vendorName,
-                        "agents",
-                        "openai.yaml",
-                    ),
-                ),
-                EXPLICIT_ONLY_SKILL_NAMES.includes(vendorName),
-                "only explicit-only skills get a Codex invocation policy",
-            );
         }
-        assert.match(
-            await readFile(
-                path.join(
-                    homeDir,
-                    runtimeRoot,
-                    "skills",
-                    "yomiyasu",
-                    "agents",
-                    "openai.yaml",
-                ),
-                "utf8",
-            ),
-            /allow_implicit_invocation: false/,
-        );
         assert.equal(
             await readFile(
                 path.join(
@@ -437,25 +426,21 @@ await withFixture(async ({ homeDir, repoDir }) => {
     const drifted = await syncSharedSkills({ apply: false, homeDir, repoDir });
     assert.ok(
         drifted.items.includes(".claude/skills/yomiyasu"),
-        "a deployed copy without the explicit-only flag must be reported",
+        "a deployed copy with the upstream description must be reported",
     );
 });
 
 await withFixture(async ({ homeDir, repoDir }) => {
-    const upstreamPolicy = path.join(
-        repoDir,
-        "vendor",
-        "yomiyasu",
-        "agents",
-        "openai.yaml",
+    await writeFile(
+        path.join(repoDir, "vendor", "yomiyasu", "SKILL.md"),
+        "---\nname: yomiyasu\n---\nno description\n",
+        "utf8",
     );
-    await mkdir(path.dirname(upstreamPolicy), { recursive: true });
-    await writeFile(upstreamPolicy, "interface: {}\n", "utf8");
 
     await assert.rejects(
         syncSharedSkills({ apply: false, homeDir, repoDir }),
-        /agents\/openai\.yaml/,
-        "an upstream Codex policy must not be overwritten silently",
+        /Missing SKILL\.md description/,
+        "an override must not silently add a description the upstream lacks",
     );
 });
 

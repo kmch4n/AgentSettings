@@ -16,25 +16,28 @@ import { pathToFileURL } from "node:url";
  * Third-party skills vendored under `vendor/`. They are deployed to the same
  * runtime skill roots as the repo-owned skills in `.claude/skills/`.
  *
- * `explicitOnly` keeps a skill out of automatic invocation without editing
- * the vendored upstream files: the deployed copy gets
- * `disable-model-invocation: true` (Claude Code) and an `agents/openai.yaml`
- * with `allow_implicit_invocation: false` (Codex). Use it when two skills
- * share trigger phrases so that only one of them is loaded automatically.
+ * `description` replaces the upstream SKILL.md description in the deployed
+ * copy without editing the vendored files. Both Claude Code and Codex decide
+ * automatic invocation from that description, so it is how two skills with
+ * overlapping upstream triggers are given disjoint responsibilities.
  */
 export const VENDORED_SKILLS = [
     { name: "apple-design", vendorDir: "apple-design" },
     { name: "create-readme", vendorDir: "create-readme" },
     { name: "hallmark", vendorDir: "hallmark" },
-    { name: "natural-japanese", vendorDir: "natural-japanese" },
-    { name: "yomiyasu", vendorDir: "yomiyasu", explicitOnly: true },
+    {
+        name: "natural-japanese",
+        vendorDir: "natural-japanese",
+        description:
+            "日本語の文章を新しく書くときに使うスキル。議事録（文字起こしからの議事録化を含む）、調査・分析レポート、社内ガイド・マニュアル、リサーチメモ、企画書・提案書・報告書、メール、スライド構成案、note・ブログ・エッセイを、ゼロから書く・メモや素材から書き起こす依頼で使用する。「〜について書いて」「議事録にまとめて」「レポートを作って」「下書きを作って」「/natural-japanese write」といった依頼、書き換えを伴わないAI臭さの診断・採点（「この文章AIが書いた？」「/natural-japanese score」）、自分の文体のプロファイル化にも対応する。既にある文章の推敲・リライト・AI臭さの除去には使わない（yomiyasu の担当）。新しく書くのか既にある文章を直すのか判断できないときは、どちらのスキルを使うかユーザーに確認してから進める。",
+    },
+    {
+        name: "yomiyasu",
+        vendorDir: "yomiyasu",
+        description:
+            "既にある日本語の文章からAI臭さを取り除き、意味を変えずに読みやすく自然な文章へ書き直すスキル。「この文章を読みやすくして」「AI臭さを消して」「AIっぽさをなくして」「自然な日本語にして」「文章を脱臭して」「推敲して」「リライトして」という依頼や、技術記事、業務仕様書・PR説明文、エッセイ・noteの推敲時に使用する。非生物主語の解体、比喩的動詞の具体化、絵文字や文末コロンの排除、不要な補足カッコの削除、英単語前後の不自然な半角空白の排除、過剰な太字・箇条書き・否定対比の平文化を行い、主張・比重・言い切りの強さを保ったまま文章を整える。文章を新しく書く依頼には使わない（natural-japanese の担当）。新しく書くのか既にある文章を直すのか判断できないときは、どちらのスキルを使うかユーザーに確認してから進める。",
+    },
 ];
-
-const EXPLICIT_ONLY_OPENAI_YAML = [
-    "policy:",
-    "  allow_implicit_invocation: false",
-    "",
-].join("\n");
 
 /**
  * Files this repository used to manage and has since retired. Neither sync
@@ -166,12 +169,13 @@ async function listRelativeFiles(rootPath) {
 }
 
 /**
- * Builds the files that turn a deployed skill into an explicit-only skill.
+ * Builds a SKILL.md whose frontmatter description is replaced.
  *
  * @param {string} sourcePath
+ * @param {string} description
  * @returns {Promise<Map<string, Buffer>>} Contents keyed by relative path.
  */
-async function explicitOnlyOverrides(sourcePath) {
+async function descriptionOverrides(sourcePath, description) {
     const skillPath = path.join(sourcePath, "SKILL.md");
     const skill = await readFile(skillPath, "utf8");
     const frontmatter = /^---(\r?\n)([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(skill);
@@ -179,28 +183,23 @@ async function explicitOnlyOverrides(sourcePath) {
     if (!frontmatter) {
         throw new Error(`Missing SKILL.md frontmatter: ${skillPath}`);
     }
-    if (await pathState(path.join(sourcePath, "agents", "openai.yaml"))) {
-        throw new Error(
-            `Refusing to replace upstream agents/openai.yaml: ${sourcePath}`,
-        );
-    }
 
     const [header, eol, body] = frontmatter;
-    const flagged = /^disable-model-invocation:/m.test(body)
-        ? body.replace(
-              /^disable-model-invocation:.*$/m,
-              "disable-model-invocation: true",
-          )
-        : `${body}${eol}disable-model-invocation: true`;
-    const patchedSkill = `---${eol}${flagged}${eol}---${eol}${skill.slice(header.length)}`;
+    // A description may continue on indented lines (folded or literal scalars).
+    const descriptionField = /^description:.*(?:\r?\n[ \t]+.*)*/m;
 
-    return new Map([
-        ["SKILL.md", Buffer.from(patchedSkill, "utf8")],
-        [
-            path.join("agents", "openai.yaml"),
-            Buffer.from(EXPLICIT_ONLY_OPENAI_YAML, "utf8"),
-        ],
-    ]);
+    if (!descriptionField.test(body)) {
+        throw new Error(`Missing SKILL.md description: ${skillPath}`);
+    }
+
+    // JSON strings are valid double-quoted YAML scalars.
+    const patchedBody = body.replace(
+        descriptionField,
+        () => `description: ${JSON.stringify(description)}`,
+    );
+    const patchedSkill = `---${eol}${patchedBody}${eol}---${eol}${skill.slice(header.length)}`;
+
+    return new Map([["SKILL.md", Buffer.from(patchedSkill, "utf8")]]);
 }
 
 /**
@@ -368,8 +367,8 @@ export async function syncSharedSkills(options) {
 
         skills.push({
             name: vendored.name,
-            overrides: vendored.explicitOnly
-                ? await explicitOnlyOverrides(sourcePath)
+            overrides: vendored.description
+                ? await descriptionOverrides(sourcePath, vendored.description)
                 : new Map(),
             sourcePath,
         });

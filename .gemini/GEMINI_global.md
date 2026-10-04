@@ -28,8 +28,10 @@
 - When a project has no established convention, use 4-space indentation, double quotes, and type annotations for new or changed Python and TypeScript interfaces. Prefer Black and Ruff for Python, Prettier and strict mode for TypeScript, and pnpm for a new JavaScript project.
 - Keep modules focused; split a file when its size makes it hard to understand. Use `cl` for a new API client instance when no project naming convention conflicts.
 
-## Design Skill Selection
-When a task names a skill, use that skill. For a new UI or redesign with no stated method, briefly present `hallmark` and `frontend-design` and ask the user to choose once. `apple-design` can provide motion guidance alongside either. For a slide deck with no chosen family, ask whether the user wants `consulting-pptx` or the `slide-md-*` family; use one family for that task. Skip this choice for mechanical fixes. See the repository README for the detailed comparison.
+## Skill Selection
+When a task names a skill, use that skill. For a new UI or redesign with no stated method, briefly present `hallmark` and `frontend-design` and ask the user to choose once. `apple-design` can provide motion guidance alongside either. For a slide deck with no chosen family, ask whether the user wants `consulting-pptx` or the `slide-md-*` family; use one family for that task. Skip this choice for mechanical fixes.
+
+For Japanese prose, use `natural-japanese` to write new text and `yomiyasu` to remove AI-like phrasing from existing text; do not load both for one task. If it is unclear whether the request is new writing or revising existing text, ask the user which skill to use before proceeding. See the repository README for the detailed comparisons.
 
 ## Output Rules
 - JSON output must use `indent=4` and `ensure_ascii=False`.
