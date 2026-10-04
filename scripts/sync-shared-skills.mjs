@@ -7,6 +7,7 @@ import {
     readFile,
     rm,
     unlink,
+    writeFile,
 } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
@@ -14,13 +15,26 @@ import { pathToFileURL } from "node:url";
 /**
  * Third-party skills vendored under `vendor/`. They are deployed to the same
  * runtime skill roots as the repo-owned skills in `.claude/skills/`.
+ *
+ * `explicitOnly` keeps a skill out of automatic invocation without editing
+ * the vendored upstream files: the deployed copy gets
+ * `disable-model-invocation: true` (Claude Code) and an `agents/openai.yaml`
+ * with `allow_implicit_invocation: false` (Codex). Use it when two skills
+ * share trigger phrases so that only one of them is loaded automatically.
  */
 export const VENDORED_SKILLS = [
     { name: "apple-design", vendorDir: "apple-design" },
     { name: "create-readme", vendorDir: "create-readme" },
     { name: "hallmark", vendorDir: "hallmark" },
-    { name: "yomiyasu", vendorDir: "yomiyasu" },
+    { name: "natural-japanese", vendorDir: "natural-japanese" },
+    { name: "yomiyasu", vendorDir: "yomiyasu", explicitOnly: true },
 ];
+
+const EXPLICIT_ONLY_OPENAI_YAML = [
+    "policy:",
+    "  allow_implicit_invocation: false",
+    "",
+].join("\n");
 
 /**
  * Files this repository used to manage and has since retired. Neither sync
@@ -151,7 +165,88 @@ async function listRelativeFiles(rootPath) {
     );
 }
 
-export async function directoriesMatch(sourcePath, destinationPath) {
+/**
+ * Builds the files that turn a deployed skill into an explicit-only skill.
+ *
+ * @param {string} sourcePath
+ * @returns {Promise<Map<string, Buffer>>} Contents keyed by relative path.
+ */
+async function explicitOnlyOverrides(sourcePath) {
+    const skillPath = path.join(sourcePath, "SKILL.md");
+    const skill = await readFile(skillPath, "utf8");
+    const frontmatter = /^---(\r?\n)([\s\S]*?)\r?\n---(?:\r?\n|$)/.exec(skill);
+
+    if (!frontmatter) {
+        throw new Error(`Missing SKILL.md frontmatter: ${skillPath}`);
+    }
+    if (await pathState(path.join(sourcePath, "agents", "openai.yaml"))) {
+        throw new Error(
+            `Refusing to replace upstream agents/openai.yaml: ${sourcePath}`,
+        );
+    }
+
+    const [header, eol, body] = frontmatter;
+    const flagged = /^disable-model-invocation:/m.test(body)
+        ? body.replace(
+              /^disable-model-invocation:.*$/m,
+              "disable-model-invocation: true",
+          )
+        : `${body}${eol}disable-model-invocation: true`;
+    const patchedSkill = `---${eol}${flagged}${eol}---${eol}${skill.slice(header.length)}`;
+
+    return new Map([
+        ["SKILL.md", Buffer.from(patchedSkill, "utf8")],
+        [
+            path.join("agents", "openai.yaml"),
+            Buffer.from(EXPLICIT_ONLY_OPENAI_YAML, "utf8"),
+        ],
+    ]);
+}
+
+/**
+ * Applies file overrides to a sorted `listRelativeFiles` result, adding any
+ * parent directories that the source does not already contain.
+ */
+function applyOverrides(entries, overrides) {
+    const result = [...entries];
+
+    for (const [relativePath, content] of overrides) {
+        let parent = path.dirname(relativePath);
+
+        while (parent !== ".") {
+            if (!result.some((entry) => entry.relativePath === parent)) {
+                result.push({ relativePath: parent, type: "directory" });
+            }
+            parent = path.dirname(parent);
+        }
+
+        const existing = result.findIndex(
+            (entry) => entry.relativePath === relativePath,
+        );
+        const entry = { content, relativePath, type: "file" };
+
+        if (existing === -1) {
+            result.push(entry);
+        } else {
+            result[existing] = entry;
+        }
+    }
+
+    return result.sort((left, right) =>
+        left.relativePath.localeCompare(right.relativePath),
+    );
+}
+
+/**
+ * @param {string} sourcePath
+ * @param {string} destinationPath
+ * @param {Map<string, Buffer>} [overrides] Files the deployed copy replaces or adds.
+ */
+export async function directoriesMatch(
+    sourcePath,
+    destinationPath,
+    overrides = new Map(),
+) {
     const destinationState = await pathState(destinationPath);
 
     if (!destinationState || destinationState.isSymbolicLink()) {
@@ -161,10 +256,11 @@ export async function directoriesMatch(sourcePath, destinationPath) {
         return false;
     }
 
-    const [sourceEntries, destinationEntries] = await Promise.all([
+    const [listedSourceEntries, destinationEntries] = await Promise.all([
         listRelativeFiles(sourcePath),
         listRelativeFiles(destinationPath),
     ]);
+    const sourceEntries = applyOverrides(listedSourceEntries, overrides);
 
     if (sourceEntries.length !== destinationEntries.length) {
         return false;
@@ -195,11 +291,13 @@ export async function directoriesMatch(sourcePath, destinationPath) {
  * @param {string} sourcePath
  * @param {string} destinationPath
  * @param {string | undefined} allowedLegacyLinkTarget
+ * @param {Map<string, Buffer>} [overrides] Files written over the copied tree.
  */
 async function replaceManagedDirectory(
     sourcePath,
     destinationPath,
     allowedLegacyLinkTarget,
+    overrides = new Map(),
 ) {
     const state = await pathState(destinationPath);
 
@@ -235,6 +333,13 @@ async function replaceManagedDirectory(
         force: false,
         recursive: true,
     });
+
+    for (const [relativePath, content] of overrides) {
+        const targetPath = containedPath(destinationPath, relativePath);
+
+        await mkdir(path.dirname(targetPath), { recursive: true });
+        await writeFile(targetPath, content);
+    }
 }
 
 /**
@@ -259,9 +364,14 @@ export async function syncSharedSkills(options) {
             );
         }
 
+        const sourcePath = directChildPath(vendorRoot, vendored.vendorDir);
+
         skills.push({
             name: vendored.name,
-            sourcePath: directChildPath(vendorRoot, vendored.vendorDir),
+            overrides: vendored.explicitOnly
+                ? await explicitOnlyOverrides(sourcePath)
+                : new Map(),
+            sourcePath,
         });
     }
 
@@ -272,10 +382,12 @@ export async function syncSharedSkills(options) {
     for (const runtimeRoot of [".claude", ".agents"]) {
         const destinationRoot = path.join(options.homeDir, runtimeRoot, "skills");
 
-        for (const { name: skillName, sourcePath } of skills) {
+        for (const { name: skillName, overrides, sourcePath } of skills) {
             const destinationPath = directChildPath(destinationRoot, skillName);
 
-            if (!(await directoriesMatch(sourcePath, destinationPath))) {
+            if (
+                !(await directoriesMatch(sourcePath, destinationPath, overrides))
+            ) {
                 items.push(`${runtimeRoot}/skills/${skillName}`);
 
                 if (options.apply) {
@@ -292,6 +404,7 @@ export async function syncSharedSkills(options) {
                         sourcePath,
                         destinationPath,
                         allowedLegacyLinkTarget,
+                        overrides,
                     );
                 }
             }

@@ -18,11 +18,33 @@ import {
 } from "../scripts/sync-shared-skills.mjs";
 
 const VENDORED_SKILL_NAMES = VENDORED_SKILLS.map((skill) => skill.name);
+const EXPLICIT_ONLY_SKILL_NAMES = VENDORED_SKILLS.filter(
+    (skill) => skill.explicitOnly,
+).map((skill) => skill.name);
 
 assert.ok(
     VENDORED_SKILL_NAMES.includes("yomiyasu"),
     "yomiyasu must be distributed by both sync commands",
 );
+assert.ok(
+    VENDORED_SKILL_NAMES.includes("natural-japanese"),
+    "natural-japanese must be distributed by both sync commands",
+);
+assert.deepEqual(
+    EXPLICIT_ONLY_SKILL_NAMES,
+    ["yomiyasu"],
+    "only one Japanese rewriting skill may be invoked automatically",
+);
+
+function vendoredSkill(vendorName) {
+    return `---\nname: ${vendorName}\n---\nvendored ${vendorName}\n`;
+}
+
+function deployedSkill(vendorName) {
+    return EXPLICIT_ONLY_SKILL_NAMES.includes(vendorName)
+        ? `---\nname: ${vendorName}\ndisable-model-invocation: true\n---\nvendored ${vendorName}\n`
+        : vendoredSkill(vendorName);
+}
 
 async function exists(targetPath) {
     try {
@@ -61,7 +83,7 @@ async function withFixture(testFn) {
             });
             await writeFile(
                 path.join(repoDir, "vendor", vendorName, "SKILL.md"),
-                `vendored ${vendorName}\n`,
+                vendoredSkill(vendorName),
                 "utf8",
             );
         }
@@ -210,10 +232,38 @@ await withFixture(async ({ homeDir, repoDir }) => {
                     ),
                     "utf8",
                 ),
-                `vendored ${vendorName}\n`,
+                deployedSkill(vendorName),
                 "vendored skills must reach both runtime skill roots",
             );
+            assert.equal(
+                await exists(
+                    path.join(
+                        homeDir,
+                        runtimeRoot,
+                        "skills",
+                        vendorName,
+                        "agents",
+                        "openai.yaml",
+                    ),
+                ),
+                EXPLICIT_ONLY_SKILL_NAMES.includes(vendorName),
+                "only explicit-only skills get a Codex invocation policy",
+            );
         }
+        assert.match(
+            await readFile(
+                path.join(
+                    homeDir,
+                    runtimeRoot,
+                    "skills",
+                    "yomiyasu",
+                    "agents",
+                    "openai.yaml",
+                ),
+                "utf8",
+            ),
+            /allow_implicit_invocation: false/,
+        );
         assert.equal(
             await readFile(
                 path.join(
@@ -287,11 +337,11 @@ await withFixture(async ({ homeDir, repoDir }) => {
     await syncSharedSkills({ apply: true, homeDir, repoDir });
     assert.equal(
         await readFile(path.join(claudeSkill, "SKILL.md"), "utf8"),
-        "vendored yomiyasu\n",
+        deployedSkill("yomiyasu"),
     );
     assert.equal(
         await readFile(path.join(agentsSkill, "SKILL.md"), "utf8"),
-        "vendored yomiyasu\n",
+        deployedSkill("yomiyasu"),
     );
 });
 
@@ -370,6 +420,43 @@ await withFixture(async ({ homeDir, repoDir, root }) => {
         "a retired path that is a symlink must not be unlinked",
     );
     assert.equal(await readFile(outsideFile, "utf8"), "outside\n");
+});
+
+await withFixture(async ({ homeDir, repoDir }) => {
+    await syncSharedSkills({ apply: true, homeDir, repoDir });
+
+    const deployedPath = path.join(
+        homeDir,
+        ".claude",
+        "skills",
+        "yomiyasu",
+        "SKILL.md",
+    );
+    await writeFile(deployedPath, vendoredSkill("yomiyasu"), "utf8");
+
+    const drifted = await syncSharedSkills({ apply: false, homeDir, repoDir });
+    assert.ok(
+        drifted.items.includes(".claude/skills/yomiyasu"),
+        "a deployed copy without the explicit-only flag must be reported",
+    );
+});
+
+await withFixture(async ({ homeDir, repoDir }) => {
+    const upstreamPolicy = path.join(
+        repoDir,
+        "vendor",
+        "yomiyasu",
+        "agents",
+        "openai.yaml",
+    );
+    await mkdir(path.dirname(upstreamPolicy), { recursive: true });
+    await writeFile(upstreamPolicy, "interface: {}\n", "utf8");
+
+    await assert.rejects(
+        syncSharedSkills({ apply: false, homeDir, repoDir }),
+        /agents\/openai\.yaml/,
+        "an upstream Codex policy must not be overwritten silently",
+    );
 });
 
 console.log("shared skill sync tests passed");

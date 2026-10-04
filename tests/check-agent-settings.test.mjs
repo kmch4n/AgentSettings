@@ -23,7 +23,7 @@ async function createFixture() {
     await write(".codex/AGENTS_global.md", "shared\n");
     await write("vendor/slide-md/SLIDE.md", "slide\n");
     for (const { name, vendorDir } of VENDORED_SKILLS) {
-        await write(`vendor/${vendorDir}/SKILL.md`, `${name}\n`);
+        await write(`vendor/${vendorDir}/SKILL.md`, `---\nname: ${name}\n---\n`);
     }
     await write(
         ".mcp/codex.config.toml",
@@ -52,9 +52,21 @@ async function createFixture() {
     await write(".agents/skills/external/SKILL.md", "external\n", homeDir);
     await write(".codex/AGENTS.md", "shared\n", homeDir);
     await write(".agents/slide-md/SLIDE.md", "slide\n", homeDir);
-    for (const { name } of VENDORED_SKILLS) {
-        await write(`.claude/skills/${name}/SKILL.md`, `${name}\n`, homeDir);
-        await write(`.agents/skills/${name}/SKILL.md`, `${name}\n`, homeDir);
+    for (const { explicitOnly, name } of VENDORED_SKILLS) {
+        const skill = explicitOnly
+            ? `---\nname: ${name}\ndisable-model-invocation: true\n---\n`
+            : `---\nname: ${name}\n---\n`;
+
+        for (const runtimeRoot of [".claude", ".agents"]) {
+            await write(`${runtimeRoot}/skills/${name}/SKILL.md`, skill, homeDir);
+            if (explicitOnly) {
+                await write(
+                    `${runtimeRoot}/skills/${name}/agents/openai.yaml`,
+                    "policy:\n  allow_implicit_invocation: false\n",
+                    homeDir,
+                );
+            }
+        }
     }
     await write(
         ".codex/config.toml",

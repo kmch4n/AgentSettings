@@ -31,7 +31,8 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `vendor/hallmark/` - 外部由来の `hallmark` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/apple-design/` - 外部由来の `apple-design` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/create-readme/` - 外部由来の `create-readme` skill 本体（Claude Code と Codex の両方へ配布）
-- `vendor/yomiyasu/` - 外部由来の `yomiyasu` skill 本体（Claude Code と Codex の両方へ配布）
+- `vendor/yomiyasu/` - 外部由来の `yomiyasu` skill 本体（Claude Code と Codex の両方へ配布。明示呼び出し専用）
+- `vendor/natural-japanese/` - 外部由来の `natural-japanese` skill 本体（Claude Code と Codex の両方へ配布）
 - `sync.ps1` / `sync.sh` - `~/.claude`、`~/.codex`、`~/.gemini/config` へ同期し、管理対象 plugin を導入するスクリプト
 
 ## 同期範囲と所有者
@@ -103,7 +104,8 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `hallmark` - AI 生成っぽさを排したWeb UIデザイン skill。新規ページ作成、既存UIのaudit、redesign、URL / screenshot からのデザイン抽出に使う。
 - `apple-design` - モーションとインタラクションの質感を扱う skill。ジェスチャ、spring、drag / sheet、慣性、中断可能なトランジション、半透明マテリアルなど。
 - `create-readme` - プロジェクトの README.md を作成する skill。構成、トーン、GFM と GitHub admonition の使い方を指示します。
-- `yomiyasu` - AI が生成した日本語の推敲に使う skill。Claude Code と Codex の両方から利用できます。
+- `natural-japanese` - 仕事の日本語文書を書く・直す skill。議事録やレポートの型、文体憲法、sudachipy による lint、AI臭さの採点を持ちます。lint の実行には `uv` が必要です。
+- `yomiyasu` - 既存の日本語文章を、意味を変えずに推敲する skill。`natural-japanese` と発動条件が重なるため、明示呼び出し専用で配布します。
 - 本体は `vendor/` を source of truth とし、sync 時に `~/.claude/skills/` と `~/.agents/skills/` の両方へ配布します。
 - 配布対象は `scripts/sync-shared-skills.mjs` の `VENDORED_SKILLS` が正で、テストもこの配列を参照します。skill を増やす場合はここへ 1 行追加してください。
 - 取り込み元と License:
@@ -111,6 +113,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
   - `apple-design` - [emilkowalski/skills](https://github.com/emilkowalski/skills)、MIT License
   - `create-readme` - [github/awesome-copilot](https://github.com/github/awesome-copilot)、MIT License
   - `yomiyasu` - [nanaism/yomiyasu](https://github.com/nanaism/yomiyasu)、MIT License
+  - `natural-japanese` - [coji/natural-japanese](https://github.com/coji/natural-japanese)、MIT License（上流の `skills/natural-japanese/` と `LICENSE` を取り込み）
 - 取り込んだcommitは各 `vendor/<name>/UPSTREAM_COMMIT` に記録します。
 - 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
 
@@ -133,6 +136,19 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 `hallmark` と `frontend-design` が本当に衝突する組み合わせです。違いは領域ではなく方法で、`hallmark` はルールエンジン、`frontend-design` は美的判断のガイドです。ユーザーの好みが不明なときは両方を提示します。
 
 スライドでは `consulting-pptx` と slide 系3種が正面から衝突します。前者は内容を統制し、後者は見た目を再現するもので、担当レイヤーが逆です。**ユーザーが系統を指定していない場合に確認し、1つを選んだらそのタスク中は併用しません。** 規約が直接矛盾するためで、たとえば `consulting-pptx` は角丸を全面禁止しますが、`SLIDE-PATTERN` は99個中77個が `border-radius` を使っています。判定に迷うときは「そのスライドは印刷されて赤入れされるか」で分けます。
+
+### 日本語文章 skill の使い分け
+`natural-japanese` と `yomiyasu` はどちらも「AI臭さを消して」「自然な日本語に」で発動する description を持ち、同時に読み込まれると指示が干渉します。そのため自動で発動するのは `natural-japanese` だけにしています。
+
+- `VENDORED_SKILLS` で `explicitOnly: true` を指定した skill は、sync 時に配布先の `SKILL.md` へ `disable-model-invocation: true`（Claude Code）を加え、`agents/openai.yaml` に `allow_implicit_invocation: false`（Codex）を置きます。`vendor/` 内の上流ファイルは書き換えません。
+- `yomiyasu` は Claude Code では `/yomiyasu`、Codex では `$yomiyasu` と指定したときだけ動きます。
+
+| Skill | 発動 | 向いている依頼 |
+| --- | --- | --- |
+| `natural-japanese` | 自動 | 議事録・レポート・ガイド・企画書・ブログの新規執筆、構成から見直す推敲、`/natural-japanese score` による AI臭さの採点、文体プロファイル |
+| `yomiyasu` | 明示のみ | 主張・比重・言い切りの強さを変えずに表現だけ直したいとき。PR 説明文や仕様書の最終仕上げ、絵文字・文末コロン・英単語前後の空白といった表記の整理 |
+
+迷ったときは「構成や内容まで直してよいか」で分けます。直してよいなら `natural-japanese`、文面の意味を一切変えたくないなら `yomiyasu` を指定します。
 
 ### SLIDE.md の共有
 - 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexが参照する `~/.agents/skills/` の両方へ同期します。
