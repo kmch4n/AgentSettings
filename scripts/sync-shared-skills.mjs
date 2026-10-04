@@ -17,7 +17,7 @@ import { pathToFileURL } from "node:url";
  * runtime skill roots as the repo-owned skills in `.claude/skills/`.
  *
  * `description` replaces the upstream SKILL.md description in the deployed
- * copy without editing the vendored files. Both Claude Code and Codex decide
+ * copy without editing the vendored files. Every runtime decides
  * automatic invocation from that description, so it is how two skills with
  * overlapping upstream triggers are given disjoint responsibilities.
  */
@@ -54,6 +54,12 @@ export const RETIRED_MANAGED_FILES = [
     ".gemini/GEMINI.md",
     ".gemini/commit_message.md",
 ];
+
+/**
+ * Home-relative directories whose `skills/` folder receives every shared
+ * skill: Claude Code, Codex (`~/.agents`), and agy (`~/.gemini/config`).
+ */
+export const SKILL_RUNTIME_ROOTS = [".claude", ".agents", ".gemini/config"];
 
 const LEGACY_CODEX_SKILLS = [
     "slide-md-creator",
@@ -382,8 +388,12 @@ export async function syncSharedSkills(options) {
 
     const items = [];
 
-    for (const runtimeRoot of [".claude", ".agents"]) {
-        const destinationRoot = path.join(options.homeDir, runtimeRoot, "skills");
+    for (const runtimeRoot of SKILL_RUNTIME_ROOTS) {
+        const destinationRoot = path.join(
+            options.homeDir,
+            ...runtimeRoot.split("/"),
+            "skills",
+        );
 
         for (const { name: skillName, overrides, sourcePath } of skills) {
             const destinationPath = directChildPath(destinationRoot, skillName);

@@ -10,7 +10,7 @@
 | このリポジトリだけの作業指示 | `AGENTS.md` | 同期しない |
 | Claude Code の slash command | `.claude/commands/` | `~/.claude/commands/` |
 | Codex の対応 prompt | `.codex/prompts/` | `~/.codex/prompts/` |
-| 自作 skill | `.claude/skills/` | `~/.claude/skills/` と `~/.agents/skills/` |
+| 自作 skill | `.claude/skills/` | `~/.claude/skills/`、`~/.agents/skills/`、`~/.gemini/config/skills/` |
 | 外部由来の skill | `vendor/` | 同上。対象は `scripts/sync-shared-skills.mjs` の `VENDORED_SKILLS` |
 | MCP server の定義 | `.mcp/` | `~/.claude.json` と `~/.codex/config.toml` の管理対象部分 |
 | 同期・検査の処理 | `sync.ps1`、`sync.sh`、`scripts/` | リポジトリから実行 |

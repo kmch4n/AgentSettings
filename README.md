@@ -39,14 +39,14 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 
 | 対象 | 所有者 | 同期方針 |
 | --- | --- | --- |
-| `.claude/skills/` 内の skill | このリポジトリ | `~/.claude/skills/` と `~/.agents/skills/` の同名ディレクトリを完全に置換 |
-| `vendor/` 配下の vendored skill | 上流リポジトリ | このリポジトリを経由して両 runtime の `skills/` へ完全に置換 |
+| `.claude/skills/` 内の skill | このリポジトリ | `~/.claude/skills/`、`~/.agents/skills/`、`~/.gemini/config/skills/` の同名ディレクトリを完全に置換 |
+| `vendor/` 配下の vendored skill | 上流リポジトリ | このリポジトリを経由して各 runtime の `skills/` へ完全に置換 |
 | `~/.agents/skills/` 内の外部 skill | 各 skill の導入元 | リポジトリに同名 skill がなければ保持 |
 | Codex の管理対象 plugin | このリポジトリ | sync 時に導入し、欠落や無効化を drift として扱う |
 | Browser、Chrome、Computer Use などの Codex bundled plugin | Codex runtime | sync では変更しない |
 | Claude の cloud connector | Claude の account / runtime | sync では変更しない |
 
-- Codex は共有 skill を `~/.agents/skills/` から利用します。旧配置の `~/.codex/skills/` にある管理済み skill は削除します。
+- Codex は共有 skill を `~/.agents/skills/`、agy は `~/.gemini/config/skills/` から利用します。グローバル指示は skill の存在を前提にしているため、3 つの runtime すべてへ同じ skill を配布します。配布先は `scripts/sync-shared-skills.mjs` の `SKILL_RUNTIME_ROOTS` が正です。旧配置の `~/.codex/skills/` にある管理済み skill は削除します。
 - `frontend-design` は Codex plugin 版を正とし、standalone skill との重複を避けます。
 - GitHub plugin は Codex では `github@openai-curated`、Claude Code では `github@claude-plugins-official` を使用します。
 - 同期はリポジトリから各 runtime への一方向です。Windows 側で任意に変更された設定をリポジトリへ逆輸入しません。
@@ -150,7 +150,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - 上流の `SKILL.md` から description がなくなった場合、sync はエラーで止まります。
 
 ### SLIDE.md の共有
-- 上記3つのskillはClaude Codeの `~/.claude/skills/` とCodexが参照する `~/.agents/skills/` の両方へ同期します。
+- 上記3つのskillは、ほかの共有 skill と同じく Claude Code、Codex、agy の skill ディレクトリへ同期します。
 - サンプルデザインとパターンは `~/.agents/slide-md/` に共有し、各プロジェクトへ自動ではコピーしません。
 - PowerShellでプロジェクトを初期化する場合:
 

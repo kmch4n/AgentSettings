@@ -13,6 +13,7 @@ import path from "node:path";
 
 import {
     RETIRED_MANAGED_FILES,
+    SKILL_RUNTIME_ROOTS,
     syncSharedSkills,
     VENDORED_SKILLS,
 } from "../scripts/sync-shared-skills.mjs";
@@ -25,6 +26,10 @@ const DESCRIPTION_OVERRIDES = new Map(
     ]),
 );
 
+assert.ok(
+    SKILL_RUNTIME_ROOTS.includes(".gemini/config"),
+    "agy must receive the shared skills referenced by its global rules",
+);
 assert.ok(
     VENDORED_SKILL_NAMES.includes("yomiyasu"),
     "yomiyasu must be distributed by both sync commands",
@@ -118,10 +123,9 @@ async function withFixture(testFn) {
             "utf8",
         );
 
-        for (const destination of [
-            path.join(homeDir, ".claude", "skills", "managed"),
-            path.join(homeDir, ".agents", "skills", "managed"),
-        ]) {
+        for (const destination of SKILL_RUNTIME_ROOTS.map((runtimeRoot) =>
+            path.join(homeDir, runtimeRoot, "skills", "managed"),
+        )) {
             await mkdir(path.join(destination, "managed"), { recursive: true });
             await writeFile(path.join(destination, "SKILL.md"), "stale\n", "utf8");
             await writeFile(path.join(destination, "removed.txt"), "stale\n", "utf8");
@@ -133,8 +137,9 @@ async function withFixture(testFn) {
         }
 
         for (const externalPath of [
-            path.join(homeDir, ".claude", "skills", "external-skill"),
-            path.join(homeDir, ".agents", "skills", "external-skill"),
+            ...SKILL_RUNTIME_ROOTS.map((runtimeRoot) =>
+                path.join(homeDir, runtimeRoot, "skills", "external-skill"),
+            ),
             path.join(homeDir, ".codex", "skills", "transcribing-textbook-code"),
         ]) {
             await mkdir(externalPath, { recursive: true });
@@ -228,7 +233,7 @@ await withFixture(async ({ homeDir, repoDir }) => {
         "shared slide destination must be an exact mirror",
     );
 
-    for (const runtimeRoot of [".claude", ".agents"]) {
+    for (const runtimeRoot of SKILL_RUNTIME_ROOTS) {
         const managedPath = path.join(homeDir, runtimeRoot, "skills", "managed");
 
         assert.equal(
