@@ -49,6 +49,10 @@ export const VENDORED_SKILLS = [
 export const RETIRED_MANAGED_FILES = [
     ".claude/rules/commit_message.md",
     ".codex/commit_message.md",
+    // Former Gemini CLI rules. agy also loads `~/.gemini/GEMINI.md` next to
+    // `~/.gemini/config/GEMINI.md`, so a stale copy would add outdated rules.
+    ".gemini/GEMINI.md",
+    ".gemini/commit_message.md",
 ];
 
 const LEGACY_CODEX_SKILLS = [
