@@ -26,6 +26,12 @@ export const VENDORED_SKILLS = [
     { name: "create-readme", vendorDir: "create-readme" },
     { name: "hallmark", vendorDir: "hallmark" },
     {
+        name: "security-audit",
+        vendorDir: "security-audit",
+        description:
+            "Security guidance and vulnerability research for codebases, APIs, services, CLI tools, libraries, and daemons. Use when the user asks a security question or wants security design advice (threat model, trust boundaries, authentication and authorization design, secret handling), asks whether a specific component, endpoint, or attack class is exploitable, or explicitly requests a security audit, pen test, or comprehensive security review of a codebase. Do not use for routine coding, general code review, or a quick security check of recent changes or a diff: prefer the /security-check or /security-review command when the runtime provides one, and use this skill's guidance mode only when it does not. If it is unclear whether the user wants a quick check of recent changes or a broader audit, ask which before proceeding. Run the complete workflow only for explicit codebase audit or pen-test requests, full/comprehensive/end-to-end reviews, or requested report artifacts.",
+    },
+    {
         name: "natural-japanese",
         vendorDir: "natural-japanese",
         description:
@@ -152,6 +158,12 @@ async function listRelativeFiles(rootPath) {
         const entries = await readdir(currentPath, { withFileTypes: true });
 
         for (const entry of entries) {
+            // Running a skill's Python scripts creates bytecode caches in the
+            // installed copy; they are not drift.
+            if (entry.name === "__pycache__") {
+                continue;
+            }
+
             const relativePath = relativePrefix
                 ? path.join(relativePrefix, entry.name)
                 : entry.name;

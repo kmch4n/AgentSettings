@@ -32,7 +32,8 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `vendor/apple-design/` - 外部由来の `apple-design` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/create-readme/` - 外部由来の `create-readme` skill 本体（Claude Code と Codex の両方へ配布）
 - `vendor/yomiyasu/` - 外部由来の `yomiyasu` skill 本体（Claude Code と Codex の両方へ配布）
-- `vendor/natural-japanese/` - 外部由来の `natural-japanese` skill 本体（Claude Code と Codex の両方へ配布）
+- `vendor/natural-japanese/` - 外部由来の `natural-japanese` skill 本体
+- `vendor/security-audit/` - 外部由来の `security-audit` skill 本体
 - `sync.ps1` / `sync.sh` - `~/.claude`、`~/.codex`、`~/.gemini/config` へ同期し、管理対象 plugin を導入するスクリプト
 
 ## 同期範囲と所有者
@@ -74,7 +75,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 
 ### レビュー / 要約系
 - `/code-review` - 直近差分のレビュー
-- `/security-check` - セキュリティ観点の確認
+- `/security-check` - 直近の変更を OWASP の観点で確認する。`security-audit` skill は読み込まない
 - `/diff_summary` - 差分の要約
 - `/test-suggest` - 必要なテストケースの提案
 - `/refactor` - リファクタリング候補の提案
@@ -104,6 +105,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `hallmark` - AI 生成っぽさを排したWeb UIデザイン skill。新規ページ作成、既存UIのaudit、redesign、URL / screenshot からのデザイン抽出に使う。
 - `apple-design` - モーションとインタラクションの質感を扱う skill。ジェスチャ、spring、drag / sheet、慣性、中断可能なトランジション、半透明マテリアルなど。
 - `create-readme` - プロジェクトの README.md を作成する skill。構成、トーン、GFM と GitHub admonition の使い方を指示します。
+- `security-audit` - セキュリティの質問への助言、特定箇所の脆弱性調査、明示された監査を担当する skill。監査では偵察、網羅的な探索、検証、報告書作成までを複数の agent で進めます。
 - `natural-japanese` - 日本語の文章を新しく書くときに使う skill。議事録やレポートの型、文体憲法、sudachipy による lint、AI臭さの採点を持ちます。lint の実行には `uv` が必要です。
 - `yomiyasu` - 既にある日本語の文章から、意味を変えずに AI臭さを取り除く skill。
 - 本体は `vendor/` を source of truth とし、sync 時に `~/.claude/skills/` と `~/.agents/skills/` の両方へ配布します。
@@ -114,6 +116,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
   - `create-readme` - [github/awesome-copilot](https://github.com/github/awesome-copilot)、MIT License
   - `yomiyasu` - [nanaism/yomiyasu](https://github.com/nanaism/yomiyasu)、MIT License
   - `natural-japanese` - [coji/natural-japanese](https://github.com/coji/natural-japanese)、MIT License（上流の `skills/natural-japanese/` と `LICENSE` を取り込み）
+  - `security-audit` - [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)、MIT License（上流の `skills/security-audit/` と `LICENSE` を取り込み）
 - 取り込んだcommitは各 `vendor/<name>/UPSTREAM_COMMIT` に記録します。
 - 上流の更新を取り込む場合は `vendor/<name>/` を上流の skill ディレクトリで置き換え、`LICENSE` と `UPSTREAM_COMMIT` を更新してください。`npx skills add` や手動での `~/.claude/skills/` への配置は使いません。ローカルへの直接導入はリポジトリからの一方向同期と競合します。
 
@@ -148,6 +151,20 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - 新しく書くのか既にある文章を直すのか判断できないときは、どちらを使うかユーザーに確認してから進めます。両方の description と、グローバル指示の両方にこのルールを入れています。
 - 担当の切り分けは、`VENDORED_SKILLS` の `description` で行います。sync 時に配布先の `SKILL.md` の description だけを差し替え、`vendor/` 内の上流ファイルは書き換えません。上流を更新しても、この切り分けは維持されます。
 - 上流の `SKILL.md` から description がなくなった場合、sync はエラーで止まります。
+
+### セキュリティ系の使い分け
+確認の範囲で分けます。`security-audit` は description を差し替え、直近の変更のクイックチェックでは発動しないようにしています。`/security-check` には、`security-audit` を同時に読み込まないことを明記しています。
+
+| 手段 | 発動 | 範囲 | 向いている場面 |
+| --- | --- | --- | --- |
+| `/security-check`（Claude Code） | 明示のみ | 直近の変更 | commit 前の素早い確認。OWASP のチェックリストで報告だけする |
+| `/security-review`（Claude Code 組み込み） | 明示のみ | ブランチの未マージ変更 | PR 前にブランチ全体をまとめて確認する |
+| `security-audit` | 自動 | 質問・特定箇所・コードベース全体 | 脅威モデルや認証設計の相談、「この endpoint は悪用できるか」の調査、明示された監査・ペネトレーションテスト |
+
+- 直近の変更の確認なのか、広い監査なのか判断できないときは、どちらにするかユーザーに確認します。
+- Codex と agy には `/security-check` に相当するコマンドがないため、変更の確認でも `security-audit` を助言モードで使います。
+- `security-audit` の完全な監査は、明示的に監査を頼んだときだけ実行します。多数の agent を起動するため、時間と利用量がかかります。
+- 完全な監査で使う `validate-findings.cjs` と `validate-coverage-ledger.cjs` は、ファイルを開くときに `O_NOFOLLOW` を要求します。Windows にはこの機能がないため、検証の段階で止まります。上流のテストも Windows では 53 件中 7 件が失敗します。完全な監査は macOS、Linux、または WSL で実行してください。助言モードには影響しません。
 
 ### SLIDE.md の共有
 - 上記3つのskillは、ほかの共有 skill と同じく Claude Code、Codex、agy の skill ディレクトリへ同期します。

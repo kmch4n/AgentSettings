@@ -33,3 +33,4 @@ Rules:
 - Reference specific file paths and line numbers
 - Do NOT automatically fix issues — only report them
 - Do NOT run any git operations
+- This command is self-contained; do not load the `security-audit` skill. If the findings point to a systemic or codebase-wide problem, recommend a `security-audit` review at the end instead

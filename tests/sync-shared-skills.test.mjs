@@ -48,6 +48,11 @@ assert.match(
     /既にある/,
     "yomiyasu must be scoped to revising existing text",
 );
+assert.match(
+    DESCRIPTION_OVERRIDES.get("security-audit") ?? "",
+    /\/security-check.*ask which before proceeding/s,
+    "security-audit must leave diff checks to commands and ask when unclear",
+);
 for (const name of ["natural-japanese", "yomiyasu"]) {
     assert.match(
         DESCRIPTION_OVERRIDES.get(name) ?? "",
@@ -432,6 +437,26 @@ await withFixture(async ({ homeDir, repoDir }) => {
     assert.ok(
         drifted.items.includes(".claude/skills/yomiyasu"),
         "a deployed copy with the upstream description must be reported",
+    );
+});
+
+await withFixture(async ({ homeDir, repoDir }) => {
+    await syncSharedSkills({ apply: true, homeDir, repoDir });
+
+    const cacheDir = path.join(
+        homeDir,
+        ".claude",
+        "skills",
+        "yomiyasu",
+        "__pycache__",
+    );
+    await mkdir(cacheDir, { recursive: true });
+    await writeFile(path.join(cacheDir, "lint.cpython-312.pyc"), "x", "utf8");
+
+    const result = await syncSharedSkills({ apply: false, homeDir, repoDir });
+    assert.ok(
+        !result.items.includes(".claude/skills/yomiyasu"),
+        "Python bytecode caches created by running a skill are not drift",
     );
 });
 
