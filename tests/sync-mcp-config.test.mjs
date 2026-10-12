@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 import {
+    expandHomePlaceholder,
     syncClaudeMcpServers,
     syncCodexMcpServers,
 } from "../scripts/sync-mcp-config.mjs";
@@ -207,7 +208,41 @@ async function testClaudeMcpServersAreMergedAndSecretsArePreserved() {
     });
 }
 
+async function testHomePlaceholderIsResolvedWithForwardSlashes() {
+    await withTempDir(async (dir) => {
+        const configPath = path.join(dir, "config.toml");
+        const templatePath = path.join(dir, "codex.config.toml");
+
+        assert.equal(
+            expandHomePlaceholder("${AGENT_SETTINGS_HOME}/x.js", "C:\\Users\\me"),
+            "C:/Users/me/x.js",
+        );
+
+        await writeFile(
+            templatePath,
+            [
+                "[mcp_servers.local]",
+                'command = "node"',
+                'args = ["${AGENT_SETTINGS_HOME}/.local/share/mcp/local/dist/index.js"]',
+                "",
+            ].join("\n"),
+        );
+        await syncCodexMcpServers({
+            configPath,
+            dotenvValues: {},
+            homeDir: "/home/me",
+            templatePath,
+        });
+
+        assert.match(
+            await readFile(configPath, "utf8"),
+            /args = \["\/home\/me\/\.local\/share\/mcp\/local\/dist\/index\.js"\]/,
+        );
+    });
+}
+
 await testCodexMcpServersAreReplacedWithoutDuplicates();
 await testClaudeMcpServersAreMergedAndSecretsArePreserved();
+await testHomePlaceholderIsResolvedWithForwardSlashes();
 
 console.log("sync-mcp-config tests passed");

@@ -143,6 +143,14 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host ""
+Write-Host "==> Installing pinned MCP server sources ..."
+$McpSourceSyncScript = Join-Path $RepoDir "scripts\sync-mcp-sources.mjs"
+& node $McpSourceSyncScript --repo $RepoDir --home $env:USERPROFILE
+if ($LASTEXITCODE -ne 0) {
+    throw "MCP server source sync failed."
+}
+
+Write-Host ""
 Write-Host "==> Syncing MCP server config ..."
 $McpSyncScript = Join-Path $RepoDir "scripts\sync-mcp-config.mjs"
 & node $McpSyncScript --repo $RepoDir --home $env:USERPROFILE

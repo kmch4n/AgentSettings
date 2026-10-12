@@ -116,6 +116,10 @@ echo "==> Syncing shared skills..."
 node "$SHARED_SKILL_SYNC_SCRIPT" --repo "$REPO_DIR" --home "$HOME"
 
 echo ""
+echo "==> Installing pinned MCP server sources ..."
+node "$REPO_DIR/scripts/sync-mcp-sources.mjs" --repo "$REPO_DIR" --home "$HOME"
+
+echo ""
 echo "==> Syncing MCP server config ..."
 node "$REPO_DIR/scripts/sync-mcp-config.mjs" --repo "$REPO_DIR" --home "$HOME"
 

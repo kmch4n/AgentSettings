@@ -13,6 +13,7 @@
 | 自作 skill | `.claude/skills/` | `~/.claude/skills/`、`~/.agents/skills/`、`~/.gemini/config/skills/` |
 | 外部由来の skill | `vendor/` | 同上。対象は `scripts/sync-shared-skills.mjs` の `VENDORED_SKILLS` |
 | MCP server の定義 | `.mcp/` | `~/.claude.json` と `~/.codex/config.toml` の管理対象部分 |
+| ソースから build する MCP server | `.mcp/sources.json`（上流 URL と固定 commit） | `~/.local/share/mcp/<name>/` に clone・build |
 | 同期・検査の処理 | `sync.ps1`、`sync.sh`、`scripts/` | リポジトリから実行 |
 
 共通の行動指示を変える場合は、各エージェント用（Claude, Codex, agy）のファイルをすべて更新します。`README.md` は人向けの説明、`AGENTS.md` はこのリポジトリ固有の作業指示です。プロジェクトごとの Git 操作制限や委任ルールは、そのプロジェクトの指示に置きます。

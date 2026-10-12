@@ -1,6 +1,6 @@
 [mcp_servers.ehs208-timetree-mcp]
-command = "npx"
-args = ["--no-install", "timetree-mcp"]
+command = "node"
+args = ["${AGENT_SETTINGS_HOME}/.local/share/mcp/TimeTree-MCP/dist/index.js"]
 
 [mcp_servers.ehs208-timetree-mcp.env]
 TIMETREE_EMAIL = "${TIMETREE_EMAIL}"

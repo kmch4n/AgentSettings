@@ -5,6 +5,8 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { expandHomePlaceholder } from "./sync-mcp-config.mjs";
+import { inspectMcpSource, readMcpSources } from "./sync-mcp-sources.mjs";
 import { syncSharedSkills } from "./sync-shared-skills.mjs";
 
 export const DESIRED_CODEX_PLUGINS = [
@@ -245,7 +247,10 @@ function parseClaudeJson(text, label) {
 
 async function checkMcp(repoDir, homeDir, codexTables, drift) {
     const codexTemplate = parseRelevantToml(
-        await readFile(path.join(repoDir, ".mcp", "codex.config.toml"), "utf8"),
+        expandHomePlaceholder(
+            await readFile(path.join(repoDir, ".mcp", "codex.config.toml"), "utf8"),
+            homeDir,
+        ),
     );
 
     for (const [name, expected] of codexTemplate) {
@@ -266,9 +271,12 @@ async function checkMcp(repoDir, homeDir, codexTables, drift) {
     }
 
     const claudeTemplate = parseClaudeJson(
-        await readFile(
-            path.join(repoDir, ".mcp", "claude.mcpServers.json"),
-            "utf8",
+        expandHomePlaceholder(
+            await readFile(
+                path.join(repoDir, ".mcp", "claude.mcpServers.json"),
+                "utf8",
+            ),
+            homeDir,
         ),
         "managed template",
     );
@@ -390,6 +398,14 @@ export async function checkAgentSettings(options) {
         }
 
         await checkMcp(options.repoDir, options.homeDir, tables, drift);
+    }
+
+    for (const source of await readMcpSources(options.repoDir)) {
+        const state = inspectMcpSource(source, options.homeDir);
+
+        if (state !== "ok") {
+            drift.push(`mcp-source:${source.name}:${state}`);
+        }
     }
 
     return {

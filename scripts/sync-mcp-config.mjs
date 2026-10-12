@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const MANAGED_BLOCK_BEGIN = "# BEGIN AgentSettings managed MCP servers";
 const MANAGED_BLOCK_END = "# END AgentSettings managed MCP servers";
+const HOME_PLACEHOLDER = "${AGENT_SETTINGS_HOME}";
 
 /**
  * @typedef {Record<string, string>} StringMap
@@ -27,6 +28,19 @@ function escapeTomlBasicString(value) {
  */
 function escapeJsonStringContent(value) {
     return JSON.stringify(value).slice(1, -1);
+}
+
+/**
+ * Replace the home placeholder before secret resolution so templates can point
+ * at files that sync installs under the home directory. Forward slashes keep
+ * the path valid in both JSON and TOML on every platform.
+ *
+ * @param {string} text
+ * @param {string} homeDir
+ * @returns {string}
+ */
+export function expandHomePlaceholder(text, homeDir) {
+    return text.split(HOME_PLACEHOLDER).join(homeDir.replace(/\\/g, "/"));
 }
 
 /**
@@ -317,6 +331,7 @@ export function ensureCodexRmcpClientEnabled(text) {
  * @param {{
  *     configPath: string;
  *     dotenvValues: StringMap;
+ *     homeDir?: string;
  *     templatePath: string;
  * }} options
  * @returns {Promise<void>}
@@ -325,7 +340,10 @@ export async function syncCodexMcpServers(options) {
     const currentConfig = existsSync(options.configPath)
         ? await readFile(options.configPath, "utf8")
         : "";
-    const template = await readFile(options.templatePath, "utf8");
+    const template = expandHomePlaceholder(
+        await readFile(options.templatePath, "utf8"),
+        options.homeDir ?? os.homedir(),
+    );
     const serverNames = getCodexTemplateServerNames(template);
     const values = mergeValueSources([
         getProcessEnvValues(process.env),
@@ -354,6 +372,7 @@ export async function syncCodexMcpServers(options) {
  * @param {{
  *     configPath: string;
  *     dotenvValues: StringMap;
+ *     homeDir?: string;
  *     templatePath: string;
  * }} options
  * @returns {Promise<void>}
@@ -363,7 +382,10 @@ export async function syncClaudeMcpServers(options) {
     const currentConfig = existsSync(options.configPath)
         ? JSON.parse(await readFile(options.configPath, "utf8"))
         : {};
-    const template = await readFile(options.templatePath, "utf8");
+    const template = expandHomePlaceholder(
+        await readFile(options.templatePath, "utf8"),
+        options.homeDir ?? os.homedir(),
+    );
     const values = mergeValueSources([
         getProcessEnvValues(process.env),
         options.dotenvValues,
@@ -424,12 +446,14 @@ async function main(options) {
     await syncCodexMcpServers({
         configPath: path.join(options.homeDir, ".codex", "config.toml"),
         dotenvValues,
+        homeDir: options.homeDir,
         templatePath: path.join(options.repoDir, ".mcp", "codex.config.toml"),
     });
 
     await syncClaudeMcpServers({
         configPath: path.join(options.homeDir, ".claude.json"),
         dotenvValues,
+        homeDir: options.homeDir,
         templatePath: path.join(options.repoDir, ".mcp", "claude.mcpServers.json"),
     });
 }

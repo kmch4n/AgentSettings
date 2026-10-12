@@ -200,6 +200,16 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - 秘密情報はリポジトリに保存しません。TimeTree の認証情報は既存のホーム側設定、環境変数、または repo root の `.env` から解決します。
 - 新しい環境では `.env.example` を参考に `.env` を作成してください。`.env` は Git 管理外です。
 
+### TimeTree MCP の導入と更新
+npm で公開されている `timetree-mcp` は古いため、TimeTree MCP は [ehs208/TimeTree-MCP](https://github.com/ehs208/TimeTree-MCP) から build して使います。
+
+- `.mcp/sources.json` に上流の URL と固定する commit を記録しています。リポジトリにはソースを含めません。
+- 通常の同期で `scripts/sync-mcp-sources.mjs` が `~/.local/share/mcp/TimeTree-MCP` に clone し、記録した commit を checkout します。commit が変わったときや build 結果がないときだけ `npm ci` と `npm run build` を実行します。
+- MCP 設定は `node <home>/.local/share/mcp/TimeTree-MCP/dist/index.js` を直接起動します。テンプレートの `${AGENT_SETTINGS_HOME}` は、同期時に各端末のホームディレクトリへ置き換わります。
+- checkout に未コミットの変更がある場合、同期は変更を消さずに停止します。
+- 更新するときは、`.mcp/sources.json` の `commit` を上流の新しい commit の完全な hash に書き換えて commit・push し、各端末で通常の同期を実行します。
+- 検査モードは checkout がない、commit が違う、build されていない、変更がある状態を `mcp-source:timetree-mcp:<状態>` として報告します。
+
 ## 補足
 - `prompt-review` は Claude Code、GitHub Copilot Chat、Cline、Roo Code、Windsurf、OpenAI Codex、OpenCode を対象にしています。
 - sync 後は `.\sync.ps1 -Check` または `./sync.sh --check` で管理対象の一致を確認してください。
