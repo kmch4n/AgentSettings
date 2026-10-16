@@ -51,6 +51,12 @@ For Japanese prose, use `natural-japanese` to write new text and `yomiyasu` to r
 - Prioritize local development; never deploy to production without explicit approval.
 - Manage secrets and configuration via `.env`, which must stay in `.gitignore`.
 
+## Windows over SSH (when applicable)
+- On Windows, treat the session as remote when `SSH_CONNECTION` or `SSH_CLIENT` is set. OpenSSH public-key logons carry no password, so DPAPI is unavailable: Windows Credential Manager (used by `git` and `gh`), browser cookies and saved passwords, and Electron `safeStorage` cannot be decrypted.
+- In such a session, do not launch browsers, GUI apps, or tools that read or write DPAPI-protected credentials. A failed decryption can make an app discard stored logins permanently. When a task needs one, stop and ask the user to run it from the console desktop.
+- Ask before shutting down or restarting the machine from an SSH session.
+- If logins or credential reads fail broadly, check `Microsoft-Windows-Crypto-DPAPI/Operational` for events 3 and 8198 and report before retrying.
+
 ## Web Frontend (when applicable)
 - Accessibility: follow ARIA labeling and ensure keyboard navigation.
 - Responsiveness: design mobile-first.
