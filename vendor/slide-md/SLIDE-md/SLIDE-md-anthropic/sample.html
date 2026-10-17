@@ -1,646 +1,667 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Anthropic Design System — Sample Slides</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --color-primary: #CC785C;
-      --color-secondary: #EFE9DF;
-      --color-background: #F5F0E8;
-      --color-accent: #CC785C;
-      --color-text: #1A1A1A;
-      --color-text-muted: #6B6560;
-      --font-heading: 'Noto Sans JP', sans-serif;
-      --font-body: 'Noto Sans JP', sans-serif;
-      --font-size-h1: 48px;
-      --font-size-h2: 32px;
-      --font-size-h3: 22px;
-      --font-size-body: 18px;
-      --font-size-caption: 13px;
-      --slide-padding-v: 64px;
-      --slide-padding-h: 80px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SLIDE.md Sample — Anthropic Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Brand */
+    --color-primary:          #cc785c;
+    --color-primary-active:   #a9583e;
+    --color-primary-disabled: #e6dfd8;
+    /* Text */
+    --color-ink:         #141413;
+    --color-body:        #3d3d3a;
+    --color-body-strong: #252523;
+    --color-muted:       #6c6a64;
+    --color-muted-soft:  #8e8b82;
+    /* Border */
+    --color-hairline:      #e6dfd8;
+    --color-hairline-soft: #ebe6df;
+    /* Surface */
+    --color-canvas:               #faf9f5;
+    --color-surface-soft:         #f5f0e8;
+    --color-surface-card:         #efe9de;
+    --color-surface-cream-strong: #e8e0d2;
+    --color-surface-dark:         #181715;
+    --color-surface-dark-elevated:#252320;
+    --color-surface-dark-soft:    #1f1e1b;
+    /* On */
+    --color-on-primary:  #ffffff;
+    --color-on-dark:     #faf9f5;
+    --color-on-dark-soft:#a09d96;
+    /* Accent / Status */
+    --color-accent-teal:  #5db8a6;
+    --color-accent-amber: #e8a55a;
+    --color-success:      #5db872;
+    --color-warning:      #d4a017;
+    --color-error:        #c64545;
+    /* Aliases */
+    --color-background: var(--color-canvas);
+    --color-text:       var(--color-ink);
+    --color-text-sub:   var(--color-body);
+    --color-text-muted: var(--color-muted);
+    --color-surface:    var(--color-surface-card);
+    --color-border:     var(--color-hairline);
+    --color-secondary:  var(--color-accent-teal);
+    --color-accent:     var(--color-accent-amber);
+    /* Font */
+    --font-display:     'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-body:        'DM Sans', system-ui, sans-serif;
+    --font-mono:        'DM Mono', monospace;
+    --slide-padding-v:  80px;
+    --slide-padding-h:  120px;
+  }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: #D8D2C8;
-      font-family: var(--font-body);
-      color: var(--color-text);
-      padding: 40px 20px;
-    }
+  body {
+    background: #e0d9cf;
+    padding: 40px 20px;
+    font-family: var(--font-body);
+  }
 
-    .slide-label {
-      text-align: center;
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 8px;
-      font-family: monospace;
-      letter-spacing: 0.05em;
-    }
+  .slide-outer {
+    margin: 0 auto 32px;
+    width: 1440px;
+  }
 
-    .slide {
-      width: 960px;
-      height: 540px;
-      background: var(--color-background);
-      padding: var(--slide-padding-v) var(--slide-padding-h);
-      margin: 0 auto 48px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.14);
-      position: relative;
-      overflow: hidden;
-    }
+  .slide-wrapper {
+    width: 1920px;
+    transform-origin: top left;
+    transform: scale(0.75);
+    margin-bottom: -270px;
+  }
 
-    /* ページ番号 */
-    .slide-number {
-      position: absolute;
-      bottom: 24px;
-      right: 80px;
-      font-size: var(--font-size-caption);
-      color: var(--color-text-muted);
-    }
+  .slide {
+    width: 1920px;
+    height: 1080px;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    box-sizing: border-box;
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-body);
+  }
 
-    /* アクセントライン */
-    .accent-bar {
-      width: 48px;
-      height: 4px;
-      background: var(--color-accent);
-      margin-bottom: 24px;
-    }
+  .page-number {
+    position: absolute;
+    right: 120px;
+    bottom: 36px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    z-index: 2;
+  }
+  .page-number .current {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+  .page-number .total {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    color: var(--color-muted);
+  }
 
-    /* ============================================
-       SLIDE 1: 表紙（タイトルスライド）
-    ============================================ */
-    .slide-cover {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .slide-cover .eyebrow {
-      font-size: var(--font-size-caption);
-      font-weight: 700;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--color-primary);
-      margin-bottom: 20px;
-    }
-
-    .slide-cover h1 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-h1);
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--color-text);
-      max-width: 620px;
-      margin-bottom: 20px;
-    }
-
-    .slide-cover .subtitle {
-      font-size: var(--font-size-body);
-      color: var(--color-text-muted);
-      max-width: 480px;
-      line-height: 1.6;
-      margin-bottom: 40px;
-    }
-
-    .slide-cover .meta {
-      display: flex;
-      gap: 32px;
-      font-size: var(--font-size-caption);
-      color: var(--color-text-muted);
-    }
-
-    .slide-cover .meta span strong {
-      color: var(--color-text);
-    }
-
-    /* 装飾円 */
-    .deco-circle {
-      position: absolute;
-      right: -60px;
-      top: -60px;
-      width: 320px;
-      height: 320px;
-      border-radius: 50%;
-      background: var(--color-secondary);
-      opacity: 0.7;
-    }
-
-    .deco-circle-sm {
-      position: absolute;
-      right: 120px;
-      bottom: -40px;
-      width: 160px;
-      height: 160px;
-      border-radius: 50%;
-      background: var(--color-primary);
-      opacity: 0.12;
-    }
-
-    /* ============================================
-       SLIDE 2: セクションタイトル
-    ============================================ */
-    .slide-section {
-      background: var(--color-text);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .slide-section .section-number {
-      font-size: 72px;
-      font-weight: 700;
-      color: var(--color-primary);
-      line-height: 1;
-      margin-bottom: 8px;
-    }
-
-    .slide-section h2 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-h1);
-      font-weight: 700;
-      color: #F5F0E8;
-      line-height: 1.2;
-      max-width: 560px;
-      margin-bottom: 16px;
-    }
-
-    .slide-section .section-desc {
-      font-size: var(--font-size-body);
-      color: #A09890;
-      max-width: 440px;
-      line-height: 1.6;
-    }
-
-    .slide-section .slide-number {
-      color: #5A5550;
-    }
-
-    /* ============================================
-       SLIDE 3: 箇条書き（本文スライド）
-    ============================================ */
-    .slide-bullets h2 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-h2);
-      font-weight: 700;
-      color: var(--color-text);
-      margin-bottom: 32px;
-    }
-
-    .bullet-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .bullet-list li {
-      display: flex;
-      align-items: flex-start;
-      gap: 16px;
-      font-size: var(--font-size-body);
-      color: var(--color-text);
-      line-height: 1.5;
-    }
-
-    .bullet-list li .bullet-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--color-accent);
-      margin-top: 8px;
-      flex-shrink: 0;
-    }
-
-    /* ============================================
-       SLIDE 4: データチャート
-    ============================================ */
-    .slide-chart h2 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-h2);
-      font-weight: 700;
-      color: var(--color-text);
-      margin-bottom: 36px;
-    }
-
-    .chart-area {
-      display: flex;
-      align-items: flex-end;
-      gap: 20px;
-      height: 260px;
-      padding-bottom: 32px;
-      border-bottom: 2px solid #D8D2C8;
-      position: relative;
-    }
-
-    .chart-bar-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .chart-bar {
-      width: 72px;
-      background: var(--color-secondary);
-      border-radius: 4px 4px 0 0;
-      transition: all 0.2s;
-      position: relative;
-    }
-
-    .chart-bar.highlight {
-      background: var(--color-primary);
-    }
-
-    .chart-bar .bar-value {
-      position: absolute;
-      top: -24px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--color-text);
-      white-space: nowrap;
-    }
-
-    .chart-label {
-      font-size: var(--font-size-caption);
-      color: var(--color-text-muted);
-      text-align: center;
-    }
-
-    .chart-note {
-      margin-top: 16px;
-      font-size: var(--font-size-caption);
-      color: var(--color-text-muted);
-    }
-
-    /* ============================================
-       SLIDE 5: まとめ
-    ============================================ */
-    .slide-summary .summary-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 32px;
-    }
-
-    .slide-summary h2 {
-      font-family: var(--font-heading);
-      font-size: var(--font-size-h2);
-      font-weight: 700;
-      color: var(--color-text);
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      margin-bottom: 32px;
-    }
-
-    .summary-card {
-      background: var(--color-secondary);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .summary-card .card-number {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--color-primary);
-      margin-bottom: 8px;
-    }
-
-    .summary-card p {
-      font-size: 15px;
-      line-height: 1.5;
-      color: var(--color-text);
-    }
-
-    .closing-message {
-      font-size: var(--font-size-body);
-      color: var(--color-text-muted);
-      border-left: 3px solid var(--color-accent);
-      padding-left: 16px;
-      line-height: 1.6;
-    }
-
-    /* =====================================================
-       DESIGN SYSTEM OVERVIEW SLIDE
-    ===================================================== */
-    .slide-system { padding: 0; }
-
-    .sys-header {
-      background: var(--color-primary);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 10px 20px;
-      letter-spacing: 0.09em;
-    }
-
-    .sys-overview {
-      padding: 0 24px;
-      font-size: 12px;
-      color: var(--color-text);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      height: 96px;
-    }
-
-    .sys-body {
-      display: flex;
-      height: calc(540px - 38px - 96px);
-    }
-
-    .sys-col {
-      flex: 1;
-      padding: 14px 22px;
-      overflow: hidden;
-    }
-
-    .sys-col + .sys-col { border-left: 1px solid #DDE6EE; }
-
-    .sys-col-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: var(--color-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      margin-bottom: 7px;
-    }
-
-    .sys-col-rule {
-      border: none;
-      border-top: 1px solid #D2DCE6;
-      margin-bottom: 10px;
-    }
-
-    .colors-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 140px);
-      gap: 10px;
-      margin-top: 2px;
-    }
-
-    .color-card {
-      border: 1px solid #E5E5E5;
-      border-radius: 7px;
-      overflow: hidden;
-      background: #FFF;
-    }
-
-    .color-swatch { height: 52px; }
-
-    .color-card-body { padding: 5px 7px; }
-
-    .swatch-role { font-size: 10px; font-weight: 600; color: #333; }
-    .swatch-hex  { font-size: 9px; color: #888; font-family: monospace; }
-
-    .type-row { margin-bottom: 11px; }
-
-    .type-role {
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--color-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      margin-bottom: 2px;
-    }
-
-    .type-spec { font-size: 9px; color: #999; margin-top: 2px; }
-  </style>
+  .brand-footer {
+    position: absolute;
+    left: 120px;
+    bottom: 38px;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--color-muted);
+    letter-spacing: 0.14em;
+    z-index: 2;
+  }
+</style>
 </head>
 <body>
 
+<!-- ===========================
+     PAGE 1: デザインシステム概要
+============================ -->
+<div class="slide-outer">
+<div class="slide-wrapper">
+<section class="slide" style="padding:44px 56px;display:flex;flex-direction:column;gap:20px;">
 
-<!-- =====================================================
-     DESIGN SYSTEM OVERVIEW
-===================================================== -->
-  <p class="slide-label">SLIDE 0 / Design System Overview</p>
-  <section class="slide slide-system">
-    <div class="sys-header">DESIGN SYSTEM — Anthropic</div>
-    <div class="sys-overview" style="background:rgba(204,120,92,0.08);">
-      <span><strong>参照ソース：</strong>Anthropic公式サイト（anthropic.com）</span>
-      <span>／</span>
-      <span><strong>マッチするシーン：</strong>テクノロジー・AI関連のカンファレンス発表、企業向けプレゼン、研究発表、製品紹介</span>
-    </div>
-    <div class="sys-body">
-      <!-- Colors -->
-      <div class="sys-col">
-        <div class="sys-col-label">Colors</div>
-        <hr class="sys-col-rule">
-      <div class="colors-grid">
-        <div class="color-card">
-          <div class="color-swatch" style="background:#CC785C;"></div>
-          <div class="color-card-body">
-            <div class="swatch-role">Primary</div>
-            <div class="swatch-hex">#CC785C</div>
+  <!-- ヘッダー -->
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+    <div style="font-family:var(--font-display);font-size:48px;font-weight:800;color:var(--color-primary);letter-spacing:-0.02em;line-height:1;">ANTHROPIC DESIGN SYSTEM</div>
+    <div style="font-family:var(--font-mono);font-size:17px;color:var(--color-muted);text-align:right;line-height:1.7;">Style Sheet / v2.0 · 16:9<br>Plus Jakarta Sans + DM Sans + DM Mono</div>
+  </div>
+
+  <!-- カラーパレット（1行） -->
+  <div style="flex-shrink:0;">
+    <div style="font-family:var(--font-display);font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;">Color Palette</div>
+    <div style="display:flex;gap:10px;align-items:flex-start;">
+
+      <!-- Brand (3) -->
+      <div style="display:flex;flex-direction:column;gap:6px;flex:3;">
+        <div style="font-size:16px;font-weight:700;color:var(--color-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;">Brand</div>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#cc785c;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">primary</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#cc785c</div>
+            </div>
           </div>
-        </div>
-        <div class="color-card">
-          <div class="color-swatch" style="background:#EFE9DF;"></div>
-          <div class="color-card-body">
-            <div class="swatch-role">Secondary</div>
-            <div class="swatch-hex">#EFE9DF</div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#a9583e;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">primary-active</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#a9583e</div>
+            </div>
           </div>
-        </div>
-        <div class="color-card">
-          <div class="color-swatch" style="background:#F5F0E8; border-bottom:1px solid #E5E5E5;"></div>
-          <div class="color-card-body">
-            <div class="swatch-role">Background</div>
-            <div class="swatch-hex">#F5F0E8</div>
-          </div>
-        </div>
-        <div class="color-card">
-          <div class="color-swatch" style="background:#CC785C;"></div>
-          <div class="color-card-body">
-            <div class="swatch-role">Accent</div>
-            <div class="swatch-hex">#CC785C</div>
-          </div>
-        </div>
-        <div class="color-card">
-          <div class="color-swatch" style="background:#1A1A1A;"></div>
-          <div class="color-card-body">
-            <div class="swatch-role">Text</div>
-            <div class="swatch-hex">#1A1A1A</div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#e6dfd8;border-bottom:1px solid var(--color-hairline);"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">disabled</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#e6dfd8</div>
+            </div>
           </div>
         </div>
       </div>
-      </div>
-      <!-- Typography -->
-      <div class="sys-col">
-        <div class="sys-col-label">Typography</div>
-        <hr class="sys-col-rule">
-      <div class="type-row">
-        <div class="type-role">Heading H1</div>
-        <div style="font-family:'Noto Sans JP',sans-serif;font-size:26px;font-weight:700;line-height:1;">あいう ABC 123</div>
-        <div class="type-spec">Noto Sans JP · 48px · Bold</div>
-      </div>
-      <div class="type-row">
-        <div class="type-role">Heading H2</div>
-        <div style="font-family:'Noto Sans JP',sans-serif;font-size:18px;font-weight:700;line-height:1;">あいう ABC 123</div>
-        <div class="type-spec">Noto Sans JP · 32px · Bold</div>
-      </div>
-      <div class="type-row">
-        <div class="type-role">Body Text</div>
-        <div style="font-family:'Noto Sans JP',sans-serif;font-size:14px;font-weight:400;line-height:1;">あいう ABC 123</div>
-        <div class="type-spec">Noto Sans JP · 18px · Regular</div>
-      </div>
-      <div class="type-row">
-        <div class="type-role">Caption</div>
-        <div style="font-family:'Noto Sans JP',sans-serif;font-size:12px;font-weight:400;line-height:1;">あいう ABC 123</div>
-        <div class="type-spec">Noto Sans JP · 13px · Regular</div>
-      </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- SLIDE 1: 表紙 -->
-  <p class="slide-label">SLIDE 1 / Cover</p>
-  <div class="slide slide-cover">
-    <div class="deco-circle"></div>
-    <div class="deco-circle-sm"></div>
-    <div class="eyebrow">Research Report · 2026</div>
-    <div class="accent-bar"></div>
-    <h1>AIが社会に与える<br>インパクトと可能性</h1>
-    <p class="subtitle">安全で信頼できるAIの開発を通じて、人類の長期的な利益のために研究を続けています。</p>
-    <div class="meta">
-      <span><strong>発表者：</strong> 担当者名</span>
-      <span><strong>日付：</strong> 2026年6月3日</span>
-      <span><strong>会社名：</strong> 組織名</span>
+      <!-- Separator -->
+      <div style="width:1px;background:var(--color-hairline);flex-shrink:0;margin-top:28px;align-self:stretch;"></div>
+
+      <!-- Accent (2) -->
+      <div style="display:flex;flex-direction:column;gap:6px;flex:2;">
+        <div style="font-size:16px;font-weight:700;color:var(--color-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;">Accent</div>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#5db8a6;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">accent-teal</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#5db8a6</div>
+            </div>
+          </div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#e8a55a;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">accent-amber</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#e8a55a</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Separator -->
+      <div style="width:1px;background:var(--color-hairline);flex-shrink:0;margin-top:28px;align-self:stretch;"></div>
+
+      <!-- Text (3) -->
+      <div style="display:flex;flex-direction:column;gap:6px;flex:3;">
+        <div style="font-size:16px;font-weight:700;color:var(--color-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;">Text</div>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#141413;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">ink</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#141413</div>
+            </div>
+          </div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#3d3d3a;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">body</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#3d3d3a</div>
+            </div>
+          </div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#6c6a64;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">muted</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#6c6a64</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Separator -->
+      <div style="width:1px;background:var(--color-hairline);flex-shrink:0;margin-top:28px;align-self:stretch;"></div>
+
+      <!-- Surface (3) -->
+      <div style="display:flex;flex-direction:column;gap:6px;flex:3;">
+        <div style="font-size:16px;font-weight:700;color:var(--color-muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;">Surface</div>
+        <div style="display:flex;gap:8px;">
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#faf9f5;border-bottom:1px solid var(--color-hairline);"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">canvas</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#faf9f5</div>
+            </div>
+          </div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#efe9de;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">surface-card</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#efe9de</div>
+            </div>
+          </div>
+          <div style="flex:1;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+            <div style="height:76px;background:#181715;"></div>
+            <div style="padding:12px 14px;background:var(--color-surface-card);">
+              <div style="font-size:18px;font-weight:700;color:var(--color-ink);">surface-dark</div>
+              <div style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);">#181715</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="slide-number">01</div>
   </div>
 
-  <!-- SLIDE 2: セクションタイトル -->
-  <p class="slide-label">SLIDE 2 / Section Title</p>
-  <div class="slide slide-section">
-    <div class="section-number">01</div>
-    <div class="accent-bar"></div>
-    <h2>現状の課題と<br>研究の背景</h2>
-    <p class="section-desc">AIシステムの急速な進歩が社会にもたらす変化と、安全性確保に向けた取り組みを解説します。</p>
-    <div class="slide-number">02</div>
-  </div>
+  <!-- 下段3カラム -->
+  <div style="display:flex;gap:20px;flex:1;min-height:0;">
 
-  <!-- SLIDE 3: 箇条書き -->
-  <p class="slide-label">SLIDE 3 / Bullet Points</p>
-  <div class="slide slide-bullets">
-    <h2>主要な研究アプローチ</h2>
-    <div class="accent-bar"></div>
-    <ul class="bullet-list">
-      <li>
-        <span class="bullet-dot"></span>
-        <span><strong>Constitutional AI</strong> — モデルが自己評価を行い、有害なコンテンツを回避する手法の研究</span>
-      </li>
-      <li>
-        <span class="bullet-dot"></span>
-        <span><strong>解釈可能性研究</strong> — AIの内部動作を人間が理解できるよう可視化・分析する</span>
-      </li>
-      <li>
-        <span class="bullet-dot"></span>
-        <span><strong>スケーリング則の検証</strong> — モデル規模と能力・安全性の関係を定量的に評価</span>
-      </li>
-      <li>
-        <span class="bullet-dot"></span>
-        <span><strong>RLHF（人間フィードバックによる強化学習）</strong> — 人間の価値観に沿った応答を学習させる</span>
-      </li>
-      <li>
-        <span class="bullet-dot"></span>
-        <span><strong>Red-teaming</strong> — 意図的な攻撃テストでシステムの脆弱性を事前に発見・修正</span>
-      </li>
-    </ul>
-    <div class="slide-number">03</div>
-  </div>
+    <!-- 左：パーツ (flex:1.6) -->
+    <div style="flex:1.6;background:var(--color-surface-card);border:1px solid var(--color-hairline);border-radius:16px;padding:30px 32px;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-shrink:0;">
+        <div style="width:6px;height:28px;border-radius:3px;background:var(--color-primary);flex-shrink:0;"></div>
+        <div style="font-family:var(--font-display);font-size:26px;font-weight:800;color:var(--color-ink);">スライドで使うパーツ</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;align-content:space-between;flex:1;">
 
-  <!-- SLIDE 4: データチャート -->
-  <p class="slide-label">SLIDE 4 / Data Chart</p>
-  <div class="slide slide-chart">
-    <h2>モデル評価スコアの推移</h2>
-    <div class="accent-bar"></div>
-    <div class="chart-area">
-      <div class="chart-bar-group">
-        <div class="chart-bar" style="height:100px;">
-          <span class="bar-value">62</span>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Button</div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <div style="padding:14px 28px;background:var(--color-primary);color:#fff;border-radius:8px;font-family:var(--font-display);font-size:18px;font-weight:700;">Primary</div>
+            <div style="padding:14px 28px;border:1.5px solid var(--color-primary);color:var(--color-primary);border-radius:8px;font-family:var(--font-display);font-size:18px;font-weight:700;">Outline</div>
+          </div>
         </div>
-        <span class="chart-label">2022 Q1</span>
-      </div>
-      <div class="chart-bar-group">
-        <div class="chart-bar" style="height:130px;">
-          <span class="bar-value">74</span>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Title Bar</div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--color-canvas);border:1px solid var(--color-hairline);border-radius:8px;">
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--color-primary);flex-shrink:0;"></div>
+            <div style="font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--color-ink);">スライドタイトル</div>
+          </div>
         </div>
-        <span class="chart-label">2022 Q4</span>
-      </div>
-      <div class="chart-bar-group">
-        <div class="chart-bar" style="height:160px;">
-          <span class="bar-value">83</span>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Numbered List</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:var(--color-primary);color:#fff;font-family:var(--font-display);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div><span style="font-size:18px;color:var(--color-body);">項目テキスト</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:var(--color-primary);color:#fff;font-family:var(--font-display);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div><span style="font-size:18px;color:var(--color-body);">項目テキスト</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:var(--color-primary);color:#fff;font-family:var(--font-display);font-size:14px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div><span style="font-size:18px;color:var(--color-body);">項目テキスト</span></div>
+          </div>
         </div>
-        <span class="chart-label">2023 Q2</span>
-      </div>
-      <div class="chart-bar-group">
-        <div class="chart-bar" style="height:185px;">
-          <span class="bar-value">89</span>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Bullet List</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--color-primary);flex-shrink:0;"></div><span style="font-size:18px;color:var(--color-body);">箇条書き項目</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--color-primary);flex-shrink:0;"></div><span style="font-size:18px;color:var(--color-body);">箇条書き項目</span></div>
+            <div style="display:flex;align-items:center;gap:10px;"><div style="width:10px;height:10px;border-radius:50%;background:var(--color-primary);flex-shrink:0;"></div><span style="font-size:18px;color:var(--color-body);">箇条書き項目</span></div>
+          </div>
         </div>
-        <span class="chart-label">2024 Q1</span>
-      </div>
-      <div class="chart-bar-group">
-        <div class="chart-bar highlight" style="height:220px;">
-          <span class="bar-value">96</span>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Card</div>
+          <div style="background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:10px;padding:14px 18px;">
+            <div style="font-weight:700;font-size:18px;color:var(--color-ink);margin-bottom:4px;">カードタイトル</div>
+            <div style="font-size:16px;color:var(--color-muted);">説明テキストが入ります</div>
+          </div>
         </div>
-        <span class="chart-label">2025 Q1</span>
-      </div>
-      <div class="chart-bar-group">
-        <div class="chart-bar highlight" style="height:242px;">
-          <span class="bar-value">98.4</span>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Chip / Label</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <div style="padding:7px 18px;border-radius:999px;font-size:16px;font-weight:600;background:rgba(204,120,92,0.14);color:var(--color-primary);">Primary</div>
+            <div style="padding:7px 18px;border-radius:999px;font-size:16px;font-weight:600;background:rgba(93,184,166,0.14);color:var(--color-secondary);">Teal</div>
+            <div style="padding:7px 18px;border-radius:999px;font-size:16px;font-weight:600;background:rgba(232,165,90,0.14);color:var(--color-accent);">Amber</div>
+          </div>
         </div>
-        <span class="chart-label">2026 Q1</span>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Divider</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
+            <div style="flex:1;height:1px;background:var(--color-hairline);"></div>
+            <div style="font-size:15px;color:var(--color-muted);font-weight:600;letter-spacing:0.1em;text-transform:uppercase;">Section</div>
+            <div style="flex:1;height:1px;background:var(--color-hairline);"></div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:8px;">Page Number</div>
+          <div style="display:flex;align-items:baseline;gap:6px;">
+            <span style="font-family:var(--font-mono);font-size:28px;font-weight:700;color:var(--color-primary);">01</span>
+            <span style="font-family:var(--font-mono);font-size:20px;color:var(--color-muted);">/ 6</span>
+          </div>
+        </div>
+
       </div>
     </div>
-    <p class="chart-note">※ スコアはベンチマーク評価（HHH基準）における100点満点での値。コーラル色は直近の実績値。</p>
-    <div class="slide-number">04</div>
+
+    <!-- 中：タイポグラフィ (flex:1) -->
+    <div style="flex:1;background:var(--color-surface-card);border:1px solid var(--color-hairline);border-radius:16px;padding:30px 32px;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-shrink:0;">
+        <div style="width:6px;height:28px;border-radius:3px;background:var(--color-primary);flex-shrink:0;"></div>
+        <div style="font-family:var(--font-display);font-size:26px;font-weight:800;color:var(--color-ink);">タイポグラフィ</div>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:space-between;flex:1;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--color-hairline);padding-bottom:10px;">
+          <span style="font-family:var(--font-display);font-size:40px;font-weight:800;letter-spacing:-0.03em;line-height:1;color:var(--color-ink);">表紙タイトル</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">100px · 800 · Display</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--color-hairline);padding-bottom:10px;">
+          <span style="font-family:var(--font-display);font-size:30px;font-weight:800;letter-spacing:-0.02em;color:var(--color-ink);">大見出し（H1）</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">80px · 800</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--color-hairline);padding-bottom:10px;">
+          <span style="font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--color-ink);">中見出し（H2）</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">54px · 700</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--color-hairline);padding-bottom:10px;">
+          <span style="font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--color-ink);">小見出し（H3）</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">32px · 700</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--color-hairline);padding-bottom:10px;">
+          <span style="font-family:var(--font-body);font-size:15px;font-weight:400;color:var(--color-body);">本文テキスト（Body L）</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">22px · 400</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed var(--color-hairline);padding-bottom:10px;">
+          <span style="font-family:var(--font-body);font-size:13px;font-weight:400;color:var(--color-body);">本文テキスト（Body S）</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">18px · 400</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <span style="font-family:var(--font-body);font-size:11px;font-weight:500;color:var(--color-muted);">キャプション・注釈</span>
+          <span style="font-family:var(--font-mono);font-size:15px;color:var(--color-muted);white-space:nowrap;margin-left:10px;">13px · 500</span>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--color-hairline);flex-shrink:0;">
+        <div style="font-size:15px;font-weight:700;color:var(--color-muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;">Typeface</div>
+        <div style="font-size:17px;color:var(--color-body);font-weight:500;">Plus Jakarta Sans · DM Sans · DM Mono</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;font-size:16px;color:var(--color-muted);">
+            <span>Slide Size</span><span style="font-family:var(--font-mono);color:var(--color-body);font-weight:600;">1920 × 1080 px</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:16px;color:var(--color-muted);">
+            <span>Padding</span><span style="font-family:var(--font-mono);color:var(--color-body);font-weight:600;">80px / 120px</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:16px;color:var(--color-muted);">
+            <span>Align</span><span style="font-family:var(--font-mono);color:var(--color-body);font-weight:600;">Left</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右：Do & Don't (flex:0.85) -->
+    <div style="flex:0.85;background:var(--color-surface-card);border:1px solid var(--color-hairline);border-radius:16px;padding:30px 32px;display:flex;flex-direction:column;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-shrink:0;">
+        <div style="width:6px;height:28px;border-radius:3px;background:var(--color-success);flex-shrink:0;"></div>
+        <div style="font-family:var(--font-display);font-size:26px;font-weight:800;color:var(--color-ink);">Do &amp; Don't</div>
+      </div>
+      <div style="display:flex;flex-direction:column;flex:1;gap:12px;">
+        <div style="background:#f0f3ee;border-radius:12px;padding:18px 20px;flex:1;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px;">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-success);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✓</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:#3a7d4a;">Do</div>
+          </div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– 1スライド1メッセージ・余白を広くとる</div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– ウォームトーンのパレットを守る</div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– 見出しは大きく・力強く表示する</div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– ink #141413 を本文に使う</div>
+        </div>
+        <div style="background:#f5ede9;border-radius:12px;padding:18px 20px;flex:1;display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:2px;">
+            <div style="width:34px;height:34px;border-radius:50%;background:var(--color-primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">✕</div>
+            <div style="font-family:var(--font-display);font-size:22px;font-weight:800;color:var(--color-primary);">Don't</div>
+          </div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– 派手なグラデーションや原色を使わない</div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– 背景に過剰な装飾を置かない</div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– 情報を詰め込みすぎない</div>
+          <div style="font-size:18px;line-height:1.6;color:var(--color-body);">– 白（#fff）を背景に使わない</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /下段 -->
+
+</section>
+</div>
+</div>
+
+<!-- ===========================
+     PAGE 2: 表紙
+============================ -->
+<div class="slide-outer">
+<div class="slide-wrapper">
+<section class="slide" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 160px;">
+
+  <div style="width:100px;height:100px;border-radius:24px;background:var(--color-primary);display:flex;align-items:center;justify-content:center;margin-bottom:40px;">
+    <svg width="54" height="54" viewBox="0 0 54 54" fill="none">
+      <circle cx="27" cy="27" r="21" stroke="white" stroke-width="4"/>
+      <circle cx="27" cy="27" r="9" fill="white"/>
+    </svg>
   </div>
 
-  <!-- SLIDE 5: まとめ -->
-  <p class="slide-label">SLIDE 5 / Summary</p>
-  <div class="slide slide-summary">
-    <div class="summary-header">
-      <div class="accent-bar" style="margin-bottom:0;"></div>
-      <h2>まとめ</h2>
-    </div>
-    <div class="summary-grid">
-      <div class="summary-card">
-        <div class="card-number">Point 01</div>
-        <p>安全性と有用性は<strong>トレードオフではなく</strong>、両立できることを実証</p>
-      </div>
-      <div class="summary-card">
-        <div class="card-number">Point 02</div>
-        <p>Constitutional AIにより<strong>自己修正能力</strong>を持つモデルを実現</p>
-      </div>
-      <div class="summary-card">
-        <div class="card-number">Point 03</div>
-        <p>継続的なRed-teamingで<strong>リスクを事前に発見</strong>するプロセスを確立</p>
-      </div>
-    </div>
-    <p class="closing-message">
-      AIの長期的な安全性の確保は、一社だけでなく業界全体で取り組むべき課題です。<br>
-      研究成果のオープンな共有と対話を通じて、信頼されるAIの未来を共に築きましょう。
-    </p>
-    <div class="slide-number">05</div>
+  <div style="font-family:var(--font-mono);font-size:16px;font-weight:700;letter-spacing:0.28em;text-transform:uppercase;color:var(--color-muted);margin-bottom:32px;">2025 Annual Presentation</div>
+
+  <h1 style="font-family:var(--font-display);font-size:108px;font-weight:800;letter-spacing:-0.04em;line-height:1;color:var(--color-primary);">新サービスのご紹介</h1>
+
+  <div style="font-family:var(--font-display);font-size:32px;font-weight:500;color:var(--color-body);margin-top:36px;line-height:1.45;">次世代プラットフォームが切り拓く、<br>ビジネスの新しい可能性</div>
+
+  <div style="width:320px;height:4px;border-radius:999px;background:var(--color-primary);margin:52px 0;opacity:0.55;"></div>
+
+  <div style="display:flex;align-items:center;gap:16px;font-family:var(--font-mono);font-size:19px;font-weight:600;color:var(--color-muted);">
+    <span>サンプル株式会社</span>
+    <span style="font-size:9px;color:var(--color-primary);">●</span>
+    <span>2025年 第4四半期</span>
   </div>
+
+  <div class="page-number"><span class="current">01</span><span class="total">/ 6</span></div>
+
+</section>
+</div>
+</div>
+
+<!-- ===========================
+     PAGE 3: セクションタイトル
+============================ -->
+<div class="slide-outer">
+<div class="slide-wrapper">
+<section class="slide" style="display:flex;flex-direction:column;justify-content:center;padding:0 140px;">
+
+  <div style="position:absolute;right:80px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:480px;font-weight:800;opacity:0.06;color:var(--color-primary);line-height:1;user-select:none;">01</div>
+
+  <div style="display:flex;align-items:stretch;gap:36px;position:relative;z-index:1;">
+    <div style="width:8px;border-radius:4px;background:var(--color-primary);flex-shrink:0;"></div>
+    <div style="display:flex;flex-direction:column;gap:22px;">
+      <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;letter-spacing:0.28em;color:var(--color-muted);text-transform:uppercase;">Section 01</div>
+      <h1 style="font-family:var(--font-display);font-size:96px;font-weight:800;letter-spacing:-0.03em;line-height:1.04;color:var(--color-ink);">事業概要</h1>
+      <p style="font-family:var(--font-body);font-size:26px;font-weight:500;color:var(--color-body);line-height:1.6;max-width:900px;">私たちが目指す方向性と、これまでの取り組みをご紹介します。顧客価値の最大化を軸に、新しい市場機会を開拓してきました。</p>
+    </div>
+  </div>
+
+  <div class="page-number"><span class="current">02</span><span class="total">/ 6</span></div>
+  <div class="brand-footer">ANTHROPIC</div>
+
+</section>
+</div>
+</div>
+
+<!-- ===========================
+     PAGE 4: 箇条書き
+============================ -->
+<div class="slide-outer">
+<div class="slide-wrapper">
+<section class="slide" style="display:flex;flex-direction:column;padding:80px 120px;">
+
+  <div style="display:flex;align-items:center;gap:18px;margin-bottom:14px;flex-shrink:0;">
+    <div style="width:7px;height:50px;border-radius:4px;background:var(--color-primary);flex-shrink:0;"></div>
+    <h1 style="font-family:var(--font-display);font-size:62px;font-weight:800;letter-spacing:-0.02em;color:var(--color-ink);line-height:1.1;">成長を支える4つの柱</h1>
+  </div>
+  <p style="font-family:var(--font-body);font-size:24px;font-weight:500;color:var(--color-muted);margin-bottom:40px;margin-left:25px;flex-shrink:0;">顧客価値・業務効率・新規事業・組織基盤を重点領域として推進</p>
+
+  <div style="display:flex;flex-direction:column;gap:20px;flex:1;min-height:0;">
+
+    <div style="display:flex;align-items:center;gap:32px;background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:14px;padding:32px 36px;flex:1;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--color-primary);color:#fff;font-family:var(--font-display);font-weight:800;font-size:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--color-ink);margin-bottom:8px;">顧客体験の向上</div>
+        <div style="font-family:var(--font-body);font-size:21px;color:var(--color-muted);line-height:1.55;">ユーザーインタビューとデータ分析をもとに、製品体験を継続的に改善する</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:32px;background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:14px;padding:32px 36px;flex:1;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--color-secondary);color:#fff;font-family:var(--font-display);font-weight:800;font-size:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--color-ink);margin-bottom:8px;">業務効率化の推進</div>
+        <div style="font-family:var(--font-body);font-size:21px;color:var(--color-muted);line-height:1.55;">自動化・標準化・ツール整備により、チームの生産性を高める</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:32px;background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:14px;padding:32px 36px;flex:1;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--color-accent);color:#fff;font-family:var(--font-display);font-weight:800;font-size:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--color-ink);margin-bottom:8px;">新規市場の開拓</div>
+        <div style="font-family:var(--font-body);font-size:21px;color:var(--color-muted);line-height:1.55;">海外展開・新規パートナーシップ・隣接領域への参入を並行して検討する</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:32px;background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:14px;padding:32px 36px;flex:1;">
+      <div style="width:64px;height:64px;border-radius:50%;background:var(--color-muted);color:#fff;font-family:var(--font-display);font-weight:800;font-size:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</div>
+      <div>
+        <div style="font-family:var(--font-display);font-size:30px;font-weight:700;color:var(--color-ink);margin-bottom:8px;">組織基盤の強化</div>
+        <div style="font-family:var(--font-body);font-size:21px;color:var(--color-muted);line-height:1.55;">採用・育成・制度設計を通じて、持続的な成長を支える組織をつくる</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-number"><span class="current">03</span><span class="total">/ 6</span></div>
+  <div class="brand-footer">ANTHROPIC</div>
+
+</section>
+</div>
+</div>
+
+<!-- ===========================
+     PAGE 5: データチャート
+============================ -->
+<div class="slide-outer">
+<div class="slide-wrapper">
+<section class="slide" style="display:flex;flex-direction:column;padding:80px 120px;">
+
+  <div style="display:flex;align-items:center;gap:18px;margin-bottom:14px;flex-shrink:0;">
+    <div style="width:7px;height:50px;border-radius:4px;background:var(--color-primary);flex-shrink:0;"></div>
+    <h1 style="font-family:var(--font-display);font-size:62px;font-weight:800;letter-spacing:-0.02em;color:var(--color-ink);line-height:1.1;">四半期業績の推移</h1>
+  </div>
+  <p style="font-family:var(--font-body);font-size:24px;font-weight:500;color:var(--color-muted);margin-bottom:36px;margin-left:25px;flex-shrink:0;">2024年度 Q1〜Q4 売上推移および売上構成比</p>
+
+  <div style="display:flex;gap:32px;flex:1;min-height:0;">
+
+    <!-- 棒グラフ -->
+    <div style="flex:1.3;background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:16px;padding:36px 44px;display:flex;flex-direction:column;">
+      <div style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--color-ink);margin-bottom:24px;flex-shrink:0;">売上推移（百万円）</div>
+      <div style="flex:1;display:flex;align-items:flex-end;gap:32px;padding-bottom:18px;border-bottom:2px solid var(--color-hairline);">
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--color-muted);">¥320</div>
+          <div style="width:100%;height:220px;background:rgba(204,120,92,0.22);border-radius:7px 7px 0 0;"></div>
+          <div style="font-family:var(--font-mono);font-size:18px;color:var(--color-muted);">Q1</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--color-muted);">¥410</div>
+          <div style="width:100%;height:295px;background:rgba(204,120,92,0.42);border-radius:7px 7px 0 0;"></div>
+          <div style="font-family:var(--font-mono);font-size:18px;color:var(--color-muted);">Q2</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--color-muted);">¥490</div>
+          <div style="width:100%;height:365px;background:rgba(204,120,92,0.62);border-radius:7px 7px 0 0;"></div>
+          <div style="font-family:var(--font-mono);font-size:18px;color:var(--color-muted);">Q3</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="font-family:var(--font-mono);font-size:20px;font-weight:700;color:var(--color-primary);">¥620</div>
+          <div style="width:100%;height:440px;background:var(--color-primary);border-radius:7px 7px 0 0;box-shadow:0 4px 14px rgba(204,120,92,0.35);"></div>
+          <div style="font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--color-primary);">Q4</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ドーナツグラフ -->
+    <div style="flex:1;background:var(--color-surface-soft);border:1px solid var(--color-hairline);border-radius:16px;padding:36px 44px;display:flex;flex-direction:column;">
+      <div style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--color-ink);margin-bottom:24px;flex-shrink:0;">売上構成比</div>
+      <div style="flex:1;display:flex;align-items:center;gap:40px;">
+        <div style="position:relative;flex-shrink:0;">
+          <div style="width:280px;height:280px;border-radius:50%;background:conic-gradient(var(--color-primary) 0% 48%,var(--color-secondary) 48% 74%,var(--color-accent) 74% 90%,var(--color-muted) 90% 100%);"></div>
+          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:160px;height:160px;border-radius:50%;background:var(--color-surface-soft);display:flex;flex-direction:column;align-items:center;justify-content:center;">
+            <div style="font-family:var(--font-mono);font-size:42px;font-weight:800;color:var(--color-primary);">48%</div>
+            <div style="font-family:var(--font-body);font-size:16px;color:var(--color-muted);">主力事業</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:16px;height:16px;border-radius:4px;background:var(--color-primary);flex-shrink:0;"></div><div style="font-size:20px;color:var(--color-body);">主力事業 <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-primary);">48%</span></div></div>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:16px;height:16px;border-radius:4px;background:var(--color-secondary);flex-shrink:0;"></div><div style="font-size:20px;color:var(--color-body);">新規事業 <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-secondary);">26%</span></div></div>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:16px;height:16px;border-radius:4px;background:var(--color-accent);flex-shrink:0;"></div><div style="font-size:20px;color:var(--color-body);">サービス <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-accent);">16%</span></div></div>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:16px;height:16px;border-radius:4px;background:var(--color-muted);flex-shrink:0;"></div><div style="font-size:20px;color:var(--color-body);">その他 <span style="font-family:var(--font-mono);font-weight:700;color:var(--color-muted);">10%</span></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="page-number"><span class="current">04</span><span class="total">/ 6</span></div>
+  <div class="brand-footer">ANTHROPIC</div>
+
+</section>
+</div>
+</div>
+
+<!-- ===========================
+     PAGE 6: まとめ
+============================ -->
+<div class="slide-outer">
+<div class="slide-wrapper">
+<section class="slide" style="display:flex;flex-direction:column;padding:80px 120px;">
+
+  <div style="display:flex;align-items:center;gap:18px;margin-bottom:14px;flex-shrink:0;">
+    <div style="width:7px;height:50px;border-radius:4px;background:var(--color-primary);flex-shrink:0;"></div>
+    <h1 style="font-family:var(--font-display);font-size:62px;font-weight:800;letter-spacing:-0.02em;color:var(--color-ink);line-height:1.1;">今後の取り組み</h1>
+  </div>
+  <p style="font-family:var(--font-body);font-size:24px;font-weight:500;color:var(--color-muted);margin-bottom:40px;margin-left:25px;flex-shrink:0;">3つの重点テーマで、次のステージへ</p>
+
+  <div style="display:flex;gap:28px;flex:1;min-height:0;">
+
+    <div style="flex:1;background:var(--color-surface-card);border:1px solid var(--color-hairline);border-radius:16px;padding:48px 40px;display:flex;flex-direction:column;gap:22px;">
+      <div style="width:72px;height:72px;border-radius:18px;background:rgba(204,120,92,0.14);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--color-primary);">強</div>
+      <div style="font-family:var(--font-display);font-size:34px;font-weight:800;letter-spacing:-0.01em;color:var(--color-ink);">強みの強化</div>
+      <div style="font-family:var(--font-body);font-size:22px;color:var(--color-muted);line-height:1.65;">既存事業の競争優位性をさらに高め、顧客ロイヤルティを深化させる。製品品質とサポート体制の両面から取り組む。</div>
+    </div>
+
+    <div style="flex:1;background:var(--color-surface-card);border:1px solid var(--color-hairline);border-radius:16px;padding:48px 40px;display:flex;flex-direction:column;gap:22px;">
+      <div style="width:72px;height:72px;border-radius:18px;background:rgba(93,184,166,0.14);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--color-secondary);">拓</div>
+      <div style="font-family:var(--font-display);font-size:34px;font-weight:800;letter-spacing:-0.01em;color:var(--color-ink);">新市場の開拓</div>
+      <div style="font-family:var(--font-body);font-size:22px;color:var(--color-muted);line-height:1.65;">国内外の新しい市場に積極的に参入し、収益源を多様化する。パートナーエコシステムの構築を加速させる。</div>
+    </div>
+
+    <div style="flex:1;background:var(--color-surface-card);border:1px solid var(--color-hairline);border-radius:16px;padding:48px 40px;display:flex;flex-direction:column;gap:22px;">
+      <div style="width:72px;height:72px;border-radius:18px;background:rgba(232,165,90,0.14);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:32px;font-weight:800;color:var(--color-accent);">基</div>
+      <div style="font-family:var(--font-display);font-size:34px;font-weight:800;letter-spacing:-0.01em;color:var(--color-ink);">基盤の整備</div>
+      <div style="font-family:var(--font-body);font-size:22px;color:var(--color-muted);line-height:1.65;">技術インフラとデータ基盤を刷新し、スケールに耐えられる組織・システムへと進化させる。</div>
+    </div>
+
+  </div>
+
+  <div style="display:flex;justify-content:center;margin-top:44px;flex-shrink:0;">
+    <div style="padding:20px 60px;border-radius:999px;background:var(--color-primary);color:#fff;font-family:var(--font-display);font-size:28px;font-weight:700;box-shadow:0 6px 22px rgba(204,120,92,0.32);">次のステップへ — サンプル株式会社</div>
+  </div>
+
+  <div class="page-number"><span class="current">06</span><span class="total">/ 6</span></div>
+  <div class="brand-footer">ANTHROPIC</div>
+
+</section>
+</div>
+</div>
 
 </body>
 </html>

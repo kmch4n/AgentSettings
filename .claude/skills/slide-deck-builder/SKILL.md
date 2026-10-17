@@ -23,6 +23,25 @@ Bash:
 
 既存フォルダがある場合、スクリプトは上書きせず停止する。更新が明示的に必要な場合だけ、PowerShellでは `-Overwrite`、Bashでは第2引数に `--overwrite` を指定する。
 
+## STEP 0：シナリオ入力の確認
+
+`slide-scenario-creator` で作成したシナリオがあるかを最初に確認する。
+
+1. 入力として `SLIDE-SCENARIO-*.md` が渡されたか、またはカレントディレクトリの `SLIDE-SCENARIO/` フォルダにファイルがあるかを確認する（複数ある場合は一覧を提示して選んでもらう）
+2. シナリオがある場合、冒頭の Brief から `title` / `audience` / `purpose` / `slide_count` を読み取り、以下のように要約して確認する：
+
+> 「シナリオ `SLIDE-SCENARIO-{name}.md` を読み込みました。以下の内容でスライドを設計します。
+>
+> - タイトル：[title]
+> - 対象者：[audience]
+> - 目的：[purpose]
+> - 枚数：[slide_count]
+>
+> よろしいですか？」
+
+3. 承認を得たら **STEP 1 のヒアリングをスキップ** する。シナリオの Storyline・Agenda を STEP 2 のプレゼン内容として使用し、STEP 3 へ進む
+4. シナリオがない場合は、従来どおり STEP 1 へ進む
+
 ## STEP 1：ブリーフ入力
 
 プレゼンの基本情報を1問ずつヒアリングする。
@@ -48,8 +67,12 @@ Bash:
 > 1. 状況報告・定例報告
 > 2. 提案・新サービス説明
 > 3. 教育・研修・勉強会
-> 4. イベント・発表
-> 5. その他（自由に入力してください）」
+> 4. 意思決定を求める（承認・予算獲得など）
+> 5. イベント・発表
+> 6. マニュアル・手順書
+> 7. その他（自由に入力してください）」
+
+（この選択肢は `slide-scenario-creator` の「①資料の目的」と共通。変更する場合は両スキルを揃えること）
 
 ### 質問4：枚数（質問3の回答を受け取った後）
 
@@ -81,7 +104,7 @@ Bash:
 
 **何も提供されていない場合**、以下のように尋ねる：
 
-> 「プレゼンの内容を教えてください。アウトライン・箇条書き・文章・MarkdownファイルなどどんなKei式でも構いません。」
+> 「プレゼンの内容を教えてください。アウトライン・箇条書き・文章・Markdownファイルなどどんな形式でも構いません。」
 
 内容を受け取ったら「受け取りました。デザインシステムを確認します。」と伝え、STEP 3へ進む。
 
@@ -107,13 +130,19 @@ Bash:
 
 選ばれたファイルを読み込む。
 
-### 1件も見つからない場合
+### 1件も見つからない場合（プラグイン同梱サンプルへのフォールバック)
+
+カレントディレクトリに1件も見つからない場合、AgentSettings が共有している `~/.agents/slide-md/SLIDE-md/SLIDE-md-*/SLIDE.md`（同梱のサンプルデザインシステム）を検索する。
+
+見つかったら「複数件見つかった場合」と同じ形式で一覧を提示し、選ばれたフォルダ（SLIDE.md と sample.html）をカレントディレクトリの `SLIDE-md/` にコピーしてから読み込む（以後のプロジェクトで再利用できるようにするため）。
+
+プラグイン同梱サンプルも見つからない場合：
 
 > 「デザインシステム（SLIDE.md）が `SLIDE-md/` フォルダに見つかりませんでした。`slide-md-creator` スキルでSLIDE.mdを先に生成してから、このスキルを再度呼び出してください。」
 
 → スキルを終了する。
 
-選択されたSLIDE.mdの全内容（Overview・Colors・Typography・Layout・Slide Frame・Do/Don't の全セクション）を読み込んで保持し、STEP 4へ進む。
+選択されたSLIDE.mdの全内容（Overview・Colors・Typography・Layout・Slide Frame・Component Style・Do/Don't の全セクション）を読み込んで保持し、STEP 4へ進む。
 
 ## STEP 4：アウトライン生成と確認
 
@@ -122,6 +151,7 @@ STEP 1のブリーフとSTEP 2のコンテンツをもとにスライド構成�
 ### 生成ルール
 
 - STEP 1で指定した枚数を目安にする（「おまかせ」の場合は内容量に応じて7〜15枚）
+- シナリオ（SLIDE-SCENARIO）から開始した場合は、Brief の `goal`（相手にどうしてほしいか）・`structure`（構成の型）と各アジェンダ項目の「想定枚数」を尊重して構成する
 - 必ず「表紙」と「まとめ・クロージング」を含める
 - セクションタイトルスライドで内容を章立てする
 - 各スライドにスライドの種類（表紙 / セクション見出し / 箇条書き / データ / まとめ 等）を明記する
@@ -146,9 +176,13 @@ STEP 1のブリーフとSTEP 2のコンテンツをもとにスライド構成�
 
 ## STEP 5：パターン自動割り当てと確認
 
-`SLIDE-PATTERN/SLIDE-PATTERN-INDEX.md` を読み込む。
+カレントディレクトリの `SLIDE-PATTERN/SLIDE-PATTERN-INDEX.md` を読み込む。
 
-### 読み込めない場合
+### 読み込めない場合（プラグイン同梱パターンへのフォールバック）
+
+カレントディレクトリに見つからない場合、AgentSettings が共有している `~/.agents/slide-md/SLIDE-PATTERN/SLIDE-PATTERN-INDEX.md`（同梱のパターン集）を読み込む。この場合、STEP 6 でのパターン定義ファイルの読み込みも同じ場所の `SLIDE-PATTERN-{name}/SLIDE-PATTERN-{name}.md` から行う。
+
+プラグイン同梱パターンも見つからない場合：
 
 > 「`SLIDE-PATTERN/SLIDE-PATTERN-INDEX.md` が見つかりませんでした。`SLIDE-PATTERN/` フォルダにスライドパターンが存在するか確認し、存在する場合は `slide-pattern-creator` スキルを呼び出してインデックスを生成してください。」
 
@@ -176,9 +210,58 @@ SLIDE-PATTERN-INDEX.md に記載された各パターンの「概要」と「適
 | Q&A | ❓ Q&A・FAQ |
 | プロフィール・登壇者 | 👤 プロフィール |
 
+### パターンプレビュー（pattern-preview.html）の生成
+
+割り当て表をテキストで見せるだけでは、ユーザーはどんなレイアウトが選ばれたのかイメージできない。割り当てが決まったら、**提示と同時に `SLIDE-DECK/pattern-preview.html` を生成する**（`SLIDE-DECK/` フォルダがなければ作成する。このファイルは使い捨ての確認用のため、既存のものがあれば上書きしてよい）。
+
+**プレビューの構成：**
+
+- ページ冒頭に見出しとひとこと説明：「各スライドに割り当てたレイアウトパターンのプレビューです。変更したい場合は『Slide 番号 → パターン名（または 候補A / 候補B）』の形式で伝えてください。」
+- 冒頭見出しの右側に、パターンギャラリーへのショートカットボタンを配置する：`<a href="https://sho-ai-magic.github.io/slide.md/" target="_blank">` で「全パターンをギャラリーで見る ↗」というボタン（例：`padding:10px 20px; border-radius:999px; background:#1A73E8; color:#FFF; font-size:14px; font-weight:700; text-decoration:none`）。候補以外のパターンから選びたいときはギャラリーで全127種類を確認できる
+- スライド1枚につき1つのカード（行）を縦に並べる。各カードの内容：
+  - **左側の情報欄**：スライド番号・種類・スライドタイトル・割り当てパターン名（`code` 表記）・INDEXに書かれた概要の1行
+  - **右側のサムネイル列**：先頭に**割り当てパターン**のサムネイル、その右に**同カテゴリの代替候補2〜3個**のサムネイルを並べる（カテゴリ内のパターンが少ない場合はある分だけでよい。他スライドと候補が重複してもよい）。各サムネイルの下にパターン名を添え、候補には「候補A」「候補B」のラベルを付ける。割り当てパターンのサムネイルは枠を強調色（例：`border:3px solid #1A73E8`）にし、「割り当て」バッジを付けて区別する
+- ユーザーが「Slide 3 → 候補B」のようにラベルで指定した場合は、該当するパターン名に読み替えて反映する
+
+**サムネイルの実装（画像は作らず、既存のスケルトンHTMLをiframeで縮小埋め込みする）：**
+
+    .thumb {
+      width: 384px; height: 236px; overflow: hidden; position: relative;
+      border: 1px solid #DDD; border-radius: 8px; background: #FFF;
+    }
+    .thumb iframe {
+      width: 1540px; height: 940px; border: 0;
+      transform: scale(0.25); transform-origin: top left;
+      pointer-events: none;
+    }
+
+- iframe の `src` には各パターンのスケルトンHTMLを指定する。カレントディレクトリにある場合はプレビューHTMLから見た相対パス（`../SLIDE-PATTERN/SLIDE-PATTERN-{name}/SLIDE-PATTERN-{name}.html`）、プラグイン同梱パターンを使っている場合はその絶対パスを指定する
+- JavaScriptは使用しない（iframeとCSSのみで完結させる）
+
+**表示にはローカルサーバーが必須（file://直開きでは表示できない）：**
+
+`pattern-preview.html` は同一階層にない別のローカルHTMLファイルをiframeで読み込む構成のため、`file://` で直接開くとブラウザのセキュリティ制限によりiframeの中身が空白になる（ダブルクリックで開いた場合や、プレビューパネルがファイルパスをそのまま渡す場合に起きる）。表示確認は必ず `http://` 経由で行う。
+
+1. カレントディレクトリの `.claude/launch.json` を確認し、カレントディレクトリ全体（`SLIDE-DECK/` と `SLIDE-PATTERN/` の両方を含む親フォルダ）を配信する設定が無ければ追記する（既存の設定は消さず末尾に追加する）。無ければ以下の形式で新規作成する：
+
+       {
+         "version": "0.0.1",
+         "configurations": [
+           {
+             "name": "patterns-root",
+             "runtimeExecutable": "python3",
+             "runtimeArgs": ["-m", "http.server", "{空いているポート番号}", "--directory", "{カレントディレクトリの絶対パス}"],
+             "port": {空いているポート番号}
+           }
+         ]
+       }
+
+2. そのサーバーを起動し、`http://localhost:{port}/SLIDE-DECK/pattern-preview.html` を開いて表示を確認する
+3. ユーザーへの提示時にも、直接ファイルを開くのではなく上記のローカルサーバー経由で開くよう明記する
+
 ### 提示形式
 
-> 「各スライドにパターンを割り当てました。変更したいものがあれば「Slide番号 → 変更先のパターン名」の形式で教えてください。
+> 「各スライドにパターンを割り当てました。
 >
 > | スライド | 種類 | 割り当てパターン |
 > |---|---|---|
@@ -186,9 +269,12 @@ SLIDE-PATTERN-INDEX.md に記載された各パターンの「概要」と「適
 > | Slide 2 | アジェンダ | `{pattern-name}` |
 > ...
 >
-> この割り当てでよいですか？」
+> **`SLIDE-DECK/pattern-preview.html` で、割り当てたパターンと代替候補をサムネイルで確認できます（`file://` で直接開くとサムネイルが空白になるため、ローカルサーバー『{launch.jsonの設定名}』を起動してから開いてください）。**
+> 変更したいものがあれば「Slide番号 → 変更先のパターン名（または 候補A / 候補B）」の形式で教えてください。この割り当てでよいですか？」
 
-変更があれば反映し、承認を得たらSTEP 6へ進む。
+HTMLのプレビュー表示機能が使える環境（Claude Code のプレビュー等）では、上記のローカルサーバーを起動した上で該当URLを開き、生成後にそのまま表示してよい。
+
+変更があれば反映し、**pattern-preview.html も再生成してから**再提示する。承認を得たらSTEP 6へ進む。
 
 ## STEP 6：SLIDE-DECK.md の生成
 
@@ -201,7 +287,9 @@ SLIDE-PATTERN-INDEX.md に記載された各パターンの「概要」と「適
 - 日本語タイトルの場合：主要キーワードをローマ字またはアルファベットで表現する（例：「2026年度 営業戦略」→ `2026-eigyo`、「新製品発表」→ `new-product`）
 - 変換が難しい場合：`deck-YYYYMMDD` 形式を使う（例：`deck-20260604`）
 
-出力先：カレントディレクトリ内の `SLIDE-DECK-{name}/SLIDE-DECK-{name}.md`
+出力先：カレントディレクトリ内の `SLIDE-DECK/` フォルダの中に `SLIDE-DECK-{name}/` フォルダを作成して保存する：
+
+    SLIDE-DECK/SLIDE-DECK-{name}/SLIDE-DECK-{name}.md
 
 ### 生成の手順
 
@@ -217,7 +305,7 @@ SLIDE-PATTERN-INDEX.md に記載された各パターンの「概要」と「適
 以下のテンプレートに従って出力する。各 `[　]` に実際の値を入れる。YAMLはコードブロックではなく4スペースインデントで記述する。
 
 ---
-出力ファイル：SLIDE-DECK-{name}/SLIDE-DECK-{name}.md
+出力ファイル：SLIDE-DECK/SLIDE-DECK-{name}/SLIDE-DECK-{name}.md
 
 # SLIDE-DECK-{name}
 
@@ -237,7 +325,7 @@ SLIDE-PATTERN-INDEX.md に記載された各パターンの「概要」と「適
 
 以下はSLIDE.mdのデザインシステム定義です。全スライドのデザインはこの定義に従ってください。
 
-[STEP 3で読み込んだSLIDE.mdの全内容をここにそのまま貼り付ける。Overview・Colors・Typography・Layout・Slide Frame・Do/Don'tのすべてのセクションを含める]
+[STEP 3で読み込んだSLIDE.mdの全内容をここにそのまま貼り付ける。Overview・Colors・Typography・Layout・Slide Frame・Component Style・Do/Don'tのすべてのセクションを含める]
 
 ---
 
@@ -308,6 +396,6 @@ SLIDE-PATTERN-INDEX.md に記載された各パターンの「概要」と「適
 
 SLIDE-DECK.md生成後、以下のようにユーザーに伝える：
 
-> 「`SLIDE-DECK-{name}/SLIDE-DECK-{name}.md` を生成しました。
+> 「`SLIDE-DECK/SLIDE-DECK-{name}/SLIDE-DECK-{name}.md` を生成しました。
 >
 > このファイル1枚をAIツールに添付するだけでスライドを生成できます。デザインシステムと使用したスライドパターン（[N]件）の定義がすべて1ファイルにまとめられています。」

@@ -58,13 +58,13 @@ try {
 
     assert.equal(
         designDirectories.filter((entry) => entry.isDirectory()).length,
-        4,
-        "initializer should copy four sample design systems",
+        10,
+        "initializer should copy ten sample design systems",
     );
     assert.equal(
         patternDirectories.filter((entry) => entry.isDirectory()).length,
-        99,
-        "initializer should copy 99 slide patterns",
+        127,
+        "initializer should copy 127 slide patterns",
     );
     await access(
         path.join(targetPath, "SLIDE-PATTERN", "SLIDE-PATTERN-INDEX.md"),

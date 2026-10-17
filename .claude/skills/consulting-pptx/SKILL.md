@@ -1,9 +1,9 @@
 ---
 name: consulting-pptx
-description: スライド設計規約 slide-rules.md（実務レビュー由来・約110項目の正典）を核に、経営会議品質のスライドを作るスキル。作成前に規約を読み、自由記述テンプレート（本線）またはSlideSpecパイプライン（62型カタログの全型を編集可能PPTXで出せる）で組み、規約の範囲で型に囚われず調整し、check_deck.py の機械チェック FAIL 0 で仕上げる。型カタログはレイアウトの発想帳であり、合わせる対象ではない。トリガー例:「コンサル品質のスライドを作って」「規約に沿ったデッキで」「型カタログから選んで」。スライド作成の依頼では slide-md-creator / slide-deck-builder 系と用途が競合するため、着手前に必ずユーザーへどちらを使うか確認する（下の「他のスライドスキルとの棲み分け」を参照）。
+description: スライド設計規約 slide-rules.md を核に、経営会議品質のスライドを作るスキル。作成前に規約を読み、HTMLパーツ集（基本27＋追加35の62型）から該当パーツをコピーして組み、規約の範囲で型に囚われず調整し、check_deck.py の機械チェック FAIL 0 で仕上げる。型カタログはレイアウトの発想帳であり、合わせる対象ではない。既存の PowerPoint 資料を渡され、そこへ差し込むページを PPTX で求められたときだけ、その資料のマスターの上に直接組む（slide-rules §8.7）。トリガー例:「コンサル品質のスライドを作って」「規約に沿ったデッキで」「型カタログから選んで」「この pptx に足すページを同じ書式で」。スライド作成の依頼では slide-md-creator / slide-deck-builder 系と用途が競合するため、着手前に必ずユーザーへどちらを使うか確認する（下の「他のスライドスキルとの棲み分け」を参照）。
 ---
 
-# コンサル型スライド作成スキル（規約正典を核にしたスライド作成システム）
+# コンサル型スライド作成スキル
 
 ## 他のスライドスキルとの棲み分け（着手前に必ず確認する）
 
@@ -11,140 +11,127 @@ description: スライド設計規約 slide-rules.md（実務レビュー由来�
 
 | 系統 | 担当 | 成果物 | 向く資料 |
 | --- | --- | --- | --- |
-| **本スキル（consulting-pptx）** | **中身の規律** — 約110項目の規約・機械チェック・別エージェントレビュー | HTML／PDF／ネイティブ編集可能PPTX（最終成果物） | 読み手が**判断・反論する**もの（提案書・報告書・投資判断・経営会議）。PPTXで納品するもの |
-| `slide-md-creator` / `slide-pattern-creator` / `slide-deck-builder` | **見た目の再現** — 任意の参照元からデザイン抽出、99レイアウトパターン | SLIDE.md／SLIDE-PATTERN／SLIDE-DECK.md（設計書。生成は下流のAIツール） | 読み手が**聞く・眺める**もの（登壇資料・社内共有・イベント・研修）。ブランドや既存デザインに寄せたいもの |
+| **本スキル（consulting-pptx）** | **中身の規律** — 実務レビュー由来の規約・機械チェック・別エージェントレビュー | HTML／PDF／編集可能PPTX（最終成果物） | 読み手が**判断・反論する**もの（提案書・報告書・投資判断・経営会議）。PPTXで納品するもの |
+| `slide-scenario-creator` / `slide-md-creator` / `slide-pattern-creator` / `slide-deck-builder` | **見た目の再現** — 任意の参照元からデザイン抽出、127レイアウトパターン | SLIDE-SCENARIO／SLIDE.md／SLIDE-PATTERN／SLIDE-DECK.md（設計書。生成は下流のAIツール） | 読み手が**聞く・眺める**もの（登壇資料・社内共有・イベント・研修）。ブランドや既存デザインに寄せたいもの |
 
 判定に迷ったときの一言基準: **「このスライドは印刷されて赤入れされるか？」** されるなら本スキル、されないなら slide-md 系。
 
-**両者の規約は正面衝突するので併用しない。** 例: 本スキル §5.1 は角丸を全面禁止するが、`SLIDE-PATTERN` は99個中77個が `border-radius` を使う。本スキル §7 の「AIぽさの3要因」と §4.28 のフローティング要素禁止は、slide-md 側の装飾的パターンの多くを否定する。**どちらか一方を選び、そのタスクの最後まで貫く。**
+**両者の規約は正面衝突するので併用しない。** 例: 本スキル §5.1 は角丸を既定で使わないが、`SLIDE-PATTERN` は127個中91個が `border-radius` を使う。本スキル §7 の「AIぽさの3要因」と §4.28 のフローティング要素禁止は、slide-md 側の装飾的パターンの多くを否定する。**どちらか一方を選び、そのタスクの最後まで貫く。**
 
-**このスキルを選んだ場合、デザインの自由度は低い**（warm／cool の2スキンと `palette` 上書きのみ）。ブランドカラーや既存資料の見た目に寄せることが要件なら、その時点で slide-md 系に切り替えるかをユーザーに確認する。
+**このスキルを選んだ場合、デザインの自由度は低い**（パーツ集の暖色系とネイビー系の2系統のトークンのみ。既存の PowerPoint 資料へ差し込むページは、その資料のマスターに合わせる）。ブランドカラーや参照元の見た目に寄せることが要件なら、その時点で slide-md 系に切り替えるかをユーザーに確認する。
 
----
+主軸は `references/slide-rules.md`。作成前に全文を読み（冒頭の「資料の種類ごとに、特に効く項目」で、作る資料に当たる行の § を確かめる）、HTMLパーツ集でたたき台を組み、規約の範囲で調整し、機械チェック FAIL 0 と目視で仕上げる。パーツ集と型カタログは規約を効率よく満たす道具であり、**スライドを型に合わせるのではなく、型をストーリーに合わせて選び、合わなければ捨てて自由に組む。**
 
-**このスキルの主軸は `references/slide-rules.md` — 実務のレビュー指摘を1行ずつ蓄積した約110項目の設計規約です。** どんなスライドを作るときも、(1) 作成前に規約を読む → (2) 自由記述テンプレートかSlideSpecパイプラインでたたき台を組む → (3) 規約の範囲で型に囚われず調整する → (4) `scripts/check_deck.py` で FAIL 0 にする、の順で規約が常に上位に立ちます。型カタログ・テンプレート・パイプラインはすべて「規約を効率よく満たすための道具」であり、**スライドを型に合わせるのではなく、型をストーリーに合わせて選び、合わなければ捨てて自由に組みます。**
+成果物は HTML（16:9・1 section = 1スライド）と、Chrome で印刷した PDF。
 
-## 2つの作り方（本線は自由記述）
+## ファイルと読むタイミング
 
-| レーン | 使いどころ | 道具 |
+| ファイル | 中身 | 読む・使うタイミング |
 | --- | --- | --- |
-| **A. 自由記述（本線）** | 納品物・こだわるデッキ全般。1枚ごとに構成を考えて組む | `templates/freeform_parts_16x9.html` をコピーし、不要パーツを消して差し替える。62型カタログは「レイアウトの発想帳」として眺めるだけ |
-| B. SlideSpecパイプライン | 数十秒でたたき台が欲しいとき・定型レポートの量産・編集可能PPTXが要るとき | SlideSpec（JSON）→ HTML → QA → PPTX の自動生成 |
-
-**品質を決めるのは規約と調整であり、型ではない。** パイプラインは型のスロットに文言を流し込むことしかできないので、
-「この型のままでよいか」を1枚ごとに疑い、収まらないと感じたらAレーンでそのスライドだけ自由に組み直す。
-判断に迷ったら常に slide-rules.md に立ち返り、調整で受けた指摘は slide-rules.md に1行ずつ追記して蓄積する。
-
-## 参照ファイル（規約は必読、他は該当工程で読む）
-
-本ファイルは思想と手順だけを持つ。詳細は `references/` に置く。**`slide-rules.md` だけは例外で、どのデッキでも作成前に全文を読む**（必読）。残り3本は該当する工程になったら読む。
-
-| ファイル | 中身 | 読むタイミング |
-| --- | --- | --- |
-| `references/slide-rules.md` | スライド設計規約の正典（約110項目） | **必読。作成前に全文**（工程を問わず） |
-| `references/archetype-catalog.md` | 62型の型カタログ（型ID・使いどころ・SlideSpecのフィールド仕様） | Bレーンで型を選ぶとき／Aレーンで見せ方の着想が欲しいとき |
+| `references/slide-rules.md` | 規約の正典 | **必読。作成前に全文** |
+| `references/archetype-catalog.md` | 62型の一覧（型ID・型名・使いどころ・どのパーツ集の何番か） | ストーリーラインの各行に見せ方を書くとき、見せ方に迷う行があれば引く（必読ではない。手順2） |
 | `references/content-review-prompt.md` | フレッシュアイ・レビューの指示文 | 機械チェック通過後、納品前 |
-| `references/ai-smell-lexicon.md` | AI臭ワード・言い回しの全リストと30秒セルフチェック | 文章の仕上げ時 |
+| `references/ai-smell-lexicon.md` | AI臭ワード・言い回しのリスト | 文章の仕上げ時 |
+| `templates/freeform_parts_16x9.html` | 基本パーツ集 27（表紙・全体マップ・矢羽・前提→帰結・軸のある表・主張パネル・評価表・分布図など）。まずここから | 手順3 |
+| `templates/freeform_parts_more_16x9.html` | 追加パーツ集 35（エグゼクティブサマリー・積み上げ棒・ブリッジ・散布図・比較表・マトリクス・ロードマップ・ガントなど）。基本で足りないとき | 手順3 |
+| `assets/SlideCatalog_16x9.pdf` | 両パーツ集を印刷した62ページ（P.1〜27 基本、P.28〜62 追加） | 型を目で探すとき |
+| `scripts/new_deck.py` | パーツ番号を並べて1本のHTMLを生成 | 手順3 |
+| `scripts/check_deck.py` | 規約の機械チェック（HTML は標準ライブラリのみ） | 手順6 |
+| `scripts/check_layout.mjs` | 重なり・はみ出し・空きの多いページの実レンダリング検査（playwright はスキルの外に入れて `PLAYWRIGHT_MODULE_DIR` で指す。入れ方は README の「セットアップ」） | 手順7 |
+| `tests/test_checks.py` | 機械チェックの自己テスト（直していない版で発火し、直した版で通ることを確認） | 機械チェックを足した・直したとき |
+| `scripts/html_to_pptx.py` | 仕上げた HTML を編集できる PPTX に変換（`html_dump.mjs`・`lib_cdp.mjs` を使う） | ユーザーが PPTX を明示したときだけ |
+| `assets/SuperTemplate_62type.pptx` | 62型のPPTX見本帳（全スライド編集可能） | PPTX を手で組むとき |
+| `scripts/measure_deck.py` | 既存の PowerPoint 資料（.pptx／テンプレートの .potx）の書式を測って `skin.json` に書き出す | 既存の資料へ差し込むページを作るとき（最初に）|
+| `scripts/deck_pptx.py` | その資料のマスターの上に、同じ書式のページを組む部品（作例は `examples/house_deck_example.py`） | 同上 |
+| `local/`（git 管理外） | 利用者の組織の規約 `slide-rules.local.md`・禁止語 `forbid.txt`・自前テンプレ（`local/README.md`） | あれば本体の規約の後に必ず読む。無ければ飛ばす |
 
-## 同梱物
+## 規約の要点（入口。全文は必ず読む）
 
-| もの | パス |
-| --- | --- |
-| 自由記述パーツテンプレ（本線Aレーン用） | `templates/freeform_parts_16x9.html`（表紙・全体マップ・矢羽・前提→帰結2カラム・スタット・軸のある表など。ニュートラル配色） |
-| 生成パイプライン（Node製・Bレーン用） | `pipeline/`（validate / render / qa / export） |
-| 63型のSlideSpec正本（36＋パーツ由来27） | `pipeline/slide-spec/super_template.json`（型IDの一覧と使いどころは `references/archetype-catalog.md`） |
-| SlideSpecスキーマ | `pipeline/slide-spec/schema.json` |
-| 型カタログの目視版 | `assets/SlideCatalog_16x9.pdf`（62型・70ページ。P.2が索引。右下の PPTX / HTML が生成経路） |
-| PPTX見本帳 | `assets/SuperTemplate_62type.pptx`（カタログと同じ70枚。全スライドがネイティブ図形・編集可能） |
-| 機械チェックスクリプト | `scripts/check_deck.py`（PPTXを検査するときのみ `pip install python-pptx`／`pip3 install python-pptx` が必要。HTML検査は標準ライブラリのみ）／`scripts/check_layout.mjs`（HTMLの実レンダリング検査。要 playwright） |
+- **タイトル**: 結論を書く。1行が基本、長ければ意味の切れ目で2行（縮小して詰めない）。です/ます禁止。タイトルだけ通し読みして1本のストーリーになること
+- **レイアウト**: 1スライド=1メッセージ。左=事実・図、右=意味合い。下部の「POINT」帯禁止
+- **表**: 行=項目・列=観点の「軸のある表」。ヘッダーは本文より大きく太字・塗りなし。最終行の下に罫線なし
+- **装飾**: 角丸禁止。塗りボックスに枠線なし。色分けするなら同一スライドに凡例
+- **図**: 推移・構成比・分布はグラフで描く。表に流し込んで済ませない（§5.11）
+- **数**: タイトルに書いた数と本文の連番を一致させる（§2.9）。ページの中身の個数はタイトルに書かない（§2.4）
+- **文章**: 1資料1用語。略語は初出でフル表記。ブレット語尾は階層内で統一
 
-> **実行コマンドは環境で異なる**。Python は macOS / Ubuntu が `python3`、Windows が `python`（この環境に `python3` は無い）。Chrome の実行パスも各OSのものを使う。以下の例は両方を併記する。
+## 手順
 
-## 規約の要点（全文は references/slide-rules.md — 作成前に必読）
+> Python の起動名は環境で異なる。macOS / Ubuntu は `python3`、Windows は `python`（`pip3` も Windows では `pip`）。以下のコマンドは `python3` で書く。
 
-約110項目のうち、毎回効く原則を抜粋する。**このダイジェストは入口にすぎず、作成前に必ず全文を読む。**
-
-- **タイトル**: 結論を書く・1行が基本で長ければ2行可（文字を縮小して1行に詰めない）・体言止め（です/ます禁止）・タイトルだけ通し読みして1本のストーリーになること
-- **レイアウト**: 1スライド=1メッセージ。上下に読ませず左右に分ける（左=事実・図、右=意味合い）。下部の「POINT」帯禁止
-- **表**: カード羅列でなく行=項目・列=観点の「軸のある表」。ヘッダーは本文より大きく太字・塗りなし・最終行の下に罫線なし
-- **装飾**: 角丸禁止・塗りボックスに枠線なし・色分けするなら同一スライドに凡例
-- **図**: 推移・構成比・分布はグラフで描く。テンプレの表パーツに流し込んで済ませない（§5.11）
-- **数**: タイトルに「3段階」と書いたら本文の連番と一致させる。食い違うと機械チェックが FAIL（§2.9）
-- **文章**: 1資料1用語（表記ゆれ禁止）・略語は初出でフル表記・ブレット語尾は階層内で統一
-
-## デッキ作成の手順（実運用フロー）
-
-### 共通: 作る前に定義する（Define-before-Produce）
-
-1. 目的・成果物の定義・スコープIN/OUTを3〜5行で先に合意する。前提が薄いまま豪華な体裁で出すのが最悪の失敗。
-2. **ストーリーライン（1枚1行のタイトル列）** を書き、**各行に見せ方を併記する**（図／表／矢羽／2カラム／数値カード）。推移・構成比・分布・相関は必ず「図」にする。ここで「図」と決めたページは、テンプレートのパーツに流し込まず自分で描く。
-3. 見せ方に迷う行があれば `references/archetype-catalog.md` を眺めて着想を得る。型に合わせるためではなく、引き出しを増やすために見る。
-
-### Aレーン（自由記述・本線）
-
-1. `templates/freeform_parts_16x9.html` をコピーし、不要な section を消して差し替える。
-2. **グラフが要るページはテンプレートのパーツを捨てて自分で描く。** 推移や構成比を表・数値の羅列で代替すると、体裁は整うのに主張が図から読めなくなる（同一プロンプトの比較検証で、テンプレートを持たせた側だけがグラフを描かなかった）。
-3. `python3`（Windows は `python`） で `scripts/check_deck.py mydeck.html` を実行し FAIL 0 にする（表紙・裏表紙の「タイトル空」WARNは許容）。
-4. `node scripts/check_layout.mjs mydeck.html` でフッター重なり・はみ出しの実レンダリング検査も FAIL 0 にする（要 playwright）。
-5. **フレッシュアイ・レビュー（最終工程）**: `references/content-review-prompt.md` の指示文を、作り方を伏せて文脈を共有しない別のエージェント（Agent ツールか新しいセッション）に渡し、デッキのファイル（HTML／PDF／PPTX）をそのまま読ませる（画像化は不要）。微妙な日本語の言い回し・論理展開の飛び・タイトルの数と本文の数の食い違い・タイトルと図の結論の食い違い・根拠のない評価語・既出ページの焼き直しは、機械チェックでは拾えず作った本人にも見えない。返ってきた指摘を採否表（採用／不採用／保留＋理由）にし、採用分だけ直して機械チェックを再実行する。
-6. PDF化して全ページ目視する。**OSを問わず動く方法を第一候補にする**:
+1. **作る前に定義する**: 目的・成果物の定義・スコープ IN/OUT を3〜5行で先に合意する。
+2. **ストーリーライン**（1枚1行のタイトル列）を書き、各行に見せ方を併記する（図／表／矢羽／2カラム／数値カード）。推移・構成比・分布・相関は必ず図。見せ方に迷う行は `references/archetype-catalog.md` を見る。
+   - 章扉は b27（アジェンダ再掲型）。section は `s chap` でページ番号に数えない（§4.45）。10枚前後なら章扉は要らない。
+   - 表の列幅: 列の内容が同種（時点・案・部門）なら `<table class="eq">` で等幅にし、最後の列だけに余白を吸わせない。説明・ブレットの列があるときだけ、その列に余白を渡す。
+   - 枚数に上限があるときの削る順: 章扉・目次 → 全体マップと重複する本文 → 補足・付録。表紙・全体マップ・結論ページ・裏表紙は残す。リスクの列挙は対応策と同じ1枚にする（§4.29）。
+3. **たたき台を生成する**:
    ```bash
-   node pipeline/scripts/html_to_pdf.mjs <入力HTML> <出力PDF>   # 要 pipeline の npm run setup
+   python3 scripts/new_deck.py --list                                   # 番号と型名（b01〜b27 基本／m01〜m35 追加）
+   python3 scripts/new_deck.py --parts b01,b02,m05,b06,b09,b10 --title "資料名" -o mydeck.html
    ```
-   playwright の chromium を使うので Chrome の場所を知らなくてよく、自由記述テンプレの `.s` セクションにも対応済み。**このスクリプトは相対パスを `pipeline/` 基準で解決するので、引数には絶対パスを渡す。**
-
-   Chrome を直接叩く場合は実行パスがOSごとに違う（`@page` 設定済み・ページ数=スライド数）:
+   両パーツ集のCSS結合・見出し様式の統一・ページ番号の振り直しはスクリプトが行う。手でコピーして組まない。生成後、プレースホルダー（`Text N` / `ラベル N` / `YYYY`）を実物に差し替える。 出典行（`.src`・`.source`）は既定で入っているので、出典を置く資料（§4.47）でなければ消す（営業提案・定例は原則置かない）。
+4. **グラフが要るページは、表パーツに流し込まず自分で描く。**
+5. **調整**: 表を2枚に割る、右カラムを帰結形に書き直す、粒度の揃わない並列を書き直す。1枚ごとに「この型のままでよいか」を疑う。受けた指摘は slide-rules.md に1行追記し、測れる指摘は機械チェックにもする（slide-rules §8「指摘は規約1行と機械チェックの両方にする」）。
+6. `python3 scripts/check_deck.py mydeck.html` → FAIL 0（表紙・裏表紙・章扉の「タイトル空」WARN は許容）。出力されるタイトル一覧を通し読みする。本文に残ったプレースホルダー、型名のままのタイトル、2文以上詰めた文章塊も FAIL になる。
+   - 社外に出すデッキは、顧客名・社内語・案件コードを1行1語で書いたリスト（リポジトリの外に置く）を当てる: `python3 scripts/check_deck.py mydeck.html --forbid ~/.config/deck-forbidden-terms.txt`。HTMLコメントや属性に残った語も拾い、語そのものは出力に出さない。
+7. `node scripts/check_layout.mjs mydeck.html` → OK（playwright が別の場所にあるなら `PLAYWRIGHT_MODULE_DIR` で指す）。版面の40%超が空いたページも FAIL になる。 中身の無い列が残ったグリッド、ページ間でずれたタイトルの大きさも FAIL、下部の結論帯らしき要素、並べた要素の幅・高さ・上端のずれ、片側だけの空き、2か所以上の塗りのハイライトは WARN で出る。会社紹介など正本から差し込んだ定型ページは `section` に `std` を付けると、はみ出し以外の検査から外れる（slide-rules §4.99）。
+8. **フレッシュアイ・レビュー**: `references/content-review-prompt.md` の指示文を、作り方を伏せた別のエージェントに渡してデッキのファイルを読ませる。指摘を採否表（採用／不採用／保留＋理由）にし、採用分だけ直して手順6・7を再実行する。
+9. **PDF 化して全ページ目視する。** 機械チェックは重なり・はみ出し・規約違反しか見ない。棒が潰れる、図が空になる、下半分が空く、泣き別れ、左右の下端不揃いは目視でしか分からない。パーツのCSSは自分のデッキ側で直してよい（直したら templates/ にも反映する）。 全ページを画像にしてから見る（一部のページだけ画像にして「全ページ確認済み」と報告しない）。報告には実際に見たページの番号を書く。
    ```bash
    # macOS
    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu \
      --no-pdf-header-footer --print-to-pdf=mydeck.pdf mydeck.html
    # Ubuntu
-   google-chrome --headless --disable-gpu --no-pdf-header-footer \
-     --print-to-pdf=mydeck.pdf mydeck.html
-   # Windows (PowerShell)
-   & "$env:ProgramFiles\Google\Chrome\Application\chrome.exe" --headless --disable-gpu `
+   google-chrome --headless --disable-gpu --no-pdf-header-footer --print-to-pdf=mydeck.pdf mydeck.html
+   ```
+   ```powershell
+   # Windows
+   & "C:\Program Files\Google\Chrome\Application\chrome.exe" --headless --disable-gpu `
      --no-pdf-header-footer --print-to-pdf=mydeck.pdf mydeck.html
    ```
+   ページ画像にするときは、poppler の `pdftoppm -png -r 60 mydeck.pdf p` を使う（macOS は `qlmanage` でもよい）。画像化の手段が無い環境では、PDF をビューアで全ページ送って確認する。
 
-### Bレーン（SlideSpecパイプライン）
+## PowerPoint（.pptx）が要るとき
 
-1. ストーリーに合わせて `references/archetype-catalog.md` から型を選ぶ。**枠組み → 証拠 → 比較 → 構造 → 計画** の順が基本形。
-2. `pipeline/slide-spec/super_template.json` から該当する型のスライド定義をコピーして新しいSlideSpec（JSON）を作り、文言・データを実物に差し替える。
-   - `title` は12字以上・主張文（体言止め）。`source` 行は必須。プレースホルダー（Text N / ラベルN）を1つも残さない。
-   - **日本語デッキでは表ヘッダーを必ず日本語化する**: `comparison_table` / `scenario_table` / `risk_table` / `cause_effect` はスライドに `"headers": {...}` を付けて列名を差し替える（例: `{"case": "シナリオ", "outcome": "想定される展開", "assumptions": "前提", "implication": "含意"}`。キーは `schema.json` の headers 定義を参照）。英語デフォルトのまま納品しない。
-3. **パイプラインでビルド**（初回のみ `cd pipeline && npm run setup`）:
-   ```bash
-   cd pipeline
-   node scripts/validate_spec.mjs slide-spec/mydeck.json          # スキーマ検証
-   node scripts/render_spec_to_html.mjs slide-spec/mydeck.json generated/mydeck.html   # HTMLプレビュー
-   node scripts/qa_html_deck.mjs generated/mydeck.html            # 構造QA
-   node scripts/export_spec_to_editable_pptx.mjs slide-spec/mydeck.json generated/mydeck.pptx  # 編集可能PPTX
-   ```
-4. **調整（ここが本番）**: HTMLプレビューを見ながら、型に囚われず考えて直す。表を2枚に割る、右カラムを帰結形に書き直す、粒度の揃わない並列を書き直す。1枚ごとに「この型のままでよいか」を疑い、収まらないスライドはAレーンで組み直す。受けた指摘は slide-rules.md に1行追記する。
-5. **機械チェック**: `python3`（Windows は `python`） で `scripts/check_deck.py generated/mydeck.pptx` を実行し、FAIL 0 にする。出力されるタイトル一覧を上から通し読みして、1本のストーリーになっているか確認する。
-6. **内容レビュー**: `references/content-review-prompt.md` の指示文で、作り方を伏せた別エージェントに全ページを読ませ、指摘を採否判断して直す（Aレーン手順5と同じ）。
-7. **目視QA**: PDF化して全ページを確認する。文字だけでなく余白・版面バランス・孤立折返し・はみ出し・左右カラムの下端揃いも見る。
+**資料は HTML で仕上げる。PPTX にするのは、ユーザーが「PPTX で」「パワポにして」と明示したときだけ。** 修正・レビューの往復はすべて HTML 上で回し、変換は最後に1回だけにする。HTML のほうが直すのも機械チェックも速く、PPTX で直すと HTML と中身がずれる。PPTX を渡した後に修正が来たら、HTML を直して変換し直す。明示が無ければ PDF で渡す。
 
-書き出したPPTXは全図形がネイティブ編集可能（`editable: true`）。納品後の微修正はPowerPoint上でそのままできる。
+1. HTML で手順6〜9（機械チェック FAIL 0・フレッシュアイ・レビュー・PDF 目視）まで済ませる
+2. 変換: `python3 scripts/html_to_pptx.py mydeck.html` → 同じフォルダに mydeck.pptx（Node 22+・Chrome・`pip3 install python-pptx` が必要）
+3. `python3 scripts/check_deck.py mydeck.pptx` を FAIL 0 に。PowerPoint で開いて（または PDF に書き出して）文字の折り返しと重なりを目視する
+4. 社外に送るなら、ファイルのプロパティ（作成者・会社名など）を消す
 
-## 出典注釈（既定オフ・このローカル版での変更点）
+変換の中身と限界（詳細は slide-rules.md §8.6）:
+- 編集できる形で再現: 文字（書体・大きさ・色・行間・折り返し幅・箇条書き書式）、塗りと枠（角丸・clip-path の多角形・CSS の三角形）、罫線、表（結合セル・セルの塗り・罫線・余白・縦書き）
+- 画像になる（中の文字や数値は編集できない）: SVG のチャート・図、img、背景画像
+- 書体は和文ゴシック＝Yu Gothic、明朝＝Yu Mincho に置き換える。字幅の差で行末が1字ずれることがあるので目視は省かない
+- 再現しない: 回転・変形（CSS の transform）、`::before`/`::after` で描いた装飾（背景付きの丸数字など。行頭記号の文字は箇条書き書式として再現する）。これらはパーツ側で使わないか、変換後に PowerPoint で直す
 
-上流版は生成デッキの最終ページに「consulting-pptx-skill で作成」の注釈を自動挿入していたが、**このローカル版では既定オフに変更してある**。スキルの出自は `UPSTREAM.md` に記録済みで、生成物に注釈を入れる必要はない。
+PPTX を一から手で組むときの見本として `assets/SuperTemplate_62type.pptx`（62型・全スライド編集可能）も置いてある。
 
-- 既定（`attribution` を書かない）: 何も挿入しない。
-- `"attribution": true`: 上流版の既定文言を最終スライドの `source` に追記する。
-- `"attribution": "任意の文字列"`: その文言を追記する。
-- Aレーン（自由記述）は元から手作業なので、入れたいときだけ最終 section の `.src`（出典行）に足す。
+### 既存の資料へ差し込むページ
 
-## カラーカスタマイズ
+入れる先の PowerPoint 資料（社内の標準デッキ・作りかけの提案書）を渡されたときは、変換せずに **その資料のマスターの上で直接組む**。変換した PPTX は書体と版面が自前なので、差し込むと浮く（slide-rules §8.7）。文章・表の軸・1枚1メッセージの規約はそのまま。
 
-**A・B 両レーンの既定は同じ**（暖色系 warm スキン: 生成りの地・濃茶の文字・茶のアクセント。本文ゴシック・見出し明朝）。ネイビー系は `cool` スキンとして残してある。トークンの正本は `pipeline/html-css/consulting-slide-system.css` の `:root` で、`templates/freeform_parts_16x9.html` の `<style>` 冒頭 `:root` はその写し。片方を変えたらもう片方も揃える。
+1. 測る: `python3 scripts/measure_deck.py house.pptx` → `house.skin.json`（書式が .potx で配られたときもそのまま渡せる）。要約を読み、資料を目で見て値を直す
+2. 組む: `examples/house_deck_example.py` を手本に `scripts/deck_pptx.py` で組む。書体・地色・ページ番号をスライドに書かない／タイトルはプレースホルダー／表はテキストボックス＋罫線（`table()`）／色は資料のテーマ色
+3. `python3 scripts/check_deck.py pages.pptx --house house.skin.json` → FAIL 0。**PowerPoint で開く前に必ず通す**（不正なファイルを開かせると、ユーザーの PowerPoint に修復のダイアログが残る）
+4. 全ページを目視する（手段は slide-rules §8 の目視QAと同じ）
+5. 渡すのは差し込むページだけのファイル。資料へ入れるのはユーザー（「貼り付け先のテーマを使用」）
 
-- Aレーン: テンプレ冒頭の `:root` トークンを差し替える（cool 用の値はコメントで同梱）
-- Bレーン: SlideSpecのルートに `"skin": "cool"` を入れると HTML・PPTX ともネイビー系に切り替わる。`palette` オブジェクトで個別の色を上書きできる（`schema.json` 参照）
+## 本スキル使用の注釈（既定オフ・このローカル版での変更点）
 
-その際も以下は守る:
+上流版は裏表紙（b10）の左下の出典行に「本資料は consulting-pptx-skill（github.com/carnot-tech/consulting-pptx-skill）で作成」の一文を既定で入れているが、**このローカル版では b10 から外してある**。上流の TRADEMARK.md §6 でも、この一文を残すかどうかは任意とされている。スキルの出自は `UPSTREAM.md` に記録済みで、生成物に注釈を入れる必要はない。
 
-- 意味を持つ色（✕の赤・追加の緑など）は変換しない
-- 2系列の区別が要る図では、メインカラー×グレー系の2色に抑える
-- 製品UIのスクリーンショットは無加工
+入れたいと頼まれたときだけ、上の一文を**文言を変えずに最終ページの出典行に**足す。他のページにツール名が出ていると `check_deck.py` が FAIL にする（クライアントに出せる体裁）。
+
+## スキルを育てる（更新・自分の規約・PR）
+
+このスキルは規約と機械チェックを使った人の指摘で良くなる。次の 3 つを作業の一部として行う。
+
+1. **最新の取り込みは AgentSettings で行う。** このスキルは AgentSettings リポジトリの `.claude/skills/consulting-pptx/` から同期で配られる写しで、git clone ではない。インストール先で `git fetch` / `git pull` はしない。上流の更新は AgentSettings 側で手作業で取り込む（`UPSTREAM.md`）
+2. **自分の規約は `local/` に置く。** 利用者から「当社ではこうする」という指摘を受けたら、本体の `references/slide-rules.md` を書き換えず `local/slide-rules.local.md` に 1 行足す。**置き場所はインストール先ではなく AgentSettings リポジトリの `.claude/skills/consulting-pptx/local/`**（同期のたびにインストール先は丸ごと置き換わるため、インストール先に書いた分は消える。`local/` は git 管理外なので push もされない）。顧客名・案件コードは `local/forbid.txt` に入れて `--forbid` で検査する。自前のパーツ集・差し込み先の資料・`skin.json` は `local/templates/`
+3. **汎用化できる指摘は PR にする。** 作業中に、本体の規約の誤検知・見逃し・どの組織でも効く新しい指摘に当たったら、納品後に「この修正を本体に PR で出しませんか」と一度だけ提案する。出し方は `CONTRIBUTING.md`（規約 1 行＋`check_deck` の判定＋修正前に FAIL・修正後に通るテスト）。**PR を作る前に `CONTRIBUTING.md` の「PR に入れないもの」を読む**: 顧客名・案件コード・金額・担当者名・実案件のファイル・`skin.json` は差分にもコミットメッセージにも PR 説明にも入れない（会話に出た案件の文脈が混ざりやすいので push 前に差分と説明を見直す）。1 社の好みや理由の書けない規則は本体でなく `local/` へ。既定を変える規則は条件付きで書く。利用者が承諾したら `gh pr create` まで行う。断られたら次のセッションまで再提案しない
+
+## 色と書体
+
+両パーツ集の既定は同じ暖色系（生成りの地・濃茶の文字・茶のアクセント。本文ゴシック・見出し明朝）。トークンは各ファイルの `<style>` 冒頭 `:root`。片方を変えたらもう片方も揃える。ネイビー系の値はコメントで同梱。意味を持つ色（✕の赤など）は変えない。2系列の区別はメインカラー×グレーの2色に抑える。製品UIのスクリーンショットは無加工。

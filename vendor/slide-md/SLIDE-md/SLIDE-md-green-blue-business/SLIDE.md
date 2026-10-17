@@ -16,62 +16,68 @@
 | Background | ホワイト | #FFFFFF |
 | Accent | ディープティール | #17A899 |
 | Text | ダークネイビー | #1A1A2E |
+| Text Sub | ネイビーグレー | #2A2A45 |
+| Text Muted | ブルーグレー | #6B6B8A |
 
-```yaml
-colors:
-  primary: "#2BB5A0"
-  secondary: "#3D9BC8"
-  background: "#FFFFFF"
-  accent: "#17A899"
-  text: "#1A1A2E"
-  light_card: "#E8F7F5"
-```
+**グラデーション：** Primary → Secondary・90deg（横）、Primary → Secondary・180deg（縦）
+
+    colors:
+      primary: "#2BB5A0"
+      secondary: "#3D9BC8"
+      background: "#FFFFFF"
+      accent: "#17A899"
+      text: "#1A1A2E"
+      text_sub: "#2A2A45"
+      text_muted: "#6B6B8A"
+      light_card: "#E8F7F5"
+      gradient_main: "linear-gradient(90deg, #2BB5A0, #3D9BC8)"
+      gradient_vert: "linear-gradient(180deg, #2BB5A0, #3D9BC8)"
 
 ## Typography
 
 | 役割 | フォント | サイズ | ウェイト |
 |---|---|---|---|
-| 見出し（H1） | Noto Sans JP | 48px | Bold |
-| 見出し（H2） | Noto Sans JP | 32px | Bold |
-| 本文 | Noto Sans JP | 18px | Regular |
+| 見出し（H1）（Display） | Noto Sans JP | 80px | Bold |
+| 見出し（H2）（Display） | Noto Sans JP | 48px | Bold |
+| 本文（Body） | Noto Sans JP | 20px | Regular |
 | キャプション | Noto Sans JP | 14px | Regular |
+| モノスペース（Mono） | なし | - | - |
 
-```yaml
-typography:
-  heading_h1:
-    font: "Noto Sans JP"
-    size: "48px"
-    weight: "700"
-  heading_h2:
-    font: "Noto Sans JP"
-    size: "32px"
-    weight: "700"
-  body:
-    font: "Noto Sans JP"
-    size: "18px"
-    weight: "400"
-  caption:
-    font: "Noto Sans JP"
-    size: "14px"
-    weight: "400"
-```
+    typography:
+      heading_h1:
+        font: "Noto Sans JP"
+        size: "80px"
+        weight: "700"
+      heading_h2:
+        font: "Noto Sans JP"
+        size: "48px"
+        weight: "700"
+      body:
+        font: "Noto Sans JP"
+        size: "20px"
+        weight: "400"
+      caption:
+        font: "Noto Sans JP"
+        size: "14px"
+        weight: "400"
+      mono:
+        font: "なし"
+        usage: "なし"
 
 ## Layout
 
-- **スライドサイズ：** 16:9（幅960px × 高さ540px）
-- **余白（上下）：** 48px
-- **余白（左右）：** 64px
+- **スライドサイズ：** 16:9（幅1920px × 高さ1080px）
+- **余白（上下）：** 80px
+- **余白（左右）：** 120px
 - **テキスト整列：** 左寄せ
 
-```yaml
-layout:
-  slide_size: "16:9"
-  width: "960px"
-  height: "540px"
-  padding_vertical: "48px"
-  padding_horizontal: "64px"
-  text_align: "left"
-```
+    layout:
+      slide_size: "16:9"
+      width: "1920px"
+      height: "1080px"
+      padding_vertical: "80px"
+      padding_horizontal: "120px"
+      text_align: "left"
 
 ## Slide Frame
 
@@ -79,29 +85,55 @@ layout:
 
 **タイトルエリア：** 上部左寄せ。スライドタイトルの左に幅6px・タイトルと同じ高さのティールグリーン（#2BB5A0）縦アクセントバーを配置。サブタイトル（例：セクション番号や補足）はアクセントカラー（#17A899）で表示。
 **ページ番号：** なし
-**ロゴエリア：** 右上にロゴ画像または社名テキストを配置（ティールカラー推奨）
-**フッター装飾：** 下部全幅に渡るグラデーションバー（#2BB5A0 → #3D9BC8、高さ36px）
+**ページ番号スタイル：** なし
+**ブランドフッター：** なし
+**背景アクセント：** なし（白背景のシンプルデザイン。下部全幅グラデーションバーが主要装飾）
+**縦バー：** あり（単色 #2BB5A0、幅6px）。タイトル左側に配置。
 
-```yaml
-slide_frame:
-  title_area:
-    position: "top-left"
-    text_align: "left"
-    decoration: "accent-bar"
-    accent_bar:
-      width: "6px"
-      color: "#2BB5A0"
-  page_number:
-    position: "none"
-    format: "none"
-  logo:
-    position: "top-right"
-    note: "ロゴ画像または社名テキストを配置（ティールカラー推奨）"
-  footer:
-    type: "gradient-bar"
-    height: "36px"
-    gradient: "linear-gradient(to right, #2BB5A0, #3D9BC8)"
-```
+    slide_frame:
+      title_area:
+        position: "top-left"
+        text_align: "left"
+        decoration: "accent-bar"
+        accent_bar:
+          width: "6px"
+          color: "#2BB5A0"
+      page_number:
+        position: "none"
+        format: "none"
+        style: "none"
+        font: "none"
+      brand_footer:
+        position: "none"
+        content: "なし"
+      background_accent:
+        type: "none"
+        note: "下部全幅グラデーションバー（#2BB5A0 → #3D9BC8、高さ36px）を全ページ配置"
+      section_bar:
+        style: "solid"
+        color: "#2BB5A0"
+        width: "6px"
+
+## Component Style
+
+スライド内で使用するコンポーネントの基本スタイルを定義します。
+
+**カード：** 薄いティール背景（#E8F7F5）または白背景・border-radius: 8px・影なし
+**箇条書きマーカー：** Primaryカラー（#2BB5A0）の単色丸ドット
+**番号スタイル：** Primaryカラー（#2BB5A0）の塗りつぶし円に白数字
+
+    component_style:
+      card:
+        border_radius: "8px"
+        shadow: "none"
+        border: "none"
+        background: "#E8F7F5"
+      bullet:
+        color: "Primary"
+        shape: "circle"
+      number:
+        style: "solid-circle"
+        color: "#2BB5A0"
 
 ## Do / Don't
 
@@ -114,6 +146,6 @@ slide_frame:
 
 **Don't（やってはいけないこと）**
 - 赤・オレンジ・紫など、ティール系と相反する派手な原色を使わない
-- フッターのグラデーションバーを省略したり変色させない
+- 下部グラデーションバーを省略したり変色させない
 - テキストを詰め込みすぎず、1スライドあたりの箇条書きは5項目以内に抑える
 - 背景に柄・テクスチャ・写真を使用しない（白背景を維持する）

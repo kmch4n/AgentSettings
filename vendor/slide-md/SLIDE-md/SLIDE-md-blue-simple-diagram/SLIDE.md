@@ -4,7 +4,7 @@
 
 ## Overview
 
-**参照ソース：** 青　シンプル　グラフ　図解のプレゼンテーション.pdf（日本語プレゼンテーション）
+**参照ソース：** 青・シンプル・グラフ・図解のプレゼンテーション（日本語プレゼンテーション）
 **マッチするシーン：** 教育・研修資料、ビジネス発表・提案資料、グラフや図解を多用した情報整理型プレゼン
 
 ## Colors
@@ -16,61 +16,67 @@
 | Background | 白 | #FFFFFF |
 | Accent | ほぼ黒 | #111111 |
 | Text | ほぼ黒（本文） | #1A1A1A |
+| Text Sub | ダークグレー | #2D2D2D |
+| Text Muted | ミディアムグレー | #6B6B6B |
 
-```yaml
-colors:
-  primary: "#29ABE2"
-  secondary: "#A8DCF0"
-  background: "#FFFFFF"
-  accent: "#111111"
-  text: "#1A1A1A"
-```
+**グラデーション：** Primary → Secondary・90deg（横）、Primary → Secondary・180deg（縦）
+
+    colors:
+      primary: "#29ABE2"
+      secondary: "#A8DCF0"
+      background: "#FFFFFF"
+      accent: "#111111"
+      text: "#1A1A1A"
+      text_sub: "#2D2D2D"
+      text_muted: "#6B6B6B"
+      gradient_main: "linear-gradient(90deg, #29ABE2, #A8DCF0)"
+      gradient_vert: "linear-gradient(180deg, #29ABE2, #A8DCF0)"
 
 ## Typography
 
 | 役割 | フォント | サイズ | ウェイト |
 |---|---|---|---|
-| 見出し（H1） | Noto Sans JP | 60px | Bold |
-| 見出し（H2） | Noto Sans JP | 28px | Bold |
-| 本文 | Noto Sans JP | 18px | Regular |
+| 見出し（H1）（Display） | Noto Sans JP | 80px | Bold |
+| 見出し（H2）（Display） | Noto Sans JP | 42px | Bold |
+| 本文（Body） | Noto Sans JP | 18px | Regular |
 | キャプション | Noto Sans JP | 13px | Regular |
+| モノスペース（Mono） | なし | - | - |
 
-```yaml
-typography:
-  heading_h1:
-    font: "Noto Sans JP"
-    size: "60px"
-    weight: "700"
-  heading_h2:
-    font: "Noto Sans JP"
-    size: "28px"
-    weight: "700"
-  body:
-    font: "Noto Sans JP"
-    size: "18px"
-    weight: "400"
-  caption:
-    font: "Noto Sans JP"
-    size: "13px"
-    weight: "400"
-```
+    typography:
+      heading_h1:
+        font: "Noto Sans JP"
+        size: "80px"
+        weight: "700"
+      heading_h2:
+        font: "Noto Sans JP"
+        size: "42px"
+        weight: "700"
+      body:
+        font: "Noto Sans JP"
+        size: "18px"
+        weight: "400"
+      caption:
+        font: "Noto Sans JP"
+        size: "13px"
+        weight: "400"
+      mono:
+        font: "なし"
+        usage: "なし"
 
 ## Layout
 
-- **スライドサイズ：** 16:9（幅960px × 高さ540px）
-- **余白（上下）：** 48px
-- **余白（左右）：** 60px
+- **スライドサイズ：** 16:9（幅1920px × 高さ1080px）
+- **余白（上下）：** 80px
+- **余白（左右）：** 100px
 - **テキスト整列：** セクションタイトルは中央寄せ、本文は左寄せ
 
-```yaml
-layout:
-  slide_size: "16:9"
-  width: "960px"
-  height: "540px"
-  padding_vertical: "48px"
-  padding_horizontal: "60px"
-  text_align: "left"
-```
+    layout:
+      slide_size: "16:9"
+      width: "1920px"
+      height: "1080px"
+      padding_vertical: "80px"
+      padding_horizontal: "100px"
+      text_align: "left"
 
 ## Slide Frame
 
@@ -78,25 +84,52 @@ layout:
 
 **タイトルエリア：** 上部中央配置。点線（`·····`）で両側を挟んだブラケット形式で表示。例：`·············· [ グラフと図の効果的な使用法 ] ··············`。コンテンツパネルの外側・上部に配置し、パネル内には含めない。
 **ページ番号：** なし
-**装飾：** 左上と右サイドに有機的なウェーブ形状（ブロブ）を Primary（#29ABE2）と Secondary（#A8DCF0）のグラデーションで配置。コンテンツスライドでは白いインナーパネル（border: 1.5px solid #CDD8E3）をブロブの前面に配置する。
+**ページ番号スタイル：** なし
+**ブランドフッター：** なし
+**背景アクセント：** 左上と右サイドに有機的なウェーブ形状（ブロブ）を Primary（#29ABE2）と Secondary（#A8DCF0）のグラデーションで配置。コンテンツスライドでは白いインナーパネル（border: 1.5px solid #CDD8E3）をブロブの前面に配置する。
+**縦バー：** なし
 
-```yaml
-slide_frame:
-  title_area:
-    position: "top-center"
-    text_align: "center"
-    decoration: "dotted-bracket"
-    format: "·· [ タイトル ] ··"
-  page_number:
-    position: "none"
-    format: "none"
-  decoration: "gradient-blob-top-left-and-right"
-  inner_panel:
-    border: "1.5px solid #CDD8E3"
-    border_radius: "3px"
-    padding: "24px 32px"
-    margin: "0 60px 16px"
-```
+    slide_frame:
+      title_area:
+        position: "top-center"
+        text_align: "center"
+        decoration: "dotted-bracket"
+        format: "·· [ タイトル ] ··"
+      page_number:
+        position: "none"
+        format: "none"
+        style: "none"
+        font: "none"
+      brand_footer:
+        position: "none"
+        content: "なし"
+      background_accent:
+        type: "blob-wave"
+        placement: "top-left, right-side"
+        color: "Primary（#29ABE2）→ Secondary（#A8DCF0）グラデーション"
+      section_bar:
+        style: "none"
+        width: "-"
+
+## Component Style
+
+スライド内で使用するコンポーネントの基本スタイルを定義します。
+
+**カード：** 白背景インナーパネル・border-radius: 3px・border: 1.5px solid #CDD8E3・padding: 24px 32px
+**箇条書きマーカー：** Primaryカラー（#29ABE2）の単色丸ドット
+**番号スタイル：** Accentカラー（#111111）の黒丸に白数字
+
+    component_style:
+      card:
+        border_radius: "3px"
+        shadow: "none"
+        border: "1.5px solid #CDD8E3"
+      bullet:
+        color: "Primary"
+        shape: "circle"
+      number:
+        style: "solid-circle"
+        color: "#111111"
 
 ## Do / Don't
 
