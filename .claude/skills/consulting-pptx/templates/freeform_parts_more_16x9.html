@@ -187,6 +187,7 @@ body {
 }
 
 .title {
+  word-break: auto-phrase; /* 折り返しは文節単位に任せ、<br> は泣き別れのときだけ（slide-rules §2.13） */
   margin: 10px 0 18px;
   max-width: 1360px;
   font-size: 39px;
@@ -1596,7 +1597,8 @@ body {
 .heat-legend {
   display: flex;
   gap: 22px;
-  margin-top: 18px;
+  justify-content: flex-end;
+  margin-bottom: 14px;
 }
 
 .heat-legend .legend-item {
@@ -1731,7 +1733,8 @@ body {
 .stack-legend {
   display: flex;
   gap: 24px;
-  margin-top: 22px;
+  justify-content: flex-end;
+  margin-bottom: 14px;
 }
 
 .stack-legend .legend-item {
@@ -2967,13 +2970,14 @@ body {
 .parts .v0 { background: var(--hairline); }
 
 /* ハーベイボール（パーツ14） */
-.parts .hb { width: 22px; height: 22px; display: inline-block; border: 1px solid var(--ink); border-radius: 50%; position: relative; vertical-align: -3px; }
-.parts .hb i { position: absolute; inset: 0; background: var(--ink); border-radius: 50%; }
-.parts .hb.q1 i { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 50%); }
-.parts .hb.q2 i { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
-.parts .hb.q3 i { clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 50%); }
-.parts .hb.q4 i { clip-path: none; }
-.parts .hb.q0 i { display: none; }
+.parts .hb{width:22px;height:22px;display:inline-block;box-sizing:border-box;border:1px solid var(--ink);border-radius:50%;vertical-align:-3px;background:conic-gradient(var(--ink) var(--hbp,0%),transparent 0) border-box}
+/* 塗りは外枠ごと1枚で描く（内側の<i>を枠の内側に重ねると縁に白い隙間が出て塗りが中途半端に見える） */
+.parts .hb i{display:none}
+.parts .hb.q0{--hbp:0%}
+.parts .hb.q1{--hbp:25%}
+.parts .hb.q2{--hbp:50%}
+.parts .hb.q3{--hbp:75%}
+.parts .hb.q4{--hbp:100%}
 
 /* ドットマトリクス（パーツ15） */
 .parts .dots { display: grid; grid-template-columns: repeat(10, 10px); gap: 4px; }
@@ -3043,6 +3047,8 @@ body {
 .exsum ul li{position:relative;padding-left:1.2em;font-size:19.2px;line-height:1.6}
 .exsum ul li::before{content:"–";position:absolute;left:0}
 .exsum .es-ref{font-size:17px;color:var(--muted);text-align:right;white-space:nowrap}
+/* 社外向けに書き出すときは body に class="external" を付けて印刷すると、社内用のページ（section.internal）が外れる（slide-rules §8） */
+body.external section.internal{display:none!important}
 </style></head><body>
 <main class="deck skin-warm">
 <section class="slide slide--no-title-rule">
@@ -3100,7 +3106,7 @@ body {
     <div class="kicker">06  stacked_bar</div>
     <h1 class="title">積み上げ棒</h1>
     <div class="rule"></div>
-    <div class="content"><div class="chart-unit">指標名、単位</div><div class="stack-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 102px;">40</div><div class="stack-seg s1" style="height: 77px;">30</div><div class="stack-seg s2" style="height: 51px;">20</div></div><div class="stack-col-label">ラベル4</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 141px;">55</div><div class="stack-seg s1" style="height: 82px;">32</div><div class="stack-seg s2" style="height: 56px;">22</div></div><div class="stack-col-label">ラベル5</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 184px;">72</div><div class="stack-seg s1" style="height: 84px;">33</div><div class="stack-seg s2" style="height: 61px;">24</div></div><div class="stack-col-label">ラベル6</div></div></div><div class="stack-legend"><div class="legend-item"><span class="legend-swatch s0"></span>ラベル1</div><div class="legend-item"><span class="legend-swatch s1"></span>ラベル2</div><div class="legend-item"><span class="legend-swatch s2"></span>ラベル3</div></div></div>
+    <div class="content"><div class="stack-legend"><div class="legend-item"><span class="legend-swatch s0"></span>ラベル1</div><div class="legend-item"><span class="legend-swatch s1"></span>ラベル2</div><div class="legend-item"><span class="legend-swatch s2"></span>ラベル3</div></div><div class="chart-unit">指標名、単位</div><div class="stack-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 102px;">40</div><div class="stack-seg s1" style="height: 77px;">30</div><div class="stack-seg s2" style="height: 51px;">20</div></div><div class="stack-col-label">ラベル4</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 141px;">55</div><div class="stack-seg s1" style="height: 82px;">32</div><div class="stack-seg s2" style="height: 56px;">22</div></div><div class="stack-col-label">ラベル5</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 184px;">72</div><div class="stack-seg s1" style="height: 84px;">33</div><div class="stack-seg s2" style="height: 61px;">24</div></div><div class="stack-col-label">ラベル6</div></div></div></div>
     <footer class="footer"><span class="source">出典：Source 1</span><span>7</span></footer>
   </div>
 </section>
@@ -3180,7 +3186,7 @@ body {
     <div class="kicker">14  heatmap_table</div>
     <h1 class="title">ヒートマップ表</h1>
     <div class="rule"></div>
-    <div class="content"><div class="heat" style="grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));"><div class="heat-corner">行の軸名</div><div class="heat-colhead">列見出し1</div><div class="heat-colhead">列見出し2</div><div class="heat-colhead">列見出し3</div><div class="heat-colhead">列見出し4</div><div class="heat-rowhead">行見出し1</div><div class="heat-cell lvl-3">高</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-1">低</div><div class="heat-cell lvl-2">中</div><div class="heat-rowhead">行見出し2</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-1">低</div><div class="heat-cell lvl-0">なし</div><div class="heat-cell lvl-1">低</div><div class="heat-rowhead">行見出し3</div><div class="heat-cell lvl-3">高</div><div class="heat-cell lvl-3">高</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-3">高</div><div class="heat-rowhead">行見出し4</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-1">低</div><div class="heat-cell lvl-0">なし</div><div class="heat-cell lvl-1">低</div></div><div class="heat-legend"><div class="legend-item"><span class="legend-swatch lvl-0" style="background: #fff;"></span>なし</div><div class="legend-item"><span class="legend-swatch lvl-1" style="background: var(--soft-blue);"></span>低</div><div class="legend-item"><span class="legend-swatch lvl-2" style="background: var(--cyan);"></span>中</div><div class="legend-item"><span class="legend-swatch lvl-3" style="background: var(--blue);"></span>高</div></div></div>
+    <div class="content"><div class="heat-legend"><div class="legend-item"><span class="legend-swatch lvl-0" style="background: #fff;"></span>なし</div><div class="legend-item"><span class="legend-swatch lvl-1" style="background: var(--soft-blue);"></span>低</div><div class="legend-item"><span class="legend-swatch lvl-2" style="background: var(--cyan);"></span>中</div><div class="legend-item"><span class="legend-swatch lvl-3" style="background: var(--blue);"></span>高</div></div><div class="heat" style="grid-template-columns: 1.4fr repeat(4, minmax(0, 1fr));"><div class="heat-corner">行の軸名</div><div class="heat-colhead">列見出し1</div><div class="heat-colhead">列見出し2</div><div class="heat-colhead">列見出し3</div><div class="heat-colhead">列見出し4</div><div class="heat-rowhead">行見出し1</div><div class="heat-cell lvl-3">高</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-1">低</div><div class="heat-cell lvl-2">中</div><div class="heat-rowhead">行見出し2</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-1">低</div><div class="heat-cell lvl-0">なし</div><div class="heat-cell lvl-1">低</div><div class="heat-rowhead">行見出し3</div><div class="heat-cell lvl-3">高</div><div class="heat-cell lvl-3">高</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-3">高</div><div class="heat-rowhead">行見出し4</div><div class="heat-cell lvl-2">中</div><div class="heat-cell lvl-1">低</div><div class="heat-cell lvl-0">なし</div><div class="heat-cell lvl-1">低</div></div></div>
     <footer class="footer"><span class="source">出典：Source 1</span><span>15</span></footer>
   </div>
 </section>
@@ -3210,7 +3216,7 @@ body {
     <div class="kicker">17  nested_row_matrix</div>
     <h1 class="title">入れ子行の行列</h1>
     <div class="rule"></div>
-    <div class="content"><div class="nrm"><div class="nrm-group" style="grid-row:1 / span 3; grid-column:1;">ラベル1</div><div class="nrm-rowlabel" style="grid-row:1; grid-column:2;">ラベル2</div><div class="nrm-content" style="grid-row:1; grid-column:3;"><ul class="nrm-bullets"><li>Text 1</li><li>Text 2</li></ul></div><div class="nrm-rowlabel" style="grid-row:2; grid-column:2;">ラベル3</div><div class="nrm-content" style="grid-row:2; grid-column:3;"><ul class="nrm-bullets"><li>Text 3</li><li>Text 4</li></ul></div><div class="nrm-rowlabel" style="grid-row:3; grid-column:2;">ラベル4</div><div class="nrm-content" style="grid-row:3; grid-column:3;"><ul class="nrm-bullets"><li>Text 5</li><li>Text 6</li></ul></div><div class="nrm-group" style="grid-row:4 / span 2; grid-column:1;">ラベル5</div><div class="nrm-rowlabel" style="grid-row:4; grid-column:2;">ラベル6</div><div class="nrm-content" style="grid-row:4; grid-column:3;"><ul class="nrm-bullets"><li>Text 7</li></ul></div><div class="nrm-rowlabel" style="grid-row:5; grid-column:2;">ラベル7</div><div class="nrm-content" style="grid-row:5; grid-column:3;"><ul class="nrm-bullets"><li>Text 8</li></ul></div></div></div>
+    <div class="content"><div class="nrm"><div class="nrm-group" style="grid-row:1 / span 3; grid-column:1;">ラベル1</div><div class="nrm-rowlabel" style="grid-row:1; grid-column:2;">ラベル2</div><div class="nrm-content" style="grid-row:1; grid-column:3;"><ul class="nrm-bullets"><li>Text 1</li><li>Text 2</li></ul></div><div class="nrm-rowlabel" style="grid-row:2; grid-column:2;">ラベル3</div><div class="nrm-content" style="grid-row:2; grid-column:3;"><ul class="nrm-bullets"><li>Text 3</li><li>Text 4</li></ul></div><div class="nrm-rowlabel" style="grid-row:3; grid-column:2;">ラベル4</div><div class="nrm-content" style="grid-row:3; grid-column:3;"><ul class="nrm-bullets"><li>Text 5</li><li>Text 6</li></ul></div><div class="nrm-group" style="grid-row:4 / span 2; grid-column:1;">ラベル5</div><div class="nrm-rowlabel" style="grid-row:4; grid-column:2;">ラベル6</div><div class="nrm-content" style="grid-row:4; grid-column:3;"><ul class="nrm-bullets"><li>Text 7</li><li>Text 7b</li></ul></div><div class="nrm-rowlabel" style="grid-row:5; grid-column:2;">ラベル7</div><div class="nrm-content" style="grid-row:5; grid-column:3;"><ul class="nrm-bullets"><li>Text 8</li><li>Text 8b</li></ul></div></div></div>
     <footer class="footer"><span class="source">出典：Source 1</span><span>18</span></footer>
   </div>
 </section>
@@ -3310,7 +3316,7 @@ body {
     <div class="kicker">27  calc_flow</div>
     <h1 class="title">計算ロジックの流れ</h1>
     <div class="rule"></div>
-    <div class="content"><div class="chart-unit">指標名、単位</div><div class="cf"><div class="cf-panel"><div class="cf-panel-label">ラベル3</div><div class="cf-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 20px;">1</div></div><div class="stack-col-label">ラベル4</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 60px;">3</div></div><div class="stack-col-label">ラベル5</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">6</div></div><div class="stack-col-label">ラベル6</div></div></div></div><div class="cf-op" aria-hidden="true">&#215;</div><div class="cf-panel"><div class="cf-panel-label">ラベル7</div><div class="cf-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">2</div></div><div class="stack-col-label">ラベル8</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">2</div></div><div class="stack-col-label">ラベル9</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">2</div></div><div class="stack-col-label">ラベル10</div></div></div></div><div class="cf-op" aria-hidden="true">=</div><div class="cf-panel"><div class="cf-panel-label">ラベル11</div><div class="cf-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 19px;">1.5</div><div class="stack-seg s1" style="height: 6px;"></div></div><div class="stack-col-label">ラベル12</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 48px;">3.8</div><div class="stack-seg s1" style="height: 6px;"></div></div><div class="stack-col-label">ラベル15</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 114px;">9</div><div class="stack-seg s1" style="height: 6px;"></div></div><div class="stack-col-label">ラベル18</div></div></div></div></div><div class="stack-legend"><div class="legend-item"><span class="legend-swatch s0"></span>ラベル1</div><div class="legend-item"><span class="legend-swatch s1"></span>ラベル2</div></div></div>
+    <div class="content"><div class="stack-legend"><div class="legend-item"><span class="legend-swatch s0"></span>ラベル1</div><div class="legend-item"><span class="legend-swatch s1"></span>ラベル2</div></div><div class="chart-unit">指標名、単位</div><div class="cf"><div class="cf-panel"><div class="cf-panel-label">ラベル3</div><div class="cf-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 20px;">1</div></div><div class="stack-col-label">ラベル4</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 60px;">3</div></div><div class="stack-col-label">ラベル5</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">6</div></div><div class="stack-col-label">ラベル6</div></div></div></div><div class="cf-op" aria-hidden="true">&#215;</div><div class="cf-panel"><div class="cf-panel-label">ラベル7</div><div class="cf-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">2</div></div><div class="stack-col-label">ラベル8</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">2</div></div><div class="stack-col-label">ラベル9</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 120px;">2</div></div><div class="stack-col-label">ラベル10</div></div></div></div><div class="cf-op" aria-hidden="true">=</div><div class="cf-panel"><div class="cf-panel-label">ラベル11</div><div class="cf-chart"><div><div class="stack-col"><div class="stack-seg s0" style="height: 19px;">1.5</div><div class="stack-seg s1" style="height: 6px;"></div></div><div class="stack-col-label">ラベル12</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 48px;">3.8</div><div class="stack-seg s1" style="height: 6px;"></div></div><div class="stack-col-label">ラベル15</div></div><div><div class="stack-col"><div class="stack-seg s0" style="height: 114px;">9</div><div class="stack-seg s1" style="height: 6px;"></div></div><div class="stack-col-label">ラベル18</div></div></div></div></div></div>
     <footer class="footer"><span class="source">出典：Source 1</span><span>28</span></footer>
   </div>
 </section>

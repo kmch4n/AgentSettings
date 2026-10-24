@@ -435,3 +435,258 @@ class LayoutFeedback20261012(unittest.TestCase):
         body = '<div style="width:50%;height:380px"><ul><li>会社概要</li></ul><div style="height:300px;border:1px solid #333"></div></div>'
         self.assertFalse(any("右側" in l for l in self.layout(body, cls="s std")))
 
+
+@unittest.skipUnless(_has_playwright(), "npm run setup で playwright を入れると実行される")
+class TableStretchAndLegend(LayoutFeedback20261012):
+    """check_layout：表を縦に引き伸ばさない（§4.12 FAIL）／凡例はグラフの見出しの上に右揃え（§5.18 WARN）"""
+
+    ROWS = '<tr><th>部門</th><th>件数</th></tr><tr><td>営業部</td><td>月に約120件</td></tr><tr><td>管理部</td><td>月に約40件</td></tr>'
+    CHART = '<svg viewBox="0 0 400 200" style="height:70mm"><rect x="20" y="40" width="80" height="160" fill="#5A3921"/><rect x="160" y="100" width="80" height="100" fill="#C5A681"/></svg>'
+    LEGEND = '<div class="legend"><span><i style="display:inline-block;width:4mm;height:4mm;background:#5A3921"></i>本社</span><span><i style="display:inline-block;width:4mm;height:4mm;background:#C5A681"></i>拠点</span></div>'
+
+    def test_stretched_table_fails(self):
+        out = self.layout(f'<table style="height:420px">{self.ROWS}</table>')
+        self.assertTrue(any("引き伸ばされている" in l for l in out), out)
+
+    def test_natural_table_passes(self):
+        out = self.layout(f'<table>{self.ROWS}</table>')
+        self.assertFalse(any("引き伸ば" in l for l in out), out)
+
+    def test_legend_below_chart_warns(self):
+        out = self.layout(f'<div>{self.CHART}{self.LEGEND}</div>')
+        self.assertTrue(any("凡例がグラフの下" in l for l in out), out)
+
+    def test_legend_above_chart_passes(self):
+        out = self.layout(f'<div>{self.LEGEND}{self.CHART}</div>')
+        self.assertFalse(any("凡例がグラフの下" in l for l in out), out)
+
+    def test_row_header_th_table_is_checked(self):
+        rows = '<tr><th>部門</th><th>件数</th></tr><tr><th>営業部</th><td>月に約120件</td></tr><tr><th>管理部</th><td>月に約40件</td></tr>'
+        out = self.layout(f'<table style="height:420px">{rows}</table>')
+        self.assertTrue(any("引き伸ばされている" in l for l in out), out)
+
+    def test_natural_table_with_list_cells_passes(self):
+        rows = ('<tr><th>部門</th><th>課題</th></tr>'
+                '<tr><td>営業部</td><td><ul><li>入力の二重化</li><li>集計の手作業</li></ul></td></tr>'
+                '<tr><td>管理部</td><td><ul><li>承認の待ち</li><li>差し戻し</li></ul></td></tr>')
+        out = self.layout(f'<table>{rows}</table>')
+        self.assertFalse(any("引き伸ば" in l or "行ぶん高い" in l for l in out), out)
+
+    def test_lg_size_class_is_not_a_legend(self):
+        out = self.layout(f'<div>{self.CHART}<div class="text-lg">図の読み方の補足</div></div>')
+        self.assertFalse(any("凡例がグラフの下" in l for l in out), out)
+
+    def test_legend_under_single_tile_is_not_below_chart(self):
+        tile = '<div style="background:#5A3921;color:#fff;width:60mm;height:30mm">月に約120件の問い合わせ</div>'
+        out = self.layout(f'<div>{tile}{self.LEGEND}</div>')
+        self.assertFalse(any("凡例がグラフの下" in l for l in out), out)
+
+    def test_legend_directly_in_section_below_chart_warns(self):
+        out = self.layout(f'{self.CHART}{self.LEGEND}')
+        self.assertTrue(any("凡例がグラフの下" in l for l in out), out)
+
+    # 親クラスのテストを二重に回さない
+    test_unequal_contrast_columns_warn = test_equal_contrast_columns_pass = None
+    test_right_side_gap_warns = test_two_highlighted_rows_warn = test_std_page_skips_layout_checks = None
+
+
+@unittest.skipUnless(_has_playwright(), "npm run setup で playwright を入れると実行される")
+class ColumnRuleAlignment(LayoutFeedback20261012):
+    """check_layout：左右2列の最初の横罫の高さを揃える（§4.21 WARN）"""
+
+    AXH = '<div><div style="height:38px;border-bottom:1.8px solid #333;font-weight:700">工数の推移</div><div style="height:200px;background:#C5A681"></div></div>'
+    TBL = ('<table style="border-collapse:collapse"><tr><td style="border-top:1.8px solid #333">営業部</td><td style="border-top:1.8px solid #333">月に約120件</td></tr>'
+           '<tr><td>管理部</td><td>月に約40件</td></tr></table>')
+    HDR = '<div style="height:38px;border-bottom:1.8px solid #333;font-weight:700">部門ごとの件数</div>'
+
+    def cols(self, left, right):
+        return f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px"><div>{left}</div><div>{right}</div></div>'
+
+    def test_headerless_table_next_to_axis_title_warns(self):
+        out = self.layout(self.cols(self.AXH, self.TBL))
+        self.assertTrue(any("最初の横罫" in l for l in out), out)
+
+    def test_table_with_same_height_header_passes(self):
+        out = self.layout(self.cols(self.AXH, self.HDR + self.TBL.replace("border-top:1.8px solid #333", "")))
+        self.assertFalse(any("最初の横罫" in l for l in out), out)
+
+
+
+class BotFeedback20261019(unittest.TestCase):
+    """check_deck：文字化け（FAIL）・ページ番号の連番（FAIL）・1項目だけの箇条・本文のですます・締めのページ・keep-all・番号つき項目名（WARN）"""
+
+    def test_garbled_text_fails(self):
+        code, fails = run(inject("確認作業が1日1時間を超える", "確認作業が1日1�間を超える"))
+        self.assertTrue(any("文字化け" in l for l in fails), fails)
+
+    def test_page_number_gap_fails(self):
+        code, fails = run(inject("<span>3</span>", "<span>5</span>"))
+        self.assertTrue(any("連番でない" in l for l in fails), fails)
+        self.assertFalse(any("連番でない" in l for l in run(GOOD)[1]))
+
+    def test_single_item_list_warns(self):
+        html = inject("<li>月末に承認が集中する</li>", "</ul><ul><li>月末に承認が集中する</li></ul><ul>")
+        self.assertTrue(any("1つだけの箇条" in l for l in warns(html)))
+        self.assertFalse(any("1つだけの箇条" in l for l in warns(GOOD)))
+
+    def test_body_desu_masu_warns(self):
+        html = inject("確認作業が1日1時間を超える", "確認作業が1日1時間を超えます")
+        self.assertTrue(any("本文がですます調" in l for l in warns(html)))
+        self.assertFalse(any("本文がですます調" in l for l in warns(GOOD)))
+
+    def test_closing_slide_is_not_desu_masu_fail(self):
+        last = GOOD.rfind('<section class="s cover">')
+        html = GOOD[:last] + GOOD[last:].replace("<section class=\"s cover\">", "<section class=\"s cover\"><h1>ありがとうございました</h1>", 1)
+        code, fails = run(html)
+        self.assertFalse(any("ですます" in l for l in fails), fails)
+
+    def test_keep_all_warns(self):
+        html = inject("</style>", "h1{word-break:keep-all}</style>")
+        self.assertTrue(any("keep-all" in l for l in warns(html)))
+
+    def test_numbered_labels_mismatch_warns(self):
+        html = inject("確認作業が1日1時間を超える", "①提出前の確認").replace("月末に承認が集中する", "①事前チェック", 1)
+        html = html.replace("<span>3</span>", "<span>3</span><i>①事前チェック</i>", 1)
+        self.assertTrue(any("番号つきの項目名" in l for l in warns(html)))
+
+    def test_mixed_parts_header_label_passes(self):
+        # 基本パーツ（.bar/.date）と追加パーツ（.kicker → new_deck で .hdr/.date）の混在は正規のデッキ
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "mixed.html"
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "new_deck.py"),
+                            "--parts", "b01,b02,b05,m05,b06,m10,b09,m20,b10", "-o", str(out)],
+                           capture_output=True, check=True)
+            r = subprocess.run([sys.executable, str(CHECK), str(out)], capture_output=True, text=True, encoding="utf8")
+        self.assertFalse(any("右上のラベル" in l for l in r.stdout.splitlines()), r.stdout[-600:])
+        self.assertFalse(any("右上のラベル" in l for l in warns(GOOD)))
+
+    def test_new_deck_fits_narrow_window(self):
+        # 画面幅がスライド幅より狭いと左右が切れていた。生成物に等比縮小の script と、印刷時に縮小を外す指定があること
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "fit.html"
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "new_deck.py"),
+                            "--parts", "b01,b02,m05,b10", "-o", str(out)], capture_output=True, check=True)
+            html = out.read_text(encoding="utf8")
+        self.assertIn('wrap.className = "fitwrap"', html)
+        self.assertRegex(html, r"@media print\{\s*\.fitwrap\{width:auto!important")  # .s の内側にスコープされていない
+
+    def test_missing_header_label_warns(self):
+        html = inject('<div class="date">打ち手</div>', '<div class="date"></div>')
+        self.assertTrue(any("右上のラベル" in l for l in warns(html)), warns(html))
+
+
+@unittest.skipUnless(_has_playwright(), "npm run setup で playwright を入れると実行される")
+class LayoutBotFeedback20261019(LayoutFeedback20261012):
+    """check_layout：箱からのはみ出し（FAIL）・箱の中の空き・下の空き30%・同じ作りで違う大きさ・文の途中の太字・混在要素の文字の重なり（WARN）"""
+
+    def test_text_overflowing_box_fails(self):
+        body = '<div style="width:120px;height:40px;overflow:hidden;background:#EFEEE8;white-space:nowrap">申請の内容を確認して承認者に回す処理を自動化する</div><div style="height:300px;border:1px solid #333">図</div>'
+        self.assertTrue(any("箱の外に" in l for l in self.layout(body)))
+
+    def test_text_inside_box_passes(self):
+        body = '<div style="width:600px;background:#EFEEE8">申請の内容を確認して承認者に回す</div><div style="height:300px;border:1px solid #333">図</div>'
+        self.assertFalse(any("箱の外に" in l for l in self.layout(body)))
+
+    def test_empty_box_warns(self):
+        body = '<div style="height:380px;background:#EFEEE8;padding:8px"><p>申請の内容を確認する</p></div>'
+        self.assertTrue(any("箱の中が" in l for l in self.layout(body)))
+
+    def test_equal_height_sibling_boxes_pass(self):
+        full = "".join(f"<p>申請の内容を確認する手順その{i}</p>" for i in range(9))
+        body = (f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;height:380px">'
+                f'<div class="cd" style="background:#EFEEE8">{full}</div><div class="cd" style="background:#EFEEE8"><p>申請の内容を確認する</p></div></div>')
+        self.assertFalse(any("箱の中が" in l for l in self.layout(body)))
+
+    def test_bottom_space_over_30_warns(self):
+        body = '<div style="height:370px;border:1px solid #333"><p>申請の内容を確認する</p></div>'
+        out = self.layout(body)
+        self.assertTrue(any("30%超" in l for l in out), out)
+
+    def test_same_role_different_size_warns(self):
+        body = ('<ul><li style="font-size:14px">申請の内容を確認する</li><li style="font-size:18px">承認者に回して結果を返す</li></ul>'
+                '<div style="height:300px;border:1px solid #333">図</div>')
+        self.assertTrue(any("違う大きさ" in l for l in self.layout(body)))
+
+    def test_mid_sentence_bold_warns(self):
+        li = "<li>申請の<b>内容</b>を確認し<b>承認者</b>に回して<b>結果</b>を返す</li>"
+        body = f'<ul>{li}<li>月末に承認が集中する</li></ul><div style="height:300px;border:1px solid #333">図</div>'
+        self.assertTrue(any("途中の太字" in l for l in self.layout(body)))
+
+    def test_overlap_in_mixed_element_warns(self):
+        body = ('<div style="position:relative;height:340px;border:1px solid #333"><p style="position:absolute;top:10px;left:10px">申請の<b>内容</b>を確認する</p>'
+                '<p style="position:absolute;top:12px;left:14px">承認者に回して結果を返す</p></div>')
+        self.assertTrue(any("文字が重なっている" in l for l in self.layout(body)))
+
+
+def _has_chrome():
+    import os
+    import shutil
+    paths = [os.environ.get("CHROME_PATH") or "", "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+             "C:/Program Files/Google/Chrome/Application/chrome.exe", "/usr/bin/google-chrome", "/usr/bin/chromium"]
+    return bool(shutil.which("node")) and any(p and Path(p).exists() for p in paths)
+
+
+@unittest.skipUnless(_has_pptx() and _has_chrome(), "python-pptx・Node・Chrome が要る")
+class PptxCssZoom(unittest.TestCase):
+    """html_to_pptx：CSS の zoom で縮めたスライド（追加パーツ集の .slide）の文字・行間・罫線を、縮小後の大きさで書き出す"""
+
+    HTML = ('<!doctype html><html lang="ja"><head><meta charset="utf-8"><style>'
+            '@page{size:338.67mm 190.5mm;margin:0}body{margin:0}'
+            '.s{width:338.67mm;height:190.5mm;position:relative;page-break-after:always;background:#fff}'
+            '.slide{width:1600px;height:900px;zoom:0.8;position:relative;page-break-after:always;background:#fff}'
+            'h1{position:absolute;left:40px;top:40px;margin:0;font-size:40px;line-height:50px;border-bottom:5px solid #000}'
+            '</style></head><body>'
+            '<section class="s"><h1>承認の手順を見直す</h1></section>'
+            '<section class="slide"><h1>承認の手順を見直す</h1></section>'
+            '</body></html>')
+
+    def convert(self):
+        from pptx import Presentation
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "deck.html"
+            p.write_text(self.HTML, encoding="utf8")
+            out = Path(d) / "deck.pptx"
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "html_to_pptx.py"), str(p), str(out)],
+                           capture_output=True, text=True, check=True)
+            got = []
+            for sl in Presentation(str(out)).slides:
+                text = next(sh for sh in sl.shapes if sh.has_text_frame and sh.text_frame.text)
+                line = next(sh for sh in sl.shapes if not (sh.has_text_frame and sh.text_frame.text))
+                para = text.text_frame.paragraphs[0]
+                got.append((para.runs[0].font.size.pt, para.line_spacing.pt, line.line.width.pt))
+            return got
+
+    def test_zoomed_slide_uses_rendered_sizes(self):
+        plain, zoomed = self.convert()
+        # 1px = 0.75pt。縮小のないスライドは 40px→30pt、zoom:0.8 のスライドは 32px→24pt
+        self.assertAlmostEqual(plain[0], 30.0, delta=0.5)
+        self.assertAlmostEqual(zoomed[0], 24.0, delta=0.5)
+        self.assertAlmostEqual(zoomed[1], 30.0, delta=0.5)   # 行間 50px×0.8
+        self.assertAlmostEqual(zoomed[2], 3.0, delta=0.1)    # 罫線 5px×0.8
+
+
+@unittest.skipUnless(_has_pptx() and _has_playwright(), "python-pptx と playwright が要る")
+class PptxVideoAndExternal(unittest.TestCase):
+    """html_to_pptx：<video> を動画として埋め込む／--external で section.internal を除く"""
+
+    def test_video_embedded_and_internal_skipped(self):
+        import shutil
+        if not shutil.which("ffmpeg"):
+            self.skipTest("ffmpeg が要る")
+        from pptx import Presentation
+        with tempfile.TemporaryDirectory() as d:
+            mp4 = Path(d) / "clip.mp4"
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-f", "lavfi", "-i", "color=c=gray:s=320x180:d=1", "-pix_fmt", "yuv420p", str(mp4)], check=True)
+            extra = ('<section class="s"><h1>画面の操作を動画で示す</h1><video src="clip.mp4" style="width:320px;height:180px"></video>'
+                     '<div class="foot"><span>9</span></div></section>'
+                     '<section class="s internal"><h1>社内用の確認事項を残しておく</h1><p>社内用</p></section>')
+            p = Path(d) / "deck.html"
+            p.write_text(GOOD.replace("</body>", extra + "</body>", 1), encoding="utf8")
+            out = Path(d) / "deck.pptx"
+            subprocess.run([sys.executable, str(ROOT / "scripts" / "html_to_pptx.py"), str(p), str(out), "--external"],
+                           capture_output=True, text=True, check=True)
+            prs = Presentation(str(out))
+            n_html = GOOD.count("<section")
+            self.assertEqual(len(prs.slides), n_html + 1)
+            xml = "".join(sl.part.blob.decode("utf8", "ignore") for sl in prs.slides)
+            self.assertIn("p:videoFile", xml.replace("a:videoFile", "p:videoFile"))

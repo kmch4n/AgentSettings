@@ -5,10 +5,10 @@ This skill started as a copy of an external repository and is now maintained loc
 | Item | Value |
 | --- | --- |
 | Source | https://github.com/carnot-tech/consulting-pptx-skill |
-| Commit | `bc9a587f4f7f8f1bd1651869e6e3cec6c3db7f5c` |
-| Commit date | 2026-10-14 |
+| Commit | `b8f7dc41024ca24a6c80b41cc1403d1a5f368b6c` |
+| Commit date | 2026-10-23 |
 | First imported | 2026-09-08 (`c10db30681513addcb09ffc73d68395ca9c58acb`) |
-| Last rebased | 2026-10-17 |
+| Last rebased | 2026-10-25 |
 | License | MIT (see `LICENSE`) |
 
 ## Why this is not vendored
@@ -38,6 +38,11 @@ Reapplied on every rebase. Keep this list current when the skill is modified fur
   back cover (b10) of `templates/freeform_parts_16x9.html`. Here that line is removed, and
   `SKILL.md` and `README.md` say to add it only on request. Upstream `TRADEMARK.md` §6 makes the
   credit line optional; MIT requires retaining `LICENSE`, and provenance is recorded here.
+  `references/slide-rules.md` §7.29 notes the same default.
+- **Product mentions are opt-in.** Upstream's `references/jinba-context.md` asks agents to
+  mention Jinba, the publisher's product, as an example tool in decks about AI or automation.
+  `SKILL.md`, `README.md` and `local/README.md` say this copy never does so unless the
+  requester asks; the file itself is kept unchanged for that case.
 - **Update and `local/` instructions fit the sync.** Upstream tells agents to `git fetch` /
   `git pull` the installed skill and to write rules into its `local/`. `SKILL.md` and
   `README.md` instead say that updates happen in this repository and that `local/` belongs in
@@ -57,7 +62,8 @@ Reapplied on every rebase. Keep this list current when the skill is modified fur
   dashes and other characters that the default cp932 console cannot encode, so `print` raised
   `UnicodeEncodeError`. `check_deck.py`, `check_deck_layout.py`, `html_to_pptx.py`,
   `measure_deck.py` and `new_deck.py` reconfigure `stdout` and `stderr` to UTF-8 right after
-  their imports. The tests in `tests/` decode subprocess output as UTF-8 to match.
+  their imports. The tests in `tests/` decode subprocess output as UTF-8 to match, and
+  `html_to_pptx.py` reads its `dump.json` as UTF-8 instead of the cp932 locale default.
 - **`.github/` is not copied.** It only holds the upstream PR template.
 - **Line endings normalised to LF.** `git archive` on Windows produces CRLF.
 
@@ -71,11 +77,21 @@ There is no automated update path. To see what upstream has changed since the la
 
 ```powershell
 git clone https://github.com/carnot-tech/consulting-pptx-skill.git $env:TEMP\cps-upstream
-git -C $env:TEMP\cps-upstream log --oneline bc9a587f4f7f8f1bd1651869e6e3cec6c3db7f5c..HEAD
+git -C $env:TEMP\cps-upstream log --oneline b8f7dc41024ca24a6c80b41cc1403d1a5f368b6c..HEAD
 ```
 
-To rebase: extract the new upstream tree without `.github/`, normalise line endings, reapply
-every item in "Local changes", run `python -m unittest discover -s tests` (Windows) or
+To rebase, the quickest route is to apply upstream's own diff, since this copy equals the last
+upstream commit plus "Local changes":
+
+```bash
+git -C <upstream> -c core.autocrlf=false diff --binary <last>..origin/HEAD -- . ':!.github' > cps.patch
+git apply --reject --directory=.claude/skills/consulting-pptx cps.patch
+```
+
+Resolve each `*.rej` by hand, take changed binaries (`assets/*.pdf`) straight from the upstream
+blob, and check every new upstream instruction against "Local changes". Otherwise extract the
+new upstream tree without `.github/`, normalise line endings, and reapply every item in "Local
+changes". Either way, run `python -m unittest discover -s tests` (Windows) or
 `python3 -m unittest discover -s tests`, then update the table above. Keep `local/` and this
 file. The repository has no local findings in `references/slide-rules.md` or
 `references/ai-smell-lexicon.md` as of this rebase; if that changes, merge those files by hand
