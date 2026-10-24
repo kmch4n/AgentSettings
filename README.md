@@ -103,7 +103,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 - `standup` - 当日や指定期間の作業サマリー生成
 
 ### 外部由来の skill
-- `hallmark` - AI 生成っぽさを排したWeb UIデザイン skill。新規ページ作成、既存UIのaudit、redesign、URL / screenshot からのデザイン抽出に使う。
+- `hallmark` - AI 生成っぽさを排したWeb UIデザイン skill（2.0）。新規ページ作成と、名前を出して頼んだときの既存ページの `redesign` / `audit` に使う。
 - `apple-design` - モーションとインタラクションの質感を扱う skill。ジェスチャ、spring、drag / sheet、慣性、中断可能なトランジション、半透明マテリアルなど。
 - `create-readme` - プロジェクトの README.md を作成する skill。構成、トーン、GFM と GitHub admonition の使い方を指示します。
 - `security-audit` - セキュリティの質問への助言、特定箇所の脆弱性調査、明示された監査を担当する skill。監査では偵察、網羅的な探索、検証、報告書作成までを複数の agent で進めます。
@@ -130,7 +130,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 
 | Skill | 用途 | 対象外 |
 | --- | --- | --- |
-| `hallmark` | 規範的なページ / コンポーネント構築。20種のテーマ、macrostructure、anti-slop ゲート、`audit` / `redesign` / `study` | モーション物理、チャート、スライド |
+| `hallmark` | 規範的なページ / コンポーネント構築。48種のテーマ、macrostructure、anti-slop ゲートと lint スクリプト、`redesign` / `audit` | モーション物理、チャート、スライド |
 | `frontend-design` | 要件が緩く、ルールより美的判断が効く場面。パレット、書体の組み合わせ、意図的な冒険を1つ | 規範的なゲート、モーション物理 |
 | `apple-design` | モーションとインタラクションの質感。上記どちらとも併用可 | レイアウト構造、パレット、コンテンツ |
 | slide 系4種 | 見た目を参照元に寄せるスライド。シナリオの壁打ち、デザイン抽出、127レイアウトパターン、SLIDE.md。成果物は設計書 | Webページ、内容の規約、PPTX 出力 |
