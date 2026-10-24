@@ -29,13 +29,19 @@ import { fileURLToPath } from "node:url";
 
 /** @type {CommandRunner} */
 function runCommand(command, args, cwd) {
-    const result = spawnSync(command, args, {
+    // npm is a .cmd shim on Windows, which spawnSync cannot run directly.
+    // Node deprecates passing an argument array together with `shell`, so the
+    // fixed npm arguments are joined into the command line instead.
+    const useShell = process.platform === "win32" && command === "npm";
+    const options = {
         cwd,
-        encoding: "utf8",
-        // npm is a .cmd shim on Windows, which spawnSync cannot run directly.
-        shell: process.platform === "win32" && command === "npm",
-        stdio: ["ignore", "pipe", "inherit"],
-    });
+        encoding: /** @type {const} */ ("utf8"),
+        shell: useShell,
+        stdio: /** @type {const} */ (["ignore", "pipe", "inherit"]),
+    };
+    const result = useShell
+        ? spawnSync([command, ...args].join(" "), options)
+        : spawnSync(command, args, options);
 
     if (result.error) {
         throw result.error;
@@ -142,7 +148,11 @@ export function syncMcpSource(source, homeDir, run = runCommand) {
         runChecked(run, "git", ["clone", "--quiet", source.repository, checkoutDir], homeDir);
     }
     if (state === "missing" || state === "outdated") {
-        const known = run("git", ["cat-file", "-e", `${source.commit}^{commit}`], checkoutDir);
+        const known = run(
+            "git",
+            ["rev-parse", "--quiet", "--verify", `${source.commit}^{commit}`],
+            checkoutDir,
+        );
 
         if (known.status !== 0) {
             runChecked(run, "git", ["fetch", "--quiet", "origin"], checkoutDir);
