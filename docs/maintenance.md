@@ -20,7 +20,7 @@
 
 ## 変更から各端末への反映
 
-1. リポジトリ内の正本を編集し、関連する説明やテストも更新します。外部 skill の更新では `LICENSE` と `UPSTREAM_COMMIT` を確認し、新規追加なら `VENDORED_SKILLS` に登録します。
+1. リポジトリ内の正本を編集し、関連する説明やテストも更新します。外部 skill と MCP server を上流に合わせるときは、`docs/upstream-updates.md` の手順に従います。
 2. `node --test "tests/*.test.mjs"` と `git diff --check` を実行します。同期スクリプトを変更した場合は Windows で `.\sync.ps1 -Check`、macOS / Linux で `bash ./sync.sh --check` も確認します。正本だけを変更した直後に差分が出るのは正常です。
 3. 変更を commit・push します。通常の同期は冒頭で `git pull` を実行するため、未コミットの変更がある開発中には実行せず、必要なら検査モードを使います。
 4. 反映する端末で `.\sync.ps1` または `bash ./sync.sh` を実行し、続けて対応する検査モードで差分がないことを確認します。別端末でも同じ通常同期を実行します。
