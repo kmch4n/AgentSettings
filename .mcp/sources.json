@@ -1,7 +1,7 @@
 {
     "timetree-mcp": {
         "repository": "https://github.com/ehs208/TimeTree-MCP.git",
-        "commit": "3f77995f4d074364c6ffe14bb95a9d0c43a7c1d8",
+        "commit": "668cab9431c5de4403df493f40780966121f8b28",
         "directory": ".local/share/mcp/TimeTree-MCP",
         "entry": "dist/index.js"
     }
