@@ -55,23 +55,24 @@ A Claude Code skill for generating boardroom-quality decks: a slide-design ruleb
 スキル本体は AgentSettings リポジトリの `.claude/skills/consulting-pptx/` にあり、`sync.ps1` / `sync.sh` で `~/.claude/skills/`、`~/.agents/skills/`、`~/.gemini/config/skills/` へ配布されます。clone は不要です。
 
 ```bash
-# 1.（任意）実レンダリング検査 check_layout.mjs を使う場合。Node.js が必要。playwright と Chromium が入る
+# 1. PDF 化と実レンダリング検査に使う Chromium headless shell を入れる（Node.js が必要。Chromium 本体は入れない。ダウンロード約95MB）
 #    インストール先は同期のたびに丸ごと置き換わるので、playwright はスキルの外に入れて PLAYWRIGHT_MODULE_DIR で指す
+#    headless shell 本体はユーザーのキャッシュ（ms-playwright）に入り、スクリプトがそこから探す
 npm install --prefix ~/.local/share/consulting-pptx playwright
-npx --prefix ~/.local/share/consulting-pptx playwright install chromium
+npx --prefix ~/.local/share/consulting-pptx playwright install --only-shell chromium   # Linux は --with-deps も付ける。日本語フォントは別に入れる
 export PLAYWRIGHT_MODULE_DIR=~/.local/share/consulting-pptx/node_modules/playwright   # PowerShell は $env:PLAYWRIGHT_MODULE_DIR = ...
 
-# 2.（任意）PPTX に変換する・PPTX を check_deck.py で検査する場合（変換には Node.js 22 以上と Chrome も使う）
+# 2.（任意）PPTX に変換する・PPTX を check_deck.py で検査する場合（変換には Node.js 22 以上と手順1の headless shell も使う）
 pip3 install python-pptx   # Windows は pip
 ```
 
 - `scripts/check_deck.py`（規約の機械チェック）と `scripts/new_deck.py`（たたき台の生成）は Python 標準ライブラリだけで動きます。Python の起動名は macOS / Ubuntu が `python3`、Windows が `python` です。
-- PDF 化は Chrome のヘッドレス印刷を使います（コマンドは次節）。
-- `package.json` は上流の `npm run setup`（リポジトリ直下に playwright を入れる）用です。このローカル版では手順1の入れ方を使います。
+- PDF 化は Chromium headless shell の印刷を使います（`scripts/snapshot.py`）。出力は Chrome 本体と画素単位で同じで、Chrome 本体が要りません。`CHROME_PATH` を指定すると Chrome 本体に切り替えられます（探し方は `scripts/find_browser.py`）。
+- `package.json` は上流の `npm run setup`（スキルのフォルダに playwright を入れる）用です。このローカル版では手順1の入れ方を使います。
 
 ## 更新と自分用のカスタマイズ
 
-上流の更新は AgentSettings リポジトリ側で手作業で取り込みます（[UPSTREAM.md](UPSTREAM.md)）。インストール先で `git pull` はしません。
+上流の更新は AgentSettings リポジトリ側で取り込みます（[UPSTREAM.md](UPSTREAM.md)）。インストール先で `git pull` はしません。
 
 自分の組織の規約・禁止語・テンプレは `local/` に置きます（`local/README.md` 参照）。置き場所はインストール先ではなく AgentSettings リポジトリの `.claude/skills/consulting-pptx/local/` です。git 管理外なので push されず、同期でインストール先へ配られます。スキルは本体の規約を読んだ後に `local/slide-rules.local.md` を読み、重なる規則はそちらを優先します。本体のファイルを直接書き換えると更新のたびに衝突するので、組織固有の規則は `local/` に、どの組織でも効く規則は PR にしてください。
 
@@ -83,8 +84,7 @@ python3 scripts/new_deck.py --parts b01,b02,m05,b06,b09,b10 --title "資料名" 
 python3 scripts/check_deck.py mydeck.html           # 規約の機械チェック（FAIL 0 にする）
 python3 scripts/check_deck.py mydeck.html --forbid ~/.config/deck-forbidden-terms.txt   # 社外に出す前に顧客名・社内語の残りを検査（リストはリポジトリ外に置く）
 node scripts/check_layout.mjs mydeck.html           # フッター重なり・はみ出し・空きの多いページの実レンダリング検査
-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu \
-  --no-pdf-header-footer --print-to-pdf=mydeck.pdf mydeck.html
+python3 scripts/snapshot.py mydeck.html            # PDF と、4ページずつまとめた目視用の画像（headless shell で印刷）
 python3 scripts/html_to_pptx.py mydeck.html         # PPTX を求められたときだけ: 編集できる PPTX に変換
 ```
 
@@ -121,8 +121,12 @@ python3 scripts/check_deck.py pages.pptx --house house.skin.json
 | `references/archetype-catalog.md` | 65型の型カタログ（型ID・型名・使いどころ・どのパーツ集の何番か） |
 | `references/content-review-prompt.md` | フレッシュアイ・レビューの指示文。機械チェックのあと、作り方を伏せた別エージェントにデッキのファイルを渡して日本語・論理・破綻を拾わせ、採否表にして直す |
 | `references/ai-smell-lexicon.md` | AI臭ワード・言い回しのリストとセルフチェック |
+| `references/rules-digest.md` | 規約の要点版（工程ごと。各行に正典の § 番号）。`scripts/rules.py --phase <工程>` で表示する |
 | `references/jinba-context.md` | Jinba の公開情報と、AI 活用・業務自動化のデッキでの触れ方（触れないときの条件つき） |
-| `scripts/new_deck.py` | パーツ番号を並べて1本のデッキHTMLを生成（両パーツ集のCSSをスコープして結合・ページ番号の振り直し） |
+| `scripts/new_deck.py` | パーツ番号を並べて1本のデッキHTMLを生成（両パーツ集のCSSをスコープして結合・ページ番号の振り直し）。`--list` でよく使う20種類と使いどころ、`--show b09` で1部品のHTML |
+| `scripts/rules.py` | 規約を工程ごとに引く（`--phase plan` など＝要点版、`--sec 4.12` で1項、`--full` で節全体） |
+| `scripts/check_all.py` | check_deck・check_layout・出典の照合（`sources.md`）を1回で回し、指摘をページごとにまとめる |
+| `scripts/snapshot.py` | PDF と、4ページずつまとめた目視用の画像を1回で作る（`--page N` で1ページを大きく） |
 | `scripts/check_deck.py` | 規約の機械チェック（HTML / PPTX 両対応。テンプレ集の検査は `--template`）。タイトルの「N段階」と本文の連番の食い違いも FAIL にする |
 | `scripts/html_to_pptx.py` | HTMLデッキを編集できる PPTX に変換（ユーザーが PPTX を求めたときだけ使う）。`scripts/html_dump.mjs` が Chrome で描画した要素を書き出し、python-pptx で組み立てる。追加の npm パッケージは不要（`scripts/lib_cdp.mjs` が Chrome を直接操作する） |
 | `scripts/check_layout.mjs` | HTMLデッキの実レンダリング検査（フッターとの重なり・右端/下端のはみ出し・版面の40%超の空き） |
