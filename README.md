@@ -130,7 +130,7 @@ macOS / Linux では `bash ./sync.sh` と `bash ./sync.sh --check` を使いま�
 
 | Skill | 用途 | 対象外 |
 | --- | --- | --- |
-| `hallmark` | 規範的なページ / コンポーネント構築。48種のテーマ、macrostructure、anti-slop ゲートと lint スクリプト、`redesign` / `audit` | モーション物理、チャート、スライド |
+| `hallmark` | 規範的なページ / コンポーネント構築。50種のテーマ、macrostructure、anti-slop ゲートと lint スクリプト、`redesign` / `audit` | モーション物理、チャート、スライド |
 | `frontend-design` | 要件が緩く、ルールより美的判断が効く場面。パレット、書体の組み合わせ、意図的な冒険を1つ | 規範的なゲート、モーション物理 |
 | `apple-design` | モーションとインタラクションの質感。上記どちらとも併用可 | レイアウト構造、パレット、コンテンツ |
 | slide 系4種 | 見た目を参照元に寄せるスライド。シナリオの壁打ち、デザイン抽出、127レイアウトパターン、SLIDE.md。成果物は設計書 | Webページ、内容の規約、PPTX 出力 |
