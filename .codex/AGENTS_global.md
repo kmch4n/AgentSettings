@@ -33,6 +33,9 @@ When a task names a skill, use that skill. For a new UI or redesign with no stat
 
 For Japanese prose, use `natural-japanese` to write new text and `yomiyasu` to remove AI-like phrasing from existing text; do not load both for one task. If it is unclear whether the request is new writing or revising existing text, ask the user which skill to use before proceeding.
 
+## Notion Memory
+Use Notion memory only when the user asks or the project's instructions call for it. Start with `notion-memory-search`.
+
 ## Output Rules
 - JSON output must use `indent=4` and `ensure_ascii=False`.
 - Do not reprint an entire file; apply surgical edits with minimal diffs.

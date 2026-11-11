@@ -16,7 +16,7 @@
 | ソースから build する MCP server | `.mcp/sources.json`（上流 URL と固定 commit） | `~/.local/share/mcp/<name>/` に clone・build |
 | 同期・検査の処理 | `sync.ps1`、`sync.sh`、`scripts/` | リポジトリから実行 |
 
-共通の行動指示を変える場合は、各エージェント用（Claude, Codex, agy）のファイルをすべて更新します。`README.md` は人向けの説明、`AGENTS.md` はこのリポジトリ固有の作業指示です。プロジェクトごとの Git 操作制限や委任ルールは、そのプロジェクトの指示に置きます。
+共通の行動指示を変える場合は、各エージェント用（Claude, Codex, agy）のファイルをすべて更新します。`README.md` は人向けの説明、`AGENTS.md` はこのリポジトリ固有の作業指示です。プロジェクトごとの Git 操作制限や委任ルールは、そのプロジェクトの指示に置きます。例外として「Notion Memory」の節は、Notion に接続している Claude と Codex だけに置きます。
 
 ## 変更から各端末への反映
 
