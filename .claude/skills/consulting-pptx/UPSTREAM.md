@@ -5,10 +5,10 @@ This skill started as a copy of an external repository and is now maintained loc
 | Item | Value |
 | --- | --- |
 | Source | https://github.com/carnot-tech/consulting-pptx-skill |
-| Commit | `e5f35e57e14d3998249a559c620a9286c95b4595` |
-| Commit date | 2026-10-26 |
+| Commit | `60affb5ea3fe4356465f0d56ad852d83329b7c56` |
+| Commit date | 2026-11-08 |
 | First imported | 2026-09-08 (`c10db30681513addcb09ffc73d68395ca9c58acb`) |
-| Last rebased | 2026-11-03 |
+| Last rebased | 2026-11-11 |
 | License | MIT (see `LICENSE`) |
 
 ## Why this is not vendored
@@ -85,7 +85,7 @@ There is no automated update path. To see what upstream has changed since the la
 
 ```powershell
 git clone https://github.com/carnot-tech/consulting-pptx-skill.git $env:TEMP\cps-upstream
-git -C $env:TEMP\cps-upstream log --oneline e5f35e57e14d3998249a559c620a9286c95b4595..HEAD
+git -C $env:TEMP\cps-upstream log --oneline 60affb5ea3fe4356465f0d56ad852d83329b7c56..HEAD
 ```
 
 To rebase, the quickest route is to apply upstream's own diff, since this copy equals the last

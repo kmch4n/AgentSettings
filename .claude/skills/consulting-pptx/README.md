@@ -62,12 +62,15 @@ npm install --prefix ~/.local/share/consulting-pptx playwright
 npx --prefix ~/.local/share/consulting-pptx playwright install --only-shell chromium   # Linux は --with-deps も付ける。日本語フォントは別に入れる
 export PLAYWRIGHT_MODULE_DIR=~/.local/share/consulting-pptx/node_modules/playwright   # PowerShell は $env:PLAYWRIGHT_MODULE_DIR = ...
 
+# PDF を画像化する snapshot.py には poppler（pdftoppm）も別途必要（手順1では入らない）
+# macOS: brew install poppler / Ubuntu: sudo apt install poppler-utils / Windows: poppler-windows の Release を展開して Library\bin を PATH に追加（または conda install -c conda-forge poppler）
+
 # 2.（任意）PPTX に変換する・PPTX を check_deck.py で検査する場合（変換には Node.js 22 以上と手順1の headless shell も使う）
 pip3 install python-pptx   # Windows は pip
 ```
 
 - `scripts/check_deck.py`（規約の機械チェック）と `scripts/new_deck.py`（たたき台の生成）は Python 標準ライブラリだけで動きます。Python の起動名は macOS / Ubuntu が `python3`、Windows が `python` です。
-- PDF 化は Chromium headless shell の印刷を使います（`scripts/snapshot.py`）。出力は Chrome 本体と画素単位で同じで、Chrome 本体が要りません。`CHROME_PATH` を指定すると Chrome 本体に切り替えられます（探し方は `scripts/find_browser.py`）。
+- PDF 化は Chromium headless shell の印刷を使います（`scripts/snapshot.py`）。出力は Chrome 本体と画素単位で同じで、Chrome 本体が要りません。`CHROME_PATH` を指定すると Chrome 本体に切り替えられます（探し方は `scripts/find_browser.py`）。PDF を画像化するには poppler（pdftoppm）が別途必要です。
 - `package.json` は上流の `npm run setup`（スキルのフォルダに playwright を入れる）用です。このローカル版では手順1の入れ方を使います。
 
 ## 更新と自分用のカスタマイズ
